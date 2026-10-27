@@ -26,7 +26,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-03](#e-03-meta-credit-may-expire-before-judging-ends) | Meta credit may expire before judging ends | High | Yes | Open |
 | [E-04](#e-04-indie-track-chosen-with-a-team-of-3) | Indie track chosen with a team of 3 | High | Yes | Open |
 | [E-05](#e-05-public-view-described-as-in-stock-products-only) | Public view described as "in-stock products" only | Medium | No | Open |
-| [E-06](#e-06-ai-spend-cap-is-150-target-is-under-100) | AI spend cap is $150; target is under $100 | Medium | Yes | Open |
+| [E-06](#e-06-ai-spend-cap-is-150-target-is-under-100) | AI spend cap is $150; target is under $100 | Medium | Yes | Decided |
 | [E-07](#e-07-when-production-migrations-run) | When production migrations run | Medium | No | Open |
 | [E-08](#e-08-ip-hash-kept-longer-than-promised) | IP hash kept longer than promised | Medium | No | Open |
 | [E-09](#e-09-preview-deploys-can-run-new-code-on-an-old-schema) | Preview deploys can run new code on an old schema | Medium | No | Open |
@@ -45,7 +45,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-22](#e-22-prd-dependency-table-says-not-chosen) | PRD dependency table says "Not chosen" | Low | No | Open |
 | [E-23](#e-23-prd-counts-ten-must-requirements) | PRD counts ten Must requirements | Low | No | Open |
 | [E-24](#e-24-doc-02-still-mentions-phone-otp-follow-ups) | Doc 02 still mentions phone OTP follow-ups | Low | No | Open |
-| [E-25](#e-25-doc-09-is-still-a-draft) | Doc 09 is still a draft | Low | Yes | Open |
+| [E-25](#e-25-doc-09-is-still-a-draft) | Doc 09 is still a draft | Low | Yes | Decided |
 | [E-26](#e-26-uptime-objective-window) | Uptime objective window | Low | No | Open |
 | [E-27](#e-27-k--ids-collide-between-07-and-09) | K- IDs collide between 07 and 09 | Low | No | Open |
 
@@ -120,6 +120,8 @@ As written, the Must cannot pass its acceptance check.
 - 08 runs a judging-week routine to Nov 9 that assumes live AI.
 - 09 risk K4 says "the demo shop replays saved AI results", but no document designs replay. `META_MODE=recorded` in 04 and 08 only matches identical requests in tests, so it cannot answer a judge's new recording.
 
+**Decision (Oct 27, owner):** deferred until spike S0 records the credit's exact end date. Choose then between demo replay only and replay plus an OpenRouter fallback (same Meta models).
+
 **Resolution (recommended, needs owner OK).**
 
 1. **Record the end date on day 1 (spike S0)** in a new env var `META_CREDIT_ENDS_AT`.
@@ -183,7 +185,9 @@ As written, the Must cannot pass its acceptance check.
 
 ### E-06 AI spend cap is $150; target is under $100
 
-**Severity:** Medium · **Owner decision:** Yes · **Status:** Open
+**Severity:** Medium · **Owner decision:** Yes · **Status:** Decided
+
+**Decision (Oct 27, owner):** $100 cap, as recommended: alerts at $50 and $80, AI off at $95, plus a per-shop daily cap.
 
 **Conflict.** 01 and 09 require total Meta spend under $100 of the $150 credit. But:
 
@@ -479,7 +483,9 @@ The subtitle "From your last 30 days of sales" also describes a moving average. 
 
 ### E-25 Doc 09 is still a draft
 
-**Severity:** Low · **Owner decision:** Yes · **Status:** Open
+**Severity:** Low · **Owner decision:** Yes · **Status:** Decided
+
+**Decision (Oct 27, owner):** approve 09 as v1.0 with the errata fixes applied through this log and ACTION_PLAN.md.
 
 **Conflict.** 09 is "Draft v0.2 … waiting for the owner's approval", while 04 and 08 depend on it to record release results, and documents 01 to 08 are v1.0 approved.
 
