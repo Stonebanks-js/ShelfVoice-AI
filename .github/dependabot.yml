@@ -1,12 +1,18 @@
 # Doc 03 P5 and doc 08 "Dependency updates": weekly PRs, each through full CI.
+# The cooldown skips versions published in the last 7 days, so a malicious or
+# broken release has time to be caught before it reaches us.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
