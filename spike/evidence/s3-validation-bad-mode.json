@@ -1,0 +1,27 @@
+{
+  "savedAt": "2026-10-28T18:38:40.784Z",
+  "request": {
+    "method": "POST",
+    "url": "https://api.meta.ai/v1/asr/transcribe"
+  },
+  "status": 400,
+  "latencyMs": 2603,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "voyager/transcribe/CEF8E0FF0FC54F69867586BCC0382DFC"
+  },
+  "body": {
+    "sessionId": "voyager/transcribe/CEF8E0FF0FC54F69867586BCC0382DFC",
+    "error": {
+      "code": null,
+      "param": null,
+      "type": "invalid_request_error",
+      "message": "Malformed request"
+    }
+  },
+  "sentRequestPart": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "NOT_A_MODE"
+  }
+}

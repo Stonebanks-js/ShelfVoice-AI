@@ -1,0 +1,26 @@
+{
+  "savedAt": "2026-10-28T18:37:45.511Z",
+  "request": {
+    "method": "POST",
+    "url": "https://api.meta.ai/v1/asr/transcribe"
+  },
+  "status": 400,
+  "latencyMs": 3019,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "voyager/transcribe/EDE0258EC36242469A3C457883D31644"
+  },
+  "body": {
+    "sessionId": "voyager/transcribe/EDE0258EC36242469A3C457883D31644",
+    "error": {
+      "code": null,
+      "param": null,
+      "type": "invalid_request_error",
+      "message": "Both a 'request' and an 'audio' part are required"
+    }
+  },
+  "sentFields": {
+    "model": "muse-voice-transcribe-1.0"
+  },
+  "clip": "generated 2 s 440 Hz tone"
+}

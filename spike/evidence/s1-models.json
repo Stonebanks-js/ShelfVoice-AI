@@ -1,0 +1,72 @@
+{
+  "savedAt": "2026-10-28T18:34:57.579Z",
+  "request": {
+    "method": "GET",
+    "url": "https://api.meta.ai/v1/models"
+  },
+  "status": 200,
+  "latencyMs": 6380,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "f5761957-4a4c-4bc7-91a7-425eb43b97bd"
+  },
+  "body": {
+    "object": "list",
+    "data": [
+      {
+        "id": "muse-wonder-1.0",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "sam-3.1",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-spark-1.3-contributor",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-voice-transcribe-1.0",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-spark-1.3",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-image-1.0",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-spark-1.2-contributor",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-spark-1.2",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      },
+      {
+        "id": "muse-spark-1.1",
+        "object": "model",
+        "created": 0,
+        "owned_by": "meta"
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "savedAt": "2026-10-28T18:37:47.189Z",
+  "request": {
+    "method": "POST",
+    "url": "https://api.meta.ai/v1/asr/transcribe"
+  },
+  "status": 400,
+  "latencyMs": 1674,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "voyager/transcribe/E1C5D3835B9B44F5A00D953A518E1A04"
+  },
+  "body": {
+    "sessionId": "voyager/transcribe/E1C5D3835B9B44F5A00D953A518E1A04",
+    "error": {
+      "code": null,
+      "param": null,
+      "type": "invalid_request_error",
+      "message": "Both a 'request' and an 'audio' part are required"
+    }
+  },
+  "sentFields": {
+    "model": "muse-voice-transcribe-1.0",
+    "mode": "PUSH_TO_TALK",
+    "keywords": "[\"Maggi\",\"Parle-G\",\"Surf Excel\"]",
+    "languageBias": "[\"hi\",\"en\"]"
+  },
+  "clip": "generated 2 s 440 Hz tone"
+}

@@ -50,6 +50,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-27](#e-27-k--ids-collide-between-07-and-09) | K- IDs collide between 07 and 09 | Low | No | Open |
 | [E-28](#e-28-staging-database-is-in-seoul-not-mumbai) | Staging database is in Seoul, not Mumbai | Medium | Yes | Decided |
 | [E-29](#e-29-schema-decisions-made-while-building-w-02) | Schema decisions made while building W-02 | Medium | No | Applied |
+| [E-30](#e-30-meta-api-details-confirmed-by-the-spike) | Meta API details confirmed by the spike | Medium | No | Decided |
 
 ---
 
@@ -579,3 +580,24 @@ Building the schema exposed places where the documents can't all hold at once, o
 | 07 | 3–4 | `shops` columns | Add `description text` (max 500) |
 | 07 | 6 | RLS summary | `shops`: no owner delete; `product_forecasts`: owner read only |
 | 07 | 8 | Planned first migrations, items 5 and 7 | Festival seed moves to W-19; pg_cron schedules move to W-13 and W-17b |
+
+---
+
+### E-30 Meta API details confirmed by the spike
+
+**Severity:** Medium · **Owner decision:** No · **Status:** Decided (from spike S1 to S3, Oct 29; evidence in `spike/`)
+
+**Conflict.** 07 lists the transcription request as "Mono 16-bit PCM WAV at 16 or 24 kHz; mode PUSH_TO_TALK; keywords; languageBias" and leaves "the exact multipart field names and response shape" to day 1. 02 says to set "low reasoning" but doesn't say Muse Spark defaults to high.
+
+**What the API actually does.**
+
+1. **Transcription** takes two multipart parts: `request` (JSON) and `audio` (the WAV). `audioEncoding` is required inside `request`, with value `"WAV"`. The response is `{ sessionId, transcript, audioDurationMs, turns }`.
+2. The API **ignores unknown fields silently**. Only `mode` is validated. Whether `keywords` and `languageBias` take effect must be measured in S4 with real speech, comparing results with and without keywords.
+3. **Muse Spark reasoning defaults to `high`.** Every job must set `reasoning.effort` explicitly ("low" for extraction), or responses can stop as `incomplete` while the model is still reasoning.
+4. The raw Responses API body has **no `output_text` field**. The client module reads the `message` item's `output_text` part.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 07 | 9 | Meta Model API integration, transcription row | Request: multipart `request` (JSON with `model`, `audioEncoding: "WAV"`, `mode`, `keywords`, `languageBias`) and `audio`. Response: `{ sessionId, transcript, audioDurationMs, turns }` |
+| 07 | 10 | "Still to confirm on day 1" | Field names and response shape confirmed (spike S3); keyword effect confirmed in S4 |
+| 02 | 8 | Integration details | Add "set `reasoning.effort` on every call; the default is high" |

@@ -21,7 +21,7 @@ These are the points where the build stops and waits for the owner. Each one lis
 | C-02 | Phase 0 | Names for teammates A, B, C, the backup for each account, and the portal submitter | D-03, D-05, J-01 |
 | C-03 | Phase 0 | The official rules text on tracks and team size, and the submission form link | D-04, W-26 |
 | C-04 | Phase 0 (done Oct 28, except the `project` scope for the issues board) | Confirm `Stonebanks-js/ShelfVoice-AI` is the project repo; authorise GitHub access for me (`gh auth login` in a terminal, or the GitHub MCP via `/mcp`); turn on secret scanning, push protection and branch protection yourself | D-06, D-07, W-01b |
-| C-05 | Phase 1, before S0 | Claim the $150 Meta credit, create the API key, put it in `.env.local` as `META_API_KEY`, and tell me the credit end date | S0 to S5, W-04 |
+| C-05 | Phase 1, before S0 (done Oct 29; credit end date assumed, see spike/README.md) | Claim the $150 Meta credit, create the API key, put it in `.env.local` as `META_API_KEY`, and tell me the credit end date | S0 to S5, W-04 |
 | C-06 | Phase 1, before W-02 (in progress: staging is `shelfvoice-staging`, ref `idrhitepkksjgwqauael`, in Seoul by owner decision E-28; linked with the CLI Oct 28; still needed: anonymous sign-ins switched on, the database password in `.env.local`, and later a production project in ap-south-1 connected only as a read-only MCP `supabase-prod`) | Install Docker Desktop and the Supabase CLI if missing; create Supabase projects `shelfvoice-staging` and `shelfvoice-prod` in ap-south-1 (Mumbai); connect me to the Supabase MCP; turn on anonymous sign-ins | S6, W-02a to W-02d |
 | C-07 | Phase 1, before W-03 | Create the Vercel project linked to the repo; set the env vars I list in the dashboard; add `VERCEL_TOKEN` and the Supabase access token as GitHub Actions secrets (or connect a Vercel MCP) | W-03, S1 (bom1 check), S6 |
 | C-08 | Phase 1, before W-03b | Create Axiom (dataset `shelfvoice`), Better Stack (4 monitors, 2 heartbeats, status page) and a Discord alert webhook; put their tokens and URLs in Vercel env | W-03b |
@@ -102,12 +102,12 @@ Every build task (W-xx) runs through the same loop. Each step comes from the doc
 
 | ID | Check | Owner | PASS means | If it fails | Fixes | Status |
 |---|---|---|---|---|---|---|
-| S0 | Claim the $150 credit and create the API key | C | Key works; credit end date recorded in `META_CREDIT_ENDS_AT`; key stored only in Vercel and the vault | Ask organisers on day 1 | E-03 | Not started |
-| S1 | Meta API reachable from India | C | `muse-spark-1.3` Responses call returns 200 from a laptop in India and from a Vercel function in bom1 | Switch `META_BASE_URL` to OpenRouter; note it in the README | — | Not started |
-| S2 | Structured output | C | 10 sample owner transcripts return JSON that passes our Zod schemas via `text.format` | Add one repair retry, then fall back to tool calling | — | Not started |
-| S3 | Transcribe request and response shape | C | Multipart field names, `keywords`, `languageBias` and `mode` confirmed; one response saved as a fixture | Keep Musts moving with typed input | — | Not started |
-| S4 | Hinglish accuracy | C + all | 20 clips (10 commands, 10 reviews) from all 3 teammates meet 04's product-name and quantity thresholds | Catalog keywords; every number editable on confirm | — | Not started |
-| S5 | SAM 3.1 masks | C | One shelf photo returns masks we decode and crop into a product image | Drop FR-10; Musts unaffected | — | Not started |
+| S0 | Claim the $150 credit and create the API key | C | Key works; credit end date recorded in `META_CREDIT_ENDS_AT`; key stored only in Vercel and the vault | Ask organisers on day 1 | E-03 | PASS Oct 29: key works; end date assumed 2026-11-05 07:30 IST until confirmed (spike/README.md) |
+| S1 | Meta API reachable from India | C | `muse-spark-1.3` Responses call returns 200 from a laptop in India and from a Vercel function in bom1 | Switch `META_BASE_URL` to OpenRouter; note it in the README | — | PASS from India Oct 29; Vercel bom1 half waits for W-03 |
+| S2 | Structured output | C | 10 sample owner transcripts return JSON that passes our Zod schemas via `text.format` | Add one repair retry, then fall back to tool calling | — | PASS Oct 29: 10/10 schema, 0 invented values |
+| S3 | Transcribe request and response shape | C | Multipart field names, `keywords`, `languageBias` and `mode` confirmed; one response saved as a fixture | Keep Musts moving with typed input | — | PASS for request and response format Oct 29; keywords and languageBias effect to confirm in S4 |
+| S4 | Hinglish accuracy | C + all | 20 clips (10 commands, 10 reviews) from all 3 teammates meet 04's product-name and quantity thresholds | Catalog keywords; every number editable on confirm | — | Not started: needs the 20 team clips (C-09) |
+| S5 | SAM 3.1 masks | C | One shelf photo returns masks we decode and crop into a product image | Drop FR-10; Musts unaffected | — | Not started: needs one shelf photo (C-09) |
 | S6 | Region latency | B | Vercel bom1 to the production Supabase project (ap-south-1) under 50 ms at p95 over 100 calls; staging is in Seoul (E-28) | Check regions in both dashboards | — | Not started |
 
 **Gate G0, Oct 28 at 9 PM IST.** S0 to S3 are PASS or have a working fallback. If not, the team spends the morning of Oct 29 on them before starting the thin slice. S4 and S5 change scope only.
