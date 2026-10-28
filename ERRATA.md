@@ -48,6 +48,8 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-25](#e-25-doc-09-is-still-a-draft) | Doc 09 is still a draft | Low | Yes | Decided |
 | [E-26](#e-26-uptime-objective-window) | Uptime objective window | Low | No | Open |
 | [E-27](#e-27-k--ids-collide-between-07-and-09) | K- IDs collide between 07 and 09 | Low | No | Open |
+| [E-28](#e-28-staging-database-is-in-seoul-not-mumbai) | Staging database is in Seoul, not Mumbai | Medium | Yes | Decided |
+| [E-29](#e-29-schema-decisions-made-while-building-w-02) | Schema decisions made while building W-02 | Medium | No | Applied |
 
 ---
 
@@ -522,3 +524,58 @@ The subtitle "From your last 30 days of sales" also describes a moving average. 
 | 09 | 9 | Risks and blockers | K1 to K11 → RK1 to RK11 |
 | 09 | 4 | Spike S0 | "(K4)" → "(RK4)" |
 | 09 | 11 | Judging week and after | "(K4)" → "(RK4)" |
+
+---
+
+## Found during the build
+
+### E-28 Staging database is in Seoul, not Mumbai
+
+**Severity:** Medium · **Owner decision:** Yes · **Status:** Decided
+
+**Conflict.** 02 (T1, T3) and 08 (provisioning step 1) put both Supabase projects in ap-south-1 (Mumbai), next to the Vercel functions in bom1. The staging project `shelfvoice-staging` (ref `idrhitepkksjgwqauael`, created Oct 28) was created in **ap-northeast-2 (Seoul)**; a project's region cannot be changed afterwards. An earlier attempt landed in eu-west-1 (Ireland) and was deleted.
+
+**Decision (Oct 28, owner):** keep Seoul for staging. This is acceptable because staging holds only test and seed data, never real shop owners' data, so doc 03's data-location promise is not affected.
+
+**Conditions.**
+
+1. **Production must be in ap-south-1.** When creating it, pick the specific region "South Asia (Mumbai)" rather than a broad area, and check the summary says `ap-south-1` before clicking Create.
+2. **Spike S6 is measured against production**, not staging, since Vercel bom1 to Seoul adds roughly 100 ms per query.
+3. Preview deploys (bom1 functions, Seoul database) will be slower than production. Performance targets (Lighthouse, k6, voice-to-proposal p95) are checked on production or with functions in the database's region, not on previews.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 02 | 14 | Environments table, Preview row | Add "staging database in ap-northeast-2 (Seoul); see E-28" |
+| 08 | 2 | Environments table, Preview row | "Staging Supabase project (Mumbai)" → "Staging Supabase project (Seoul, ap-northeast-2; see E-28)" |
+| 08 | 6 | One-time provisioning, step 1 | Add "Staging is in ap-northeast-2 (E-28); production must be ap-south-1, chosen explicitly" |
+| 09 | 5 | Spike S6 | "Vercel bom1 to Supabase ap-south-1" → "…to the production project in ap-south-1" |
+
+---
+
+### E-29 Schema decisions made while building W-02
+
+**Severity:** Medium · **Owner decision:** No · **Status:** Applied (migrations `20261028120000` to `20261028120600`, on staging Oct 28)
+
+Building the schema exposed places where the documents can't all hold at once, or leave a detail open. Each choice below follows the documents' intent and is covered by a pgTAP test.
+
+1. **Public reads use the base tables, limited by column grants.** 03 asks for views with `security_invoker = true`; 02 says public pages never read base tables; 04 expects anonymous reads of base tables to return 0 rows. A `security_invoker` view runs with the reader's own rights, so anon must be able to read the published rows underneath it. A security-definer view would avoid that, but the Security Advisor flags it as an error, which 03's release checklist forbids. **Resolution:** anon gets a policy for published rows plus column grants for safe columns only (no `owner_id`, no `stock_qty`, no lead times). Anon sees exactly what `public_storefront` shows, and reading a hidden column fails with a permission error. Signed-in users don't get the public policy, because column grants can't vary per row.
+2. **Anonymous demo users can't create shops.** Supabase's advisor warns (lint 0012) on every policy that anonymous sign-ins can reach. These warnings are expected, because "Try the demo shop" users must work inside their own demo copy (03). Migration `…600` closes the one real gap: anonymous sessions can no longer create shops; only the server makes demo copies.
+3. **Owners can't delete their shop row directly.** FR-16's delete goes through a server function that also removes storage and the auth user (07). A direct delete would leave files behind, so owners get no delete policy on `shops`.
+4. **Owners only read `product_forecasts`.** 07's RLS summary lists it as "read and write own". Forecasts are computed by code (02, ADR-002), so writes come only from the server.
+5. **Owners change proposals only while pending, and only `status`, `confirmed_changes` and `decided_at`** (column grants). Undo (E-02) runs as a server function.
+6. **Explicit grants.** Every table revokes Supabase's default grants to `anon` and `authenticated` and grants only what each role needs.
+7. **Deferred, not dropped:**
+   - The festival seed rows (07 migration 5) move to W-19, after each 2026–27 date is checked against a source.
+   - The pg_cron schedules (07 migration 7) move to W-13 and W-17b, which create the functions they call.
+8. **Test helpers.** 04 names the Basejump helpers. The tests set the session role and JWT claims directly instead, which needs no extra extension in production.
+9. **`shops.description`** (500 characters) is added: 03 sets its length limit, but 07's column list omits it.
+10. **Local password trap.** The Supabase CLI reads `SUPABASE_DB_PASSWORD` from `.env.local` automatically and then uses it for the local database as well. The staging password is stored as `STAGING_DB_PASSWORD` and passed explicitly only when pushing to staging (see `.env.example`).
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 02 | 11 | Access rules | "never the base tables" → "anon reads published rows through RLS and safe-column grants (E-29)" |
+| 03 | 6 | RLS conventions, public reads | Add the column-grant approach (E-29 item 1) |
+| 04 | 4 | Database tests, "Anonymous visitor reads base tables" | "0 rows" → "only published rows; hidden columns fail with a permission error" |
+| 07 | 3–4 | `shops` columns | Add `description text` (max 500) |
+| 07 | 6 | RLS summary | `shops`: no owner delete; `product_forecasts`: owner read only |
+| 07 | 8 | Planned first migrations, items 5 and 7 | Festival seed moves to W-19; pg_cron schedules move to W-13 and W-17b |
