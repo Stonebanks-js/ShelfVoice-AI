@@ -51,6 +51,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-28](#e-28-staging-database-is-in-seoul-not-mumbai) | Staging database is in Seoul, not Mumbai | Medium | Yes | Decided |
 | [E-29](#e-29-schema-decisions-made-while-building-w-02) | Schema decisions made while building W-02 | Medium | No | Applied |
 | [E-30](#e-30-meta-api-details-confirmed-by-the-spike) | Meta API details confirmed by the spike | Medium | No | Decided |
+| [E-31](#e-31-decisions-made-while-building-the-backend) | Decisions made while building the backend | Medium | No | Applied |
 
 ---
 
@@ -595,9 +596,44 @@ Building the schema exposed places where the documents can't all hold at once, o
 2. The API **ignores unknown fields silently**. Only `mode` is validated. Whether `keywords` and `languageBias` take effect must be measured in S4 with real speech, comparing results with and without keywords.
 3. **Muse Spark reasoning defaults to `high`.** Every job must set `reasoning.effort` explicitly ("low" for extraction), or responses can stop as `incomplete` while the model is still reasoning.
 4. The raw Responses API body has **no `output_text` field**. The client module reads the `message` item's `output_text` part.
+5. **`tool_choice` accepts only `"auto"`** (found Oct 29 while building W-11): `"required"` and named tools return 400. The model may answer a command in words instead of calling `ask_clarification`; that reply is shown to the owner as the clarifying question.
 
 | Doc | Page | Section | Change |
 |---|---|---|---|
 | 07 | 9 | Meta Model API integration, transcription row | Request: multipart `request` (JSON with `model`, `audioEncoding: "WAV"`, `mode`, `keywords`, `languageBias`) and `audio`. Response: `{ sessionId, transcript, audioDurationMs, turns }` |
 | 07 | 10 | "Still to confirm on day 1" | Field names and response shape confirmed (spike S3); keyword effect confirmed in S4 |
 | 02 | 8 | Integration details | Add "set `reasoning.effort` on every call; the default is high" |
+
+---
+
+### E-31 Decisions made while building the backend
+
+**Severity:** Medium · **Owner decision:** No · **Status:** Applied (Oct 29)
+
+Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the documents' intent and is covered by a test.
+
+1. **Forecast smoothing factor is 0.2, not 0.3.** Doc 02 starts at 0.3 and says the factors are "tuned in the backtest defined in document 04". At 0.3 the policy held 11.3% more stock than a 4-week moving average (gate: at most 10%). At 0.2 it passes every gate on four seeds:
+
+   | Seed | Warned 2+ days ahead (≥80%) | Fewer stock-out days than "reorder when empty" (≥50%) | Stock vs moving average (≤110%) |
+   |---|---|---|---|
+   | 404 | 86.0% | 78.8% | 107.2% |
+   | 1 | 82.0% | 77.2% | 104.1% |
+   | 77 | 82.8% | 78.9% | 106.0% |
+   | 2026 | 83.5% | 79.9% | 105.8% |
+
+   z stays 1.28 (90% service level).
+2. **The Meta client uses `fetch`, not the OpenAI SDK.** Doc 02 suggests wrapping the OpenAI SDK, but the spike (E-30) showed transcription and response shapes that SDK doesn't model. One small module (`src/server/ai/meta.ts`) does timeouts, one retry, the breaker, budget caps and `ai_calls` logging.
+3. **The forecast runs in TypeScript** and is refreshed after each sale, confirm or undo, and by the nightly Vercel cron (`/api/cron/nightly`, 02:00 IST). pg_cron isn't needed for it, so W-13 no longer adds pg_cron.
+4. **Customer reviews upload through the server** as one multipart request. A 15-second review is under 1 MB, well inside Vercel's 4.5 MB body limit; owner clips and photos still use signed upload URLs (doc 02).
+5. **Turnstile is checked before the review rate limits**, so bots without a token can't use up a shop's 200-per-day quota.
+6. **The circuit breaker opens after 5 consecutive failures** rather than "5 in 2 minutes", because `ai_breaker` has no per-failure timestamps. Recovery is as doc 05 says: one probe after 60 s.
+7. **Liveness (`/api/health`) runs on every request** instead of being prerendered, so the uptime monitor really checks the running app.
+8. **The demo shop template lives in code** (`src/server/demo/template.ts`): 15 products, 90 days of seeded history and two analysed reviews. W-21 builds on it.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 02 | 11–12 | Restock forecasting method | Smoothing factor 0.2 (tuned, see table) |
+| 02 | 8 | Integration details | One `fetch`-based module instead of the OpenAI SDK |
+| 02 | 12 | Background jobs | Forecast refresh: TypeScript after each sale and nightly Vercel cron; no pg_cron |
+| 02 | 6 | Endpoints, public review | Multipart upload through the server for reviews |
+| 05 | 7 | Reliability patterns | Breaker opens after 5 consecutive failures |

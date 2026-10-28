@@ -40,6 +40,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
+      # Integration tests run the server services against a real local
+      # Supabase (doc 04: Supabase is never mocked); AI calls replay recordings.
+      - run: pnpm exec supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
       # Fails below 80% line coverage on src/server (doc 04, V4).
       - run: pnpm test
 
