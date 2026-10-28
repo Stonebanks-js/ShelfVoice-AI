@@ -1,0 +1,238 @@
+{
+  "endpoint": "/responses",
+  "status": 200,
+  "body": {
+    "top_logprobs": 0,
+    "temperature": 1,
+    "top_p": 1,
+    "service_tier": "auto",
+    "model": "muse-spark-1.3",
+    "reasoning": {
+      "effort": "low"
+    },
+    "background": false,
+    "tools": [
+      {
+        "type": "function",
+        "name": "add_product",
+        "description": "Add a product the shop doesn't have yet.",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "category": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "price_rupees": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": "object",
+          "required": [
+            "name",
+            "unit",
+            "price_rupees",
+            "category"
+          ]
+        },
+        "strict": true
+      },
+      {
+        "type": "function",
+        "name": "update_price",
+        "description": "Change one product's price.",
+        "parameters": {
+          "type": "object",
+          "required": [
+            "product_id",
+            "price_rupees"
+          ],
+          "properties": {
+            "price_rupees": {
+              "type": "number"
+            },
+            "product_id": {
+              "description": "An id from the catalog list. Never invent one.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "strict": true
+      },
+      {
+        "type": "function",
+        "name": "set_stock",
+        "description": "Mark a product in or out of stock, or set how many are on the shelf. Use null for whichever wasn't said.",
+        "parameters": {
+          "required": [
+            "product_id",
+            "in_stock",
+            "count"
+          ],
+          "properties": {
+            "count": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "in_stock": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "product_id": {
+              "description": "An id from the catalog list. Never invent one.",
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "strict": true
+      },
+      {
+        "type": "function",
+        "name": "record_sale",
+        "description": "Record units sold.",
+        "parameters": {
+          "required": [
+            "product_id",
+            "qty",
+            "price_rupees"
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "price_rupees": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "product_id": {
+              "description": "An id from the catalog list. Never invent one.",
+              "type": "string"
+            },
+            "qty": {
+              "type": "integer"
+            }
+          }
+        },
+        "strict": true
+      },
+      {
+        "type": "function",
+        "name": "record_delivery",
+        "description": "Record units delivered by a supplier.",
+        "parameters": {
+          "required": [
+            "product_id",
+            "qty"
+          ],
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "description": "An id from the catalog list. Never invent one.",
+              "type": "string"
+            },
+            "qty": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
+        "strict": true
+      },
+      {
+        "type": "function",
+        "name": "ask_clarification",
+        "description": "Ask the owner a short question when the item or number is unclear or matches more than one product. Never guess.",
+        "parameters": {
+          "required": [
+            "question"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "question": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "strict": true
+      }
+    ],
+    "tool_choice": "auto",
+    "truncation": "disabled",
+    "id": "resp_6ae24b78de56c9d92fa14b56",
+    "object": "response",
+    "status": "completed",
+    "created_at": 1793215352,
+    "completed_at": 1793215352,
+    "error": null,
+    "incomplete_details": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae24b78de56c9d92fa14b56:rs_16b3b9e8-3697-49d8-bd39-c6bcc7203186",
+        "summary": [],
+        "status": "completed"
+      },
+      {
+        "type": "message",
+        "id": "rs_fd0ab999-e952-4f15-a246-b2e184b6cdb0",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Atta ki delivery note kar raha hoon.",
+            "annotations": [],
+            "logprobs": []
+          }
+        ],
+        "phase": "commentary",
+        "status": "completed"
+      },
+      {
+        "type": "function_call",
+        "id": "fc_b63b2aa1-c2ba-4e71-b103-7cfa8aa00e98",
+        "call_id": "call_b63b2aa1-c2ba-4e71-b103-7cfa8aa00e98",
+        "name": "record_delivery",
+        "arguments": "{\"product_id\":\"00000000-0000-4000-8000-000000000003\",\"qty\":2}",
+        "status": "completed"
+      }
+    ],
+    "instructions": null,
+    "usage": {
+      "input_tokens": 1376,
+      "input_tokens_details": {
+        "cached_tokens": 113
+      },
+      "output_tokens": 291,
+      "output_tokens_details": {
+        "reasoning_tokens": 192
+      },
+      "total_tokens": 1667
+    },
+    "parallel_tool_calls": true,
+    "store": true,
+    "max_output_tokens": 1500
+  }
+}

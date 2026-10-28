@@ -1,0 +1,68 @@
+{
+  "endpoint": "/responses",
+  "status": 200,
+  "body": {
+    "top_logprobs": 0,
+    "temperature": 1,
+    "top_p": 1,
+    "service_tier": "auto",
+    "model": "muse-spark-1.3",
+    "reasoning": {
+      "effort": "low"
+    },
+    "background": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "restock_explanation",
+        "schema": {
+          "properties": {
+            "sentence": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "sentence"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      }
+    },
+    "tools": [],
+    "tool_choice": "auto",
+    "truncation": "disabled",
+    "id": "resp_6ae24b92f4977becff7a4270",
+    "object": "response",
+    "status": "incomplete",
+    "created_at": 1793215378,
+    "error": null,
+    "incomplete_details": {
+      "reason": "max_output_tokens"
+    },
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae24b92f4977becff7a4270:rs_dc8297ad-d53c-40e7-8fdd-e0abe5aea9c8",
+        "summary": [],
+        "status": "incomplete"
+      }
+    ],
+    "instructions": null,
+    "usage": {
+      "input_tokens": 142,
+      "input_tokens_details": {
+        "cached_tokens": 113
+      },
+      "output_tokens": 400,
+      "output_tokens_details": {
+        "reasoning_tokens": 398
+      },
+      "total_tokens": 542
+    },
+    "parallel_tool_calls": true,
+    "store": true,
+    "max_output_tokens": 400
+  }
+}
