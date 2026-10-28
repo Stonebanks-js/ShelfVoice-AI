@@ -51,6 +51,11 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm exec supabase db start
       - run: pnpm exec supabase test db
+      # Doc 07: committed types must match the migrations.
+      - name: Generated types are up to date
+        run: |
+          pnpm db:types
+          git diff --exit-code -- src/types/database.ts
 
   security:
     name: Security scans
