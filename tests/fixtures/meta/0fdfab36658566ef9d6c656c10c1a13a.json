@@ -1,0 +1,189 @@
+{
+  "endpoint": "/responses",
+  "status": 200,
+  "body": {
+    "top_logprobs": 0,
+    "temperature": 1,
+    "top_p": 1,
+    "service_tier": "auto",
+    "model": "muse-spark-1.3",
+    "reasoning": {
+      "effort": "low"
+    },
+    "background": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "shop_setup",
+        "schema": {
+          "additionalProperties": false,
+          "required": [
+            "shop",
+            "hours",
+            "products"
+          ],
+          "type": "object",
+          "properties": {
+            "hours": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "close": {
+                    "description": "24-hour HH:MM",
+                    "type": "string"
+                  },
+                  "days": {
+                    "items": {
+                      "enum": [
+                        "mon",
+                        "tue",
+                        "wed",
+                        "thu",
+                        "fri",
+                        "sat",
+                        "sun"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "open": {
+                    "description": "24-hour HH:MM",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "days",
+                  "open",
+                  "close"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "products": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "category": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "price_rupees": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "unit": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "unit",
+                  "price_rupees",
+                  "category"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "shop": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "category",
+                "address",
+                "phone"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "strict": true
+      }
+    },
+    "tools": [],
+    "tool_choice": "auto",
+    "truncation": "disabled",
+    "id": "resp_6ae24b88f9ae19c2dcbe47c7",
+    "object": "response",
+    "status": "completed",
+    "created_at": 1793215368,
+    "completed_at": 1793215368,
+    "error": null,
+    "incomplete_details": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae24b88f9ae19c2dcbe47c7:rs_dd39f754-249c-4b4d-8c74-2cc52ff0468b",
+        "summary": [],
+        "status": "completed"
+      },
+      {
+        "type": "message",
+        "id": "msg_52931332-f9e2-45bf-a727-ea58a79d66c3",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"hours\": [{\"close\": \"22:00\", \"days\": [\"mon\", \"tue\", \"wed\", \"thu\", \"fri\", \"sat\", \"sun\"], \"open\": \"07:00\"}], \"products\": [{\"category\": \"Snacks\", \"name\": \"Maggi\", \"price_rupees\": 14, \"unit\": null}, {\"category\": \"Snacks\", \"name\": \"Parle-G\", \"price_rupees\": 10, \"unit\": null}, {\"category\": \"Dairy\", \"name\": \"Amul butter\", \"price_rupees\": null, \"unit\": \"100 g\"}], \"shop\": {\"address\": null, \"category\": null, \"name\": \"Sharma Kirana Store\", \"phone\": null}}",
+            "annotations": [],
+            "logprobs": []
+          }
+        ],
+        "status": "completed"
+      }
+    ],
+    "instructions": null,
+    "usage": {
+      "input_tokens": 520,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens": 1128,
+      "output_tokens_details": {
+        "reasoning_tokens": 960
+      },
+      "total_tokens": 1648
+    },
+    "parallel_tool_calls": true,
+    "store": true,
+    "max_output_tokens": 2000
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "endpoint": "/responses",
+  "status": 200,
+  "body": {
+    "top_logprobs": 0,
+    "temperature": 1,
+    "top_p": 1,
+    "service_tier": "auto",
+    "model": "muse-spark-1.3",
+    "reasoning": {
+      "effort": "low"
+    },
+    "background": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "review_insight",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sentiment",
+            "summary",
+            "mentioned_product_ids",
+            "stockout_product_ids"
+          ],
+          "properties": {
+            "mentioned_product_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "sentiment": {
+              "enum": [
+                "POSITIVE",
+                "NEUTRAL",
+                "NEGATIVE"
+              ],
+              "type": "string"
+            },
+            "stockout_product_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "summary": {
+              "type": "string"
+            }
+          }
+        },
+        "strict": true
+      }
+    },
+    "tools": [],
+    "tool_choice": "auto",
+    "truncation": "disabled",
+    "id": "resp_6ae24b8db8043ed2d6fc404a",
+    "object": "response",
+    "status": "completed",
+    "created_at": 1793215373,
+    "completed_at": 1793215373,
+    "error": null,
+    "incomplete_details": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae24b8db8043ed2d6fc404a:rs_4b2ef651-efb3-4d29-aba5-8a972d001a8b",
+        "summary": [],
+        "status": "completed"
+      },
+      {
+        "type": "message",
+        "id": "msg_c8d059d0-b3cc-49a4-a053-2598c92104cd",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"mentioned_product_ids\":[],\"sentiment\":\"NEGATIVE\",\"stockout_product_ids\":[],\"summary\":\"The customer complained that the shop was very dirty and had no cleanliness.\"}",
+            "annotations": [],
+            "logprobs": []
+          }
+        ],
+        "status": "completed"
+      }
+    ],
+    "instructions": null,
+    "usage": {
+      "input_tokens": 407,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens": 444,
+      "output_tokens_details": {
+        "reasoning_tokens": 400
+      },
+      "total_tokens": 851
+    },
+    "parallel_tool_calls": true,
+    "store": true,
+    "max_output_tokens": 2000
+  }
+}

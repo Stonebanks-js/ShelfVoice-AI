@@ -1,0 +1,115 @@
+{
+  "endpoint": "/responses",
+  "status": 200,
+  "body": {
+    "top_logprobs": 0,
+    "temperature": 1,
+    "top_p": 1,
+    "service_tier": "auto",
+    "model": "muse-spark-1.3",
+    "reasoning": {
+      "effort": "low"
+    },
+    "background": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "bill_lines",
+        "schema": {
+          "properties": {
+            "lines": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "product_id": {
+                    "description": "Matching id from the catalog, or null if none matches.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "qty": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "unit": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "qty",
+                  "unit",
+                  "product_id"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "lines"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      }
+    },
+    "tools": [],
+    "tool_choice": "auto",
+    "truncation": "disabled",
+    "id": "resp_6ae24b90a4ed7bc150b4422b",
+    "object": "response",
+    "status": "completed",
+    "created_at": 1793215376,
+    "completed_at": 1793215376,
+    "error": null,
+    "incomplete_details": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae24b90a4ed7bc150b4422b:rs_37d554aa-c257-4fef-8e6c-9db14b828570",
+        "summary": [],
+        "status": "completed"
+      },
+      {
+        "type": "message",
+        "id": "msg_deb9def8-4b60-402f-bf01-c25cfac609c7",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"lines\": [{\"name\": \"Parle-G Biscuit 76g\", \"product_id\": \"00000000-0000-4000-8000-000000000002\", \"qty\": 48, \"unit\": \"pcs\"}, {\"name\": \"Tata Salt 1kg\", \"product_id\": \"00000000-0000-4000-8000-000000000005\", \"qty\": 10, \"unit\": \"pkt\"}, {\"name\": \"Maggi Noodles 70g\", \"product_id\": \"00000000-0000-4000-8000-000000000001\", \"qty\": 24, \"unit\": \"pcs\"}, {\"name\": \"Haldiram Bhujia 200g\", \"product_id\": null, \"qty\": 12, \"unit\": \"pkt\"}]}",
+            "annotations": [],
+            "logprobs": []
+          }
+        ],
+        "status": "completed"
+      }
+    ],
+    "instructions": null,
+    "usage": {
+      "input_tokens": 1632,
+      "input_tokens_details": {
+        "cached_tokens": 1521
+      },
+      "output_tokens": 527,
+      "output_tokens_details": {
+        "reasoning_tokens": 341
+      },
+      "total_tokens": 2159
+    },
+    "parallel_tool_calls": true,
+    "store": true,
+    "max_output_tokens": 3000
+  }
+}
