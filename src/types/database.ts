@@ -287,7 +287,20 @@ isOneToOne: false
                 }
           }
           Functions: {
-            [_ in never]: never
+            "ai_spend":
+{ Args: { "p_shop_id"?: string }; Returns: {
+              "shop_today_usd": number,"today_usd": number,"total_usd": number
+            }[]
+                           },
+"confirm_proposal":
+{ Args: { "p_changes": Json,"p_proposal_id": string }; Returns: Json
+                           },
+"hit_rate_limit":
+{ Args: { "p_key": string,"p_window_seconds": number }; Returns: number
+                           },
+"undo_proposal":
+{ Args: { "p_proposal_id": string,"p_window_seconds"?: number }; Returns: Json
+                           }
           }
           Enums: {
             "ai_job": "SETUP_EXTRACTION"|"COMMAND"|"BILL"|"SHELF"|"REVIEW"|"EXPLANATION"|"TRANSCRIBE"|"SEGMENT","ai_outcome": "OK"|"SCHEMA_REJECTED"|"TIMEOUT"|"RATE_LIMITED"|"ERROR","breaker_state": "CLOSED"|"OPEN"|"HALF_OPEN","movement_kind": "SALE"|"DELIVERY"|"CORRECTION","movement_source": "VOICE"|"BILL"|"TAP"|"SEED"|"UNDO","owner_action": "CONFIRMED"|"EDITED"|"REJECTED","proposal_kind": "SETUP"|"COMMAND"|"BILL"|"SHELF","proposal_status": "PENDING"|"CONFIRMED"|"CANCELLED"|"FAILED"|"EXPIRED"|"UNDONE","review_status": "PENDING"|"ANALYZED"|"FAILED","sentiment": "POSITIVE"|"NEUTRAL"|"NEGATIVE"
