@@ -1,7 +1,7 @@
 import "server-only";
 
 import { env } from "@/env/server";
-import { log } from "@/server/log";
+import { background, log, sendAlert } from "@/server/log";
 import { adminClient } from "@/server/supabase";
 
 import { createMetaClient, type AiLedger, type MetaClient } from "./meta";
@@ -55,6 +55,7 @@ export const ledger: AiLedger = {
         outcome: call.outcome,
       });
     if (error) log("error", "ai.call.log_failed", { error });
+    else if (call.costUsd > 0) background(() => budgetAlert(call.costUsd));
     const level = call.outcome === "OK" ? "info" : "warn";
     log(level, call.outcome === "OK" ? "ai.call.ok" : "ai.call.failed", {
       requestId: call.ctx.requestId,
@@ -66,6 +67,24 @@ export const ledger: AiLedger = {
     });
   },
 };
+
+// Doc 05 credit burn: alert at 50% and 80% of the total AI budget, and at
+// 95%, where the client pauses AI features. Fires on the call that crosses.
+const BUDGET_ALERTS = [
+  { at: 0.95, severity: "critical" },
+  { at: 0.8, severity: "medium" },
+  { at: 0.5, severity: "medium" },
+] as const;
+
+export async function budgetAlert(costUsd: number) {
+  const { totalUsd } = await ledger.spend(null);
+  const capUsd = env.AI_TOTAL_BUDGET_USD;
+  const crossed = BUDGET_ALERTS.find(({ at }) => totalUsd >= capUsd * at && totalUsd - costUsd < capUsd * at);
+  if (!crossed) return;
+  const event = `ai.budget.${crossed.at * 100}pct`;
+  log("warn", event, { totalUsd, capUsd });
+  await sendAlert(crossed.severity, event, { totalUsd: Number(totalUsd.toFixed(2)), capUsd });
+}
 
 let client: MetaClient | undefined;
 

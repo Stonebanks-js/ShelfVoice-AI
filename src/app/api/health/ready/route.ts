@@ -1,5 +1,5 @@
 import { env } from "@/env/server";
-import { log } from "@/server/log";
+import { log, release } from "@/server/log";
 import { adminClient } from "@/server/supabase";
 
 // Readiness (doc 05): Postgres under 500 ms, Storage reachable, Meta key
@@ -50,7 +50,7 @@ export async function GET() {
   const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
   if (failed.length) log("warn", "health.not_ready", { failed, databaseMs });
   return Response.json(
-    { status: failed.length ? "not_ready" : "ready", release: process.env.RELEASE ?? "dev", checks, databaseMs },
+    { status: failed.length ? "not_ready" : "ready", release: release(), checks, databaseMs },
     { status: failed.length ? 503 : 200 },
   );
 }
