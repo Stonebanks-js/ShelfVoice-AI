@@ -539,18 +539,21 @@ The subtitle "From your last 30 days of sales" also describes a moving average. 
 
 **Decision (Oct 28, owner):** keep Seoul for staging. This is acceptable because staging holds only test and seed data, never real shop owners' data, so doc 03's data-location promise is not affected.
 
+**Update (Oct 29, owner):** no separate Mumbai project. The Seoul project is the live app's database for the hackathon, so it will hold real owners' data.
+
 **Conditions.**
 
-1. **Production must be in ap-south-1.** When creating it, pick the specific region "South Asia (Mumbai)" rather than a broad area, and check the summary says `ap-south-1` before clicking Create.
-2. **Spike S6 is measured against production**, not staging, since Vercel bom1 to Seoul adds roughly 100 ms per query.
-3. Preview deploys (bom1 functions, Seoul database) will be slower than production. Performance targets (Lighthouse, k6, voice-to-proposal p95) are checked on production or with functions in the database's region, not on previews.
+1. **Privacy wording says Seoul, not India.** Doc 03's promise that data is stored in India no longer holds. The privacy page and the README must say data is stored with Supabase in Seoul, South Korea (ap-northeast-2), and processed by Vercel functions in Mumbai.
+2. **Spike S6 is measured against this project.** Vercel bom1 to Seoul adds about 100 to 200 ms per query, so the doc's 50 ms target doesn't apply. The readiness limit is 1500 ms (E-31 item 9).
+3. Performance targets (Lighthouse, k6, voice-to-proposal p95) are checked against this setup and judged with the extra round trip in mind.
 
 | Doc | Page | Section | Change |
 |---|---|---|---|
 | 02 | 14 | Environments table, Preview row | Add "staging database in ap-northeast-2 (Seoul); see E-28" |
 | 08 | 2 | Environments table, Preview row | "Staging Supabase project (Mumbai)" → "Staging Supabase project (Seoul, ap-northeast-2; see E-28)" |
-| 08 | 6 | One-time provisioning, step 1 | Add "Staging is in ap-northeast-2 (E-28); production must be ap-south-1, chosen explicitly" |
-| 09 | 5 | Spike S6 | "Vercel bom1 to Supabase ap-south-1" → "…to the production project in ap-south-1" |
+| 08 | 6 | One-time provisioning, step 1 | Add "One Supabase project, in ap-northeast-2 (E-28)" |
+| 03 | — | Data location | "Stored in India" → "Stored in Seoul, South Korea (Supabase ap-northeast-2)" |
+| 09 | 5 | Spike S6 | "Vercel bom1 to Supabase ap-south-1" → "…to the Seoul project; 50 ms target dropped" |
 
 ---
 
@@ -629,7 +632,7 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 6. **The circuit breaker opens after 5 consecutive failures** rather than "5 in 2 minutes", because `ai_breaker` has no per-failure timestamps. Recovery is as doc 05 says: one probe after 60 s.
 7. **Liveness (`/api/health`) runs on every request** instead of being prerendered, so the uptime monitor really checks the running app.
 8. **The demo shop template lives in code** (`src/server/demo/template.ts`): 15 products, 90 days of seeded history and two analysed reviews. W-21 builds on it.
-9. **Readiness times the faster of two database reads** and reports it as `databaseMs`. From Vercel `bom1` to Seoul staging (E-28), a read usually takes about 190 ms, but whole requests spike to 500–830 ms (3 in 20, even with two reads), which would page on a healthy database. The limit is 1500 ms while the app reads Seoul staging. Set it back to 500 ms when production in Mumbai goes live.
+9. **Readiness times the faster of two database reads** and reports it as `databaseMs`. From Vercel `bom1` to Seoul staging (E-28), a read usually takes about 190 ms, but whole requests spike to 500–830 ms (3 in 20, even with two reads), which would page on a healthy database. The live app stays on the Seoul project (E-28 update), so the limit is 1500 ms.
 10. **Logs reach Axiom through a small `fetch` sink in `src/server/log.ts`, not `next-axiom`.** Lines are batched per request and sent in `after()`, so the response isn't held up. The logger already redacts, and this avoids a library that has to keep up with Next 16. Error-level events also post to the Discord webhook, at most once per event every 10 minutes per instance. The AI budget alerts at 50%, 80% and 95% fire on the call that crosses each line. The nightly job pings the Better Stack heartbeat, or `/fail` when a shop's forecast failed. Web Vitals and browser errors come with the frontend.
 
 | Doc | Page | Section | Change |
@@ -639,5 +642,5 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 | 02 | 12 | Background jobs | Forecast refresh: TypeScript after each sale and nightly Vercel cron; no pg_cron |
 | 02 | 6 | Endpoints, public review | Multipart upload through the server for reviews |
 | 05 | 7 | Reliability patterns | Breaker opens after 5 consecutive failures |
-| 05 | — | Health checks | Readiness: faster of two Postgres reads, under 1500 ms on Seoul staging and 500 ms in production |
+| 05 | — | Health checks | Readiness: faster of two Postgres reads, under 1500 ms (database in Seoul) |
 | 05 | 3 | Logging (O1) | Axiom via a `fetch` sink in the logger instead of `next-axiom` |

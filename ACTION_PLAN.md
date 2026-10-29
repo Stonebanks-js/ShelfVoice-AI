@@ -18,7 +18,7 @@ These are the points where the build stops and waits for the owner. Each one lis
 |---|---|---|---|
 | C-00 | Phase 0 (done Oct 28) | Install the missing local tools: Node 24 alongside Node 26 (Vercel runs 24.x), pnpm, GitHub CLI. The Supabase CLI goes into the repo as a dev dependency, so no global install is needed | W-01, W-01b, D-06 |
 | C-01 | Phase 0, now | The four decisions in D-01: credit-expiry plan and OpenRouter use, $100 cap, approving 09 (track rules come in C-03) | D-01, W-03, W-04 |
-| C-02 | Phase 0 | Names for teammates A, B, C, the backup for each account, and the portal submitter | D-03, D-05, J-01 |
+| C-02 | Phase 0 | Names for teammates A, B, C, the backup for each account, and the portal submitter (done Oct 29: solo builder, A.S Chaudhary holds every role) | D-03, D-05, J-01 |
 | C-03 | Phase 0 | The official rules text on tracks and team size, and the submission form link | D-04, W-26 |
 | C-04 | Phase 0 (done Oct 28, except the `project` scope for the issues board) | Confirm `Stonebanks-js/ShelfVoice-AI` is the project repo; authorise GitHub access for me (`gh auth login` in a terminal, or the GitHub MCP via `/mcp`); turn on secret scanning, push protection and branch protection yourself | D-06, D-07, W-01b |
 | C-05 | Phase 1, before S0 (done Oct 29; credit end date assumed, see spike/README.md) | Claim the $150 Meta credit, create the API key, put it in `.env.local` as `META_API_KEY`, and tell me the credit end date | S0 to S5, W-04 |
@@ -26,7 +26,7 @@ These are the points where the build stops and waits for the owner. Each one lis
 | C-07 | Phase 1, before W-03 | Create the Vercel project linked to the repo; set the env vars I list in the dashboard; add `VERCEL_TOKEN` and the Supabase access token as GitHub Actions secrets (or connect a Vercel MCP) | W-03, S1 (bom1 check), S6 |
 | C-08 | Phase 1, before W-03b | Create Axiom (dataset `shelfvoice`), Better Stack (4 monitors, 2 heartbeats, status page) and a Discord alert webhook; put their tokens and URLs in Vercel env | W-03b |
 | C-09 | Phase 1, during spike | Record 20 Hinglish clips across all 3 teammates (10 owner commands, 10 reviews) and take 1 shelf photo | S4, S5 |
-| C-10 | Phase 2, before W-07 | Create the Google Cloud OAuth client with the redirect URI I give you; enter its ID and secret in the Supabase dashboard; set the consent screen to production before real owners | W-07 |
+| C-10 | Phase 2, before W-07 | (in progress Oct 29) Create the Google Cloud OAuth client with the redirect URI I give you; enter its ID and secret in the Supabase dashboard; set the consent screen to production before real owners | W-07 |
 | C-11 | Phase 2, before W-08 | A mid-range Android phone on hand for mic and upload tests | W-08, W-24 |
 | C-12 | Phase 3, before W-14 | Create the Cloudflare Turnstile site; put the site key and secret in Vercel env | W-14 |
 | C-13 | Phase 3 | Record the audio fixtures (6 setup, 12 command, 10 review, 6 edge-case clips) and photo fixtures (5 shelf, 10 printed bills, 5 handwritten bills, 1 with GPS EXIF) | W-09, W-11, W-15, W-16, W-22 |
@@ -204,7 +204,7 @@ Every build task (W-xx) runs through the same loop. Each step comes from the doc
 
 | ID | Task | Owner | Sources | Fixes | Done when | Status |
 |---|---|---|---|---|---|---|
-| J-01 | On-call rota: three 8-hour shifts covering 24 hours; acknowledge alerts within 15 minutes; handover note in Discord at each change | All | 05 p8, 08 p10 | — | Rota posted with names | Not started |
+| J-01 | On-call rota: three 8-hour shifts covering 24 hours; acknowledge alerts within 15 minutes; handover note in Discord at each change | All | 05 p8, 08 p10 | — | Rota posted with names | Solo builder: Better Stack push alerts on the owner's phone replace the 3-person rota |
 | J-02 | Morning check each day: overnight alerts, Better Stack monitors and both heartbeats, admin page (budget, success, p95), nightly evals, demo shop run in a private window, last night's backup | On-call | 08 p10 | E-14 | Logged in Discord daily | Not started |
 | J-03 | Change policy: only security fixes, each approved by a second teammate, released through manual promotion with the previous SHA ready for instant rollback | All | 08 p9, p11 | E-07 | — | Not started |
 | J-04 | Credit watch: compare credit left with `META_CREDIT_ENDS_AT`; when it ends, switch to demo replay and check it works; use the OpenRouter fallback only if D-01 approved a budget | C | 09 K4 | E-03 | Demo works after the credit ends | Not started |
