@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localAnon, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
 
 // F-02 review gate: O-1 sign-in and O-2 language choice. The first block
 // needs no backend (API failures are simulated). The second runs against the
@@ -92,25 +92,9 @@ test.describe("signed-in entry", () => {
     await expect(page).toHaveURL("/app");
   });
 
-  test("a new owner picks a language, then sets up the shop in it", async ({ page, context }) => {
+  test("a new owner picks a language, then sets up the shop in it", async ({ page }) => {
     const admin = localAdmin();
-    const email = `owner-${Date.now()}@example.test`;
-    const password = `Local-${Math.random().toString(36).slice(2)}-test`;
-    const { data: created, error: createError } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
-    if (createError) throw createError;
-    const anon = localAnon();
-    const { data, error } = await anon.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-
-    // The @supabase/ssr session cookie, as the Google callback would set it.
-    await context.clearCookies();
-    await context.addCookies([
-      {
-        name: "sb-127-auth-token",
-        value: "base64-" + Buffer.from(JSON.stringify(data.session)).toString("base64url"),
-        url: `http://localhost:${process.env.E2E_PORT ?? 3200}`,
-      },
-    ]);
+    const userId = await signInAsNewOwner(page, { withShop: false });
 
     try {
       await page.goto("/app");
@@ -122,11 +106,11 @@ test.describe("signed-in entry", () => {
       await expect(page).toHaveURL("/app/setup");
       await expect(page.getByRole("heading", { level: 1, name: "Tell us about your shop" })).toBeVisible();
 
-      const { data: shop } = await admin.from("shops").select("language").eq("owner_id", created.user.id).single();
+      const { data: shop } = await admin.from("shops").select("language").eq("owner_id", userId).single();
       expect(shop?.language).toBe("en");
     } finally {
-      await admin.from("shops").delete().eq("owner_id", created.user.id);
-      await admin.auth.admin.deleteUser(created.user.id);
+      await admin.from("shops").delete().eq("owner_id", userId);
+      await admin.auth.admin.deleteUser(userId);
     }
   });
 });

@@ -2,6 +2,7 @@ import { after } from "next/server";
 
 import { meta } from "@/server/ai";
 import { explainRestock, type ExplainInput, templateExplanation } from "@/server/ai/jobs";
+import { isRunningLow } from "@/server/forecast/low";
 import { fromPostgres, route } from "@/server/http";
 import { log } from "@/server/log";
 import { requireShop } from "@/server/owner";
@@ -27,7 +28,7 @@ export const GET = route(async (_request, _ctx, { requestId }) => {
   const toExplain = new Map<string, ExplainInput>();
   const items = data
     .map((p) => ({ product: p, f: Array.isArray(p.product_forecasts) ? p.product_forecasts[0] : p.product_forecasts }))
-    .filter(({ product, f }) => f && ((f.order_qty ?? 0) > 0 || (f.reorder_point === null && product.stock_qty! <= product.low_stock_level)))
+    .filter(({ product, f }) => isRunningLow(product, f))
     .map(({ product, f }) => {
       const input: ExplainInput = {
         productName: product.name,
