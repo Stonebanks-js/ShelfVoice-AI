@@ -54,5 +54,16 @@ export async function GET(request: Request) {
   result.proposalsExpired = expired?.length ?? 0;
 
   log(result.failures ? "warn" : "info", "cron.nightly.finished", { ...result, durationMs: Date.now() - started });
+
+  // Doc 05: Better Stack alerts if this ping is 2 hours late; /fail reports
+  // a run that finished with errors.
+  if (env.BETTERSTACK_HEARTBEAT_URL) {
+    const url = result.failures ? `${env.BETTERSTACK_HEARTBEAT_URL.replace(/\/$/, "")}/fail` : env.BETTERSTACK_HEARTBEAT_URL;
+    try {
+      await fetch(url, { method: "POST", signal: AbortSignal.timeout(5000) });
+    } catch (error) {
+      log("warn", "cron.heartbeat_failed", { error });
+    }
+  }
   return Response.json(result);
 }

@@ -630,6 +630,7 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 7. **Liveness (`/api/health`) runs on every request** instead of being prerendered, so the uptime monitor really checks the running app.
 8. **The demo shop template lives in code** (`src/server/demo/template.ts`): 15 products, 90 days of seeded history and two analysed reviews. W-21 builds on it.
 9. **Readiness times the faster of two database reads** and reports it as `databaseMs`. From Vercel `bom1` to Seoul staging (E-28), a read usually takes about 190 ms, but whole requests spike to 500–830 ms (3 in 20, even with two reads), which would page on a healthy database. The limit is 1500 ms while the app reads Seoul staging. Set it back to 500 ms when production in Mumbai goes live.
+10. **Logs reach Axiom through a small `fetch` sink in `src/server/log.ts`, not `next-axiom`.** Lines are batched per request and sent in `after()`, so the response isn't held up. The logger already redacts, and this avoids a library that has to keep up with Next 16. Error-level events also post to the Discord webhook, at most once per event every 10 minutes per instance. The AI budget alerts at 50%, 80% and 95% fire on the call that crosses each line. The nightly job pings the Better Stack heartbeat, or `/fail` when a shop's forecast failed. Web Vitals and browser errors come with the frontend.
 
 | Doc | Page | Section | Change |
 |---|---|---|---|
@@ -639,3 +640,4 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 | 02 | 6 | Endpoints, public review | Multipart upload through the server for reviews |
 | 05 | 7 | Reliability patterns | Breaker opens after 5 consecutive failures |
 | 05 | — | Health checks | Readiness: faster of two Postgres reads, under 1500 ms on Seoul staging and 500 ms in production |
+| 05 | 3 | Logging (O1) | Axiom via a `fetch` sink in the logger instead of `next-axiom` |
