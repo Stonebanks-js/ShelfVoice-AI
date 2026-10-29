@@ -51,3 +51,32 @@ export async function signInToDemo(page: Page) {
   await page.getByRole("button", { name: "Try the demo shop" }).click();
   await page.waitForURL("/app");
 }
+
+// Signs in as a fresh Google-style owner (email account on the local stack),
+// with an empty shop unless `withShop` is false. Returns the user's ID.
+export async function signInAsNewOwner(page: Page, { withShop = true, language = "en" } = {}) {
+  const admin = localAdmin();
+  const email = `owner-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.test`;
+  const password = `Local-${Math.random().toString(36).slice(2)}-test`;
+  const { data: created, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+  if (error) throw error;
+  if (withShop) {
+    const { error: shopError } = await admin
+      .from("shops")
+      .insert({ owner_id: created.user.id, name: "New Kirana", slug: `new-${created.user.id.slice(0, 8)}`, language });
+    if (shopError) throw shopError;
+  }
+  const { data, error: signInError } = await localAnon().auth.signInWithPassword({ email, password });
+  if (signInError) throw signInError;
+  // The @supabase/ssr session cookie, as the Google callback would set it.
+  await page.context().clearCookies();
+  await page.context().addCookies([
+    {
+      name: "sb-127-auth-token",
+      value: "base64-" + Buffer.from(JSON.stringify(data.session)).toString("base64url"),
+      url: `http://localhost:${process.env.E2E_PORT ?? 3200}`,
+    },
+  ]);
+  return created.user.id;
+}
+

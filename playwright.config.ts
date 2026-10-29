@@ -10,13 +10,18 @@ export default defineConfig({
   fullyParallel: true,
   // Locally, journeys share one laptop with Docker and the production server;
   // more workers starve the local Supabase stack and make uploads time out.
-  workers: process.env.CI ? undefined : 4,
+  workers: process.env.CI ? undefined : 2,
+  // Local journeys create a demo shop (1,400 rows) before they start.
+  timeout: process.env.CI ? 30_000 : 60_000,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://localhost:${port}`,
     trace: "retain-on-failure",
+    // The app turns transitions off for reduced motion, so axe never measures
+    // a colour halfway through a theme change.
+    contextOptions: { reducedMotion: "reduce" },
     launchOptions: { args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] },
   },
   projects: [

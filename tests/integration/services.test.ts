@@ -26,6 +26,7 @@ const { refreshForecasts } = await import("@/server/forecast/refresh");
 const proposals = await import("@/server/proposals");
 const { storeReview, analyseStoredReview } = await import("@/server/reviews");
 const { limit } = await import("@/server/abuse");
+const { todaySummary } = await import("@/server/today");
 const { ledger } = await import("@/server/ai/index");
 const { ApiError } = await import("@/server/http");
 
@@ -77,6 +78,52 @@ describe("demo copy and forecasts", () => {
   it("returns 0 for a shop with no products", async () => {
     const owner = await testOwner();
     expect(await refreshForecasts(owner.shop.id)).toBe(0);
+  });
+});
+
+describe("Today summary (doc 06 O-5)", () => {
+  it("adds up today's sales, the running-low items and new reviews for a demo shop", async () => {
+    const owner = await testOwner(false);
+    const now = new Date();
+    const shopId = await createDemoCopy(owner.user.id, now, "en");
+    const summary = await todaySummary(owner.db, shopId, now);
+
+    expect(summary.productCount).toBe(15);
+    // Spot-check revenue against the stored sales of today (India day).
+    const dayStart = new Date(Math.floor((now.getTime() + 19_800_000) / 86_400_000) * 86_400_000 - 19_800_000).toISOString();
+    const { data: sales } = await admin.from("stock_movements").select("qty, unit_price_paise, products(price_paise)").eq("shop_id", shopId).eq("kind", "SALE").gte("occurred_at", dayStart);
+    const expected = sales!.reduce((n, s) => n + s.qty * (s.unit_price_paise ?? (s.products as { price_paise: number }).price_paise), 0);
+    expect(summary.salesPaise).toBe(expected);
+    expect(summary.unitsSold).toBe(sales!.reduce((n, s) => n + s.qty, 0));
+
+    // The demo's atta is low and flagged by a customer, so it comes first.
+    expect(summary.lowCount).toBeGreaterThan(0);
+    expect(summary.low[0]).toMatchObject({ name: "Aashirvaad Atta", flagged: true });
+    expect(summary.low.length).toBeLessThanOrEqual(3);
+    expect(summary.newReviews).toBe(2);
+    expect(summary.reviews[0].sentiment).toBe("NEGATIVE");
+  });
+
+  it("is empty for a new shop", async () => {
+    const owner = await testOwner();
+    expect(await todaySummary(owner.db, owner.shop.id)).toEqual({
+      productCount: 0,
+      salesPaise: 0,
+      unitsSold: 0,
+      lastWeekPaise: 0,
+      low: [],
+      lowCount: 0,
+      reviews: [],
+      newReviews: 0,
+    });
+  });
+
+  it("never shows another shop's numbers", async () => {
+    const owner = await testOwner();
+    const other = await testOwner(false);
+    const otherShop = await createDemoCopy(other.user.id);
+    const summary = await todaySummary(owner.db, otherShop);
+    expect(summary).toMatchObject({ productCount: 0, salesPaise: 0, newReviews: 0 });
   });
 });
 

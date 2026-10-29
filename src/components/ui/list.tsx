@@ -53,21 +53,22 @@ interface ListRowProps {
   href?: string;
   onClick?: () => void;
   titleId?: string;
+  wrap?: boolean; // up to two lines of title and subtitle, for names that matter
 }
 
 // One row. A link or button when it navigates or acts (with a chevron for
 // links); plain otherwise. The separator is inset past the icon, as on iOS.
-export function ListRow({ title, subtitle, icon, iconTone, value, accessory, href, onClick, titleId }: ListRowProps) {
+export function ListRow({ title, subtitle, icon, iconTone, value, accessory, href, onClick, titleId, wrap = false }: ListRowProps) {
   const interactive = Boolean(href || onClick);
   const body = (
     <>
       {icon && <IconTile icon={icon} tone={iconTone} />}
       <span className="flex min-h-12 min-w-0 flex-1 items-center gap-3 border-separator py-2.5 pr-4 [li+li_&]:border-t">
         <span className="flex min-w-0 flex-1 flex-col">
-          <span id={titleId} className="truncate text-body text-ink">
+          <span id={titleId} className={cn("text-body text-ink", wrap ? "line-clamp-2" : "truncate")}>
             {title}
           </span>
-          {subtitle && <span className="truncate text-footnote text-ink-2">{subtitle}</span>}
+          {subtitle && <span className={cn("text-footnote text-ink-2", wrap ? "line-clamp-2" : "truncate")}>{subtitle}</span>}
         </span>
         {value && <span className="shrink-0 text-body text-ink-2">{value}</span>}
         {accessory}
