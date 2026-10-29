@@ -31,7 +31,8 @@ export async function GET() {
   await db.from("shops").select("id").limit(1);
   const started = performance.now();
   const { error: dbError } = await db.from("shops").select("id").limit(1);
-  checks.database = !dbError && performance.now() - started < 500;
+  const databaseMs = Math.round(performance.now() - started);
+  checks.database = !dbError && databaseMs < 500;
 
   const { error: storageError } = await db.storage.getBucket("voice");
   checks.storage = !storageError;
@@ -42,9 +43,9 @@ export async function GET() {
   checks.budget = spend ? Number(spend.total_usd) < env.AI_TOTAL_BUDGET_USD * 0.95 : false;
 
   const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
-  if (failed.length) log("warn", "health.not_ready", { failed });
+  if (failed.length) log("warn", "health.not_ready", { failed, databaseMs });
   return Response.json(
-    { status: failed.length ? "not_ready" : "ready", release: process.env.RELEASE ?? "dev", checks },
+    { status: failed.length ? "not_ready" : "ready", release: process.env.RELEASE ?? "dev", checks, databaseMs },
     { status: failed.length ? 503 : 200 },
   );
 }
