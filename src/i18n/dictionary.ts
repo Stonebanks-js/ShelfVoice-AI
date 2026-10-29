@@ -18,6 +18,7 @@ const en = {
   "mic.idle": "Tap to speak",
   "mic.recording": "Recording, tap to stop",
   "mic.stop": "Stop",
+  "mic.uploading": "Listening…",
   "mic.processing": "Understanding…",
   "mic.paused": "Voice is resting for now. You can still edit by tapping.",
 
@@ -77,6 +78,21 @@ const en = {
 
   "soon.title": "Coming next",
   "soon.body": "This screen is being built. Everything else keeps working.",
+  "mic.primer.title": "Speak to your shop",
+  "mic.primer.reason": "Shelf Voice asks for your microphone so you can speak instead of typing.",
+  "mic.primer.tip1": "“Set Maggi's price to ₹15”",
+  "mic.primer.tip2": "“Sold 3 packets of Parle-G”",
+  "mic.primer.tip3": "“Atta is out of stock”",
+  "mic.primer.start": "Start speaking",
+  "mic.primer.limit": "Up to {seconds} seconds. Tap again to stop.",
+  "mic.saved": "Recording sent",
+  "mic.error.denied": "Shelf Voice needs the microphone. Allow it for this site in your browser settings, then try again.",
+  "mic.error.none": "No microphone was found on this phone.",
+  "mic.error.failed": "Couldn't record. Please try again.",
+  "mic.error.tooShort": "Couldn't hear you. Try again closer to the phone.",
+  "mic.error.unsupported": "This browser can't record. Please open Shelf Voice in Chrome or Safari.",
+  "mic.error.upload": "Couldn't send the recording. Check your internet and try again.",
+
 };
 
 export type MessageKey = keyof typeof en;
@@ -95,7 +111,8 @@ const hi: Record<MessageKey, string> = {
   "mic.idle": "बोलने के लिए दबाएँ",
   "mic.recording": "रिकॉर्ड हो रहा है, रोकने के लिए दबाएँ",
   "mic.stop": "रोको",
-  "mic.processing": "समझ रहे हैं…",
+  "mic.uploading": "सुन रहा हूँ…",
+  "mic.processing": "समझ रहा हूँ…",
   "mic.paused": "आवाज़ अभी आराम कर रही है। आप छूकर बदलाव कर सकते हैं।",
 
   "action.confirmAll": "सब पक्का करो",
@@ -154,6 +171,21 @@ const hi: Record<MessageKey, string> = {
 
   "soon.title": "जल्द आ रहा है",
   "soon.body": "यह स्क्रीन बन रही है। बाकी सब चलता रहेगा।",
+  "mic.primer.title": "अपनी दुकान से बात करें",
+  "mic.primer.reason": "शेल्फ़ वॉइस माइक माँगता है, ताकि आप टाइप करने की जगह बोल सकें।",
+  "mic.primer.tip1": "“मैगी का दाम 15 रुपये करो”",
+  "mic.primer.tip2": "“पारले-जी के 3 पैकेट बिके”",
+  "mic.primer.tip3": "“आटा ख़त्म हो गया”",
+  "mic.primer.start": "बोलना शुरू करें",
+  "mic.primer.limit": "{seconds} सेकंड तक। रोकने के लिए फिर दबाएँ।",
+  "mic.saved": "रिकॉर्डिंग भेज दी",
+  "mic.error.denied": "शेल्फ़ वॉइस को माइक चाहिए। ब्राउज़र की सेटिंग में इस साइट को माइक की अनुमति दें, फिर कोशिश करें।",
+  "mic.error.none": "इस फ़ोन में माइक नहीं मिला।",
+  "mic.error.failed": "रिकॉर्ड नहीं हो पाया। फिर से कोशिश करें।",
+  "mic.error.tooShort": "आवाज़ सुनाई नहीं दी। फ़ोन के पास बोलकर फिर कोशिश करें।",
+  "mic.error.unsupported": "यह ब्राउज़र रिकॉर्ड नहीं कर सकता। कृपया Chrome या Safari में खोलें।",
+  "mic.error.upload": "रिकॉर्डिंग नहीं भेज पाए। इंटरनेट देखकर फिर कोशिश करें।",
+
 };
 
 const dictionaries: Record<Lang, Record<MessageKey, string>> = { en, hi };

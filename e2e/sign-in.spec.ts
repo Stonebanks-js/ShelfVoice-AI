@@ -1,18 +1,11 @@
-import { execSync } from "node:child_process";
+import { expect, test } from "@playwright/test";
 
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
-import { createClient } from "@supabase/supabase-js";
+import { blockingViolations, localAdmin, localAnon, localSupabase, signInToDemo } from "./support";
 
 // F-02 review gate: O-1 sign-in and O-2 language choice. The first block
 // needs no backend (API failures are simulated). The second runs against the
 // local Supabase stack when one is up (`supabase start`), and is skipped
 // otherwise, as in the CI e2e job.
-
-async function blockingViolations(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
-  return results.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id);
-}
 
 test.describe("sign-in screen", () => {
   test.beforeEach(async ({ context }) => {
@@ -85,26 +78,11 @@ test.describe("sign-in screen", () => {
   });
 });
 
-// ------------------------------------------------------------ with Supabase
-function localSupabase() {
-  try {
-    const out = execSync("pnpm exec supabase status -o json", { stdio: ["ignore", "pipe", "ignore"], timeout: 60_000 }).toString();
-    const status = JSON.parse(out.slice(out.indexOf("{"))) as Record<string, string>;
-    return status.API_URL?.includes("127.0.0.1") ? status : null;
-  } catch {
-    return null;
-  }
-}
-const supabase = process.env.CI ? null : localSupabase();
-
 test.describe("signed-in entry", () => {
-  test.skip(!supabase, "needs the local Supabase stack");
+  test.skip(!localSupabase, "needs the local Supabase stack");
 
-  test("demo shop opens the owner app with the tab bar", async ({ page, context }) => {
-    await context.clearCookies();
-    await page.goto("/");
-    await page.getByRole("radio", { name: "English" }).click();
-    await page.getByRole("button", { name: "Try the demo shop" }).click();
+  test("demo shop opens the owner app with the tab bar", async ({ page }) => {
+    await signInToDemo(page);
     await expect(page).toHaveURL("/app");
     // The demo shop follows the language chosen on the sign-in screen.
     await expect(page.getByRole("navigation", { name: "Main sections" })).toBeVisible();
@@ -115,12 +93,12 @@ test.describe("signed-in entry", () => {
   });
 
   test("a new owner picks a language, then lands in the app in it", async ({ page, context }) => {
-    const admin = createClient(supabase!.API_URL, supabase!.SECRET_KEY, { auth: { persistSession: false } });
+    const admin = localAdmin();
     const email = `owner-${Date.now()}@example.test`;
     const password = `Local-${Math.random().toString(36).slice(2)}-test`;
     const { data: created, error: createError } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
     if (createError) throw createError;
-    const anon = createClient(supabase!.API_URL, supabase!.PUBLISHABLE_KEY, { auth: { persistSession: false } });
+    const anon = localAnon();
     const { data, error } = await anon.auth.signInWithPassword({ email, password });
     if (error) throw error;
 
