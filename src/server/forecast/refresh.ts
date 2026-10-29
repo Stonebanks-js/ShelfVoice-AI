@@ -70,7 +70,11 @@ export async function refreshForecasts(shopId: string, productIds?: string[], no
     const firstDay = Math.min(istDay(product.created_at), ...mine.map((m) => istDay(m.occurred_at)));
     const startDay = Math.max(firstDay, today - 89);
     const dailySales = Array.from({ length: today - startDay + 1 }, () => 0);
-    for (const m of mine) if (m.kind === "SALE") dailySales[istDay(m.occurred_at) - startDay] += m.qty;
+    for (const m of mine) {
+      // A sale dated after today (device clock ahead) counts from tomorrow.
+      const i = istDay(m.occurred_at) - startDay;
+      if (m.kind === "SALE" && i < dailySales.length) dailySales[i] += m.qty;
+    }
 
     const festivalFactor = Math.max(
       1,

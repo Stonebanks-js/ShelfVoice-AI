@@ -56,6 +56,17 @@ describe("demo copy and forecasts", () => {
     expect(await refreshForecasts(shopId)).toBe(15);
   });
 
+  // 18:42 IST: today's 6 pm sales must not land tomorrow and break the forecast.
+  it("seeds an evening demo copy without future movements", async () => {
+    const owner = await testOwner(false);
+    const now = new Date("2026-10-29T13:12:00Z");
+    const shopId = await createDemoCopy(owner.user.id, now);
+    const { data: latest } = await admin.from("stock_movements").select("occurred_at").eq("shop_id", shopId).order("occurred_at", { ascending: false }).limit(1).single();
+    expect(new Date(latest!.occurred_at).getTime()).toBeLessThanOrEqual(now.getTime());
+    const { count } = await admin.from("product_forecasts").select("product_id", { count: "exact", head: true }).eq("shop_id", shopId);
+    expect(count).toBe(15);
+  });
+
   it("returns 0 for a shop with no products", async () => {
     const owner = await testOwner();
     expect(await refreshForecasts(owner.shop.id)).toBe(0);

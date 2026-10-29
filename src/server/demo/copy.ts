@@ -9,6 +9,7 @@ import { DEMO_PRODUCTS, DEMO_SHOP, simulateHistory } from "./template";
 
 const DEMO_TTL_HOURS = 24;
 const DAY_MS = 86_400_000;
+const IST_OFFSET_MS = 330 * 60_000;
 
 // Gives one anonymous demo user their own fresh copy of the demo shop (doc 03:
 // visitors never change each other's data). Written with the service role,
@@ -55,15 +56,17 @@ export async function createDemoCopy(userId: string, now = new Date()): Promise<
   if (productError) throw productError;
   const idByIndex = DEMO_PRODUCTS.map((p) => products.find((row) => row.name === p.name)!.id);
 
-  // Movements in time order; the stock trigger applies each one.
-  const start = now.getTime() - 89 * DAY_MS;
+  // Movements in time order; the stock trigger applies each one. Days are
+  // India days (8 am deliveries, 6 pm sales); today's never run past now.
+  const todayStart = Math.floor((now.getTime() + IST_OFFSET_MS) / DAY_MS) * DAY_MS - IST_OFFSET_MS;
+  const start = todayStart - 89 * DAY_MS;
   const rows = simulateHistory().map((m, i) => ({
     shop_id: shop.id,
     product_id: idByIndex[m.productIndex],
     kind: m.kind,
     qty: m.qty,
     source: "SEED" as const,
-    occurred_at: new Date(start + m.day * DAY_MS + (m.kind === "DELIVERY" ? 8 : 18) * 3_600_000).toISOString(),
+    occurred_at: new Date(Math.min(start + m.day * DAY_MS + (m.kind === "DELIVERY" ? 8 : 18) * 3_600_000, now.getTime())).toISOString(),
     idempotency_key: `seed:${i}`,
   }));
   rows.sort((a, b) => a.occurred_at.localeCompare(b.occurred_at));
