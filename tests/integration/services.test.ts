@@ -67,6 +67,13 @@ describe("demo copy and forecasts", () => {
     expect(count).toBe(15);
   });
 
+  it("opens the demo shop in the visitor's language", async () => {
+    const owner = await testOwner(false);
+    const shopId = await createDemoCopy(owner.user.id, new Date(), "en");
+    const { data } = await admin.from("shops").select("language").eq("id", shopId).single();
+    expect(data?.language).toBe("en");
+  });
+
   it("returns 0 for a shop with no products", async () => {
     const owner = await testOwner();
     expect(await refreshForecasts(owner.shop.id)).toBe(0);

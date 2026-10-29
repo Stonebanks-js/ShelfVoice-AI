@@ -1,3 +1,4 @@
+import { langFromAcceptLanguage } from "@/i18n/dictionary";
 import { ipHash, limit } from "@/server/abuse";
 import { createDemoCopy } from "@/server/demo/copy";
 import { ApiError, route } from "@/server/http";
@@ -16,7 +17,10 @@ export const POST = route(async (request, _ctx, { requestId }) => {
     throw new ApiError(503, "DEMO_UNAVAILABLE", "The demo shop isn't available right now");
   }
 
-  const shopId = await createDemoCopy(data.user.id);
+  // The demo shop speaks the language the visitor chose on the sign-in screen.
+  const chosen = /(?:^|;\s*)sv_lang=(hi|en)(?:;|$)/.exec(request.headers.get("cookie") ?? "")?.[1] as "hi" | "en" | undefined;
+  const language = chosen ?? langFromAcceptLanguage(request.headers.get("accept-language"));
+  const shopId = await createDemoCopy(data.user.id, new Date(), language);
   log("info", "auth.demo.signed_in", { requestId, shopId });
   return Response.json({ shopId }, { status: 201 });
 });
