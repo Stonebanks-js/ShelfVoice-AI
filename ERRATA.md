@@ -629,7 +629,7 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 6. **The circuit breaker opens after 5 consecutive failures** rather than "5 in 2 minutes", because `ai_breaker` has no per-failure timestamps. Recovery is as doc 05 says: one probe after 60 s.
 7. **Liveness (`/api/health`) runs on every request** instead of being prerendered, so the uptime monitor really checks the running app.
 8. **The demo shop template lives in code** (`src/server/demo/template.ts`): 15 products, 90 days of seeded history and two analysed reviews. W-21 builds on it.
-9. **Readiness times the faster of two database reads** against the 500 ms limit, and reports it as `databaseMs`. From Vercel `bom1` to Seoul staging (E-28), a read takes about 190 ms, but 3 of 10 single reads spiked to 530–770 ms, which would page on a healthy database.
+9. **Readiness times the faster of two database reads** and reports it as `databaseMs`. From Vercel `bom1` to Seoul staging (E-28), a read usually takes about 190 ms, but whole requests spike to 500–830 ms (3 in 20, even with two reads), which would page on a healthy database. The limit is 1500 ms while the app reads Seoul staging. Set it back to 500 ms when production in Mumbai goes live.
 
 | Doc | Page | Section | Change |
 |---|---|---|---|
@@ -638,4 +638,4 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 | 02 | 12 | Background jobs | Forecast refresh: TypeScript after each sale and nightly Vercel cron; no pg_cron |
 | 02 | 6 | Endpoints, public review | Multipart upload through the server for reviews |
 | 05 | 7 | Reliability patterns | Breaker opens after 5 consecutive failures |
-| 05 | — | Health checks | Readiness: Postgres check uses the faster of two reads under 500 ms |
+| 05 | — | Health checks | Readiness: faster of two Postgres reads, under 1500 ms on Seoul staging and 500 ms in production |

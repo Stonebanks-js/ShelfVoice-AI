@@ -35,7 +35,9 @@ export async function GET() {
   };
   const reads = [await timedRead(), await timedRead()];
   const databaseMs = Math.min(...reads.map((r) => r.ms));
-  checks.database = reads.every((r) => !r.error) && databaseMs < 500;
+  // 1500 ms while the app reads Seoul staging; back to doc 05's 500 ms once
+  // production is in Mumbai (E-31 item 9).
+  checks.database = reads.every((r) => !r.error) && databaseMs < 1500;
 
   const { error: storageError } = await db.storage.getBucket("voice");
   checks.storage = !storageError;
