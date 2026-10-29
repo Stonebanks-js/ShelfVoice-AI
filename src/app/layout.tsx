@@ -1,17 +1,36 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Noto_Sans_Devanagari } from "next/font/google";
+
 import "./globals.css";
 
-// Fonts (Baloo 2, Mukta), tokens and the app shell arrive with W-06 (doc 06).
+// Latin text uses the phone's own font; this covers Hindi (errata E-32).
+const devanagari = Noto_Sans_Devanagari({
+  subsets: ["devanagari"],
+  variable: "--font-devanagari",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Shelf Voice",
   description: "Speak your shop online, know what to restock, and hear every customer.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover", // lets the tab bar sit above the home indicator
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f2f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
+
+// `lang` here is the document default; each screen's language provider marks
+// its own subtree, so Hindi is announced correctly (doc 06).
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${devanagari.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-bg font-sans text-ink">{children}</body>
     </html>
   );
 }
