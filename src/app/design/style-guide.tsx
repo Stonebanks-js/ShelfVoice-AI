@@ -15,10 +15,11 @@ import {
   TriangleAlert,
   Undo2,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { MicButton, type MicState } from "@/components/shell/mic-button";
+import { MicButton } from "@/components/shell/mic-button";
 import { TabBar } from "@/components/shell/tab-bar";
+import { VoiceCapture } from "@/components/shell/voice-capture";
 import { Button } from "@/components/ui/button";
 import { Badge, Chip, Segmented, Switch } from "@/components/ui/controls";
 import { EmptyState, PageHeader, SkeletonList } from "@/components/ui/feedback";
@@ -28,6 +29,7 @@ import { AlertDialog, Sheet } from "@/components/ui/overlay";
 import { ToastProvider, useToast } from "@/components/ui/toast";
 import type { Lang } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
+import type { Recording } from "@/lib/audio/use-recorder";
 
 type Theme = "phone" | "light" | "dark";
 
@@ -77,15 +79,15 @@ const PRODUCTS = [
 function Guide({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => void }) {
   const { lang, setLang, t } = useLang();
   const toast = useToast();
-  const [mic, setMic] = useState<MicState>("idle");
+  const [clip, setClip] = useState<Recording | null>(null);
+  const clipUrl = useMemo(() => (clip ? URL.createObjectURL(new Blob([clip.wav], { type: "audio/wav" })) : null), [clip]);
+  useEffect(() => () => void (clipUrl && URL.revokeObjectURL(clipUrl)), [clipUrl]);
   const [search, setSearch] = useState("");
   const [chip, setChip] = useState("All");
   const [published, setPublished] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-
-  const nextMic: Record<MicState, MicState> = { idle: "recording", recording: "processing", processing: "idle", paused: "idle" };
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-10 pb-16">
@@ -236,18 +238,25 @@ function Guide({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => 
         </div>
       </Section>
 
-      <Section title="Mic" note="Tap to start, tap to stop. Tap the big one to cycle its states.">
-        <div className="mx-4 flex flex-wrap items-end justify-around gap-6 rounded-lg bg-surface py-8 shadow-card">
-          <MicButton size="hero" state={mic} elapsed="0:12" onPress={() => setMic(nextMic[mic])} />
+      <Section title="Mic" note="Doc 06 states: idle, recording (ring fills toward the limit, live level bars), sending, understanding, resting.">
+        <div className="mx-4 grid grid-cols-3 justify-items-center gap-y-8 rounded-lg bg-surface py-8 shadow-card sm:grid-cols-5">
           <MicButton state="idle" />
-          <MicButton state="recording" elapsed="0:07" />
+          <MicButton state="recording" elapsedMs={12_000} maxSeconds={30} level={0.6} />
+          <MicButton state="uploading" />
           <MicButton state="processing" />
           <MicButton state="paused" />
         </div>
-        <div className="px-4">
-          <Button variant="gray" onClick={() => setMic("paused")} icon={<Mic aria-hidden className="size-5" />}>
-            Show “voice resting”
-          </Button>
+        <div data-testid="live-recorder" className="mx-4 flex flex-col items-center gap-4 rounded-lg bg-surface px-4 pt-10 pb-6 shadow-card">
+          <p className="text-footnote text-ink-2">Live recorder: tap, speak, tap again. Nothing is uploaded here.</p>
+          <VoiceCapture size="hero" maxSeconds={15} onRecorded={setClip} />
+          {clip && (
+            <div className="flex w-full flex-col items-center gap-2">
+              <p className="text-footnote text-ink-2 tabular-nums" data-testid="clip-info">
+                {(clip.durationMs / 1000).toFixed(1)} s · 16 kHz mono WAV · {Math.round(clip.wav.byteLength / 1024)} KB
+              </p>
+              <audio controls src={clipUrl ?? undefined} className="w-full max-w-xs" />
+            </div>
+          )}
         </div>
       </Section>
 
