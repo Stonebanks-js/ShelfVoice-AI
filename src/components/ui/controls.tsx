@@ -90,7 +90,7 @@ export function Segmented<T extends string>({
             className={cn(
               // Unselected labels stay in body ink: ink-2 on the grey track is under 4.5:1.
               "min-h-11 flex-1 rounded-md px-3 text-footnote text-ink transition-[background-color,box-shadow] duration-200",
-              selected ? "bg-surface font-semibold shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "font-medium",
+              selected ? "bg-segment font-semibold shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "font-medium",
             )}
           >
             {option.label}

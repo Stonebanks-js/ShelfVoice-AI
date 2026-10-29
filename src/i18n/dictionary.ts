@@ -53,6 +53,30 @@ const en = {
   "theme.phone": "Phone",
   "theme.light": "Light",
   "theme.dark": "Dark",
+
+  "signin.google": "Continue with Google",
+  "signin.demo": "Try the demo shop",
+  "signin.demoNote": "No sign-up. A sample kirana shop, yours for 24 hours.",
+  "signin.voice.title": "Speak to set up your shop",
+  "signin.voice.body": "Say what you sell. We build your shop page.",
+  "signin.restock.title": "Know what to restock",
+  "signin.restock.body": "A daily order list from your own sales.",
+  "signin.reviews.title": "Hear every customer",
+  "signin.reviews.body": "Customers leave voice reviews from a QR code.",
+  "signin.failed": "Sign-in didn't finish. Please try again.",
+
+  "welcome.title": "Choose your language",
+  "welcome.body": "The app will talk to you in this language. You can change it later in My shop.",
+  "action.continue": "Continue",
+
+  "error.rateLimited": "Too many tries. Please wait a little and try again.",
+  "error.demoUnavailable": "The demo shop isn't available right now. Please try again soon.",
+  "error.signedOut": "Please sign in again.",
+  "error.generic": "Something went wrong. Please try again.",
+  "error.offline": "You're offline. Check your internet and try again.",
+
+  "soon.title": "Coming next",
+  "soon.body": "This screen is being built. Everything else keeps working.",
 };
 
 export type MessageKey = keyof typeof en;
@@ -106,6 +130,30 @@ const hi: Record<MessageKey, string> = {
   "theme.phone": "फ़ोन जैसा",
   "theme.light": "हल्का",
   "theme.dark": "गहरा",
+
+  "signin.google": "Google से आगे बढ़ें",
+  "signin.demo": "डेमो दुकान देखें",
+  "signin.demoNote": "साइन-अप नहीं चाहिए। एक नमूना किराना दुकान, 24 घंटे आपकी।",
+  "signin.voice.title": "बोलकर दुकान सेट करें",
+  "signin.voice.body": "बताइए आप क्या बेचते हैं। हम आपकी दुकान का पेज बना देंगे।",
+  "signin.restock.title": "जानें क्या मँगवाना है",
+  "signin.restock.body": "आपकी अपनी बिक्री से रोज़ की ऑर्डर लिस्ट।",
+  "signin.reviews.title": "हर ग्राहक की सुनें",
+  "signin.reviews.body": "ग्राहक QR कोड से आवाज़ में रिव्यू देते हैं।",
+  "signin.failed": "साइन-इन पूरा नहीं हुआ। फिर से कोशिश करें।",
+
+  "welcome.title": "अपनी भाषा चुनें",
+  "welcome.body": "ऐप आपसे इसी भाषा में बात करेगा। इसे बाद में \"मेरी दुकान\" में बदल सकते हैं।",
+  "action.continue": "आगे बढ़ें",
+
+  "error.rateLimited": "बहुत बार कोशिश हुई। थोड़ी देर बाद फिर करें।",
+  "error.demoUnavailable": "डेमो दुकान अभी उपलब्ध नहीं है। थोड़ी देर में फिर कोशिश करें।",
+  "error.signedOut": "कृपया फिर से साइन-इन करें।",
+  "error.generic": "कुछ गड़बड़ हुई। फिर से कोशिश करें।",
+  "error.offline": "आप ऑफ़लाइन हैं। इंटरनेट देखकर फिर कोशिश करें।",
+
+  "soon.title": "जल्द आ रहा है",
+  "soon.body": "यह स्क्रीन बन रही है। बाकी सब चलता रहेगा।",
 };
 
 const dictionaries: Record<Lang, Record<MessageKey, string>> = { en, hi };
