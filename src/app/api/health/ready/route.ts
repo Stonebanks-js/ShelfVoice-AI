@@ -2,7 +2,7 @@ import { env } from "@/env/server";
 import { log, release } from "@/server/log";
 import { adminClient } from "@/server/supabase";
 
-// Readiness (doc 05): Postgres under 500 ms, Storage reachable, Meta key
+// Readiness (doc 05): Postgres under 1500 ms, Storage reachable, Meta key
 // valid (cached 5 minutes, no token spend), AI budget below 95%. Returns 503
 // naming the failed check. Also keeps the free Supabase project from pausing.
 let metaCheck: { ok: boolean; at: number } | undefined;
@@ -27,7 +27,7 @@ export async function GET() {
   const checks: Record<string, boolean> = {};
 
   // Best of two reads: a cold function's TLS handshake, or one slow hop to
-  // the database region (staging is in Seoul, E-28), isn't database slowness.
+  // the database region (Seoul, E-28), isn't database slowness.
   const timedRead = async () => {
     const started = performance.now();
     const { error } = await db.from("shops").select("id").limit(1);
@@ -35,8 +35,7 @@ export async function GET() {
   };
   const reads = [await timedRead(), await timedRead()];
   const databaseMs = Math.min(...reads.map((r) => r.ms));
-  // 1500 ms while the app reads Seoul staging; back to doc 05's 500 ms once
-  // production is in Mumbai (E-31 item 9).
+  // 1500 ms, not doc 05's 500 ms: the database is in Seoul (E-28, E-31 item 9).
   checks.database = reads.every((r) => !r.error) && databaseMs < 1500;
 
   const { error: storageError } = await db.storage.getBucket("voice");
