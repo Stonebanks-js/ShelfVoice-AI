@@ -31,7 +31,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-08](#e-08-ip-hash-kept-longer-than-promised) | IP hash kept longer than promised | Medium | No | Open |
 | [E-09](#e-09-preview-deploys-can-run-new-code-on-an-old-schema) | Preview deploys can run new code on an old schema | Medium | No | Open |
 | [E-10](#e-10-ai-call-outcome-names-do-not-match) | AI call outcome names do not match | Medium | No | Open |
-| [E-11](#e-11-devanagari-font) | Devanagari font | Low | No | Open |
+| [E-11](#e-11-devanagari-font) | Devanagari font | Low | No | Superseded (E-32) |
 | [E-12](#e-12-owner-voice-note-retention) | Owner voice note retention | Low | No | Open |
 | [E-13](#e-13-meta-api-timeouts) | Meta API timeouts | Low | No | Open |
 | [E-14](#e-14-what-triggers-the-nightly-backup) | What triggers the nightly backup | Low | No | Open |
@@ -292,7 +292,7 @@ Nothing enforces $100. Also, 03 calls for a per-shop daily cap and 08 says to "r
 
 ### E-11 Devanagari font
 
-**Severity:** Low · **Owner decision:** No · **Status:** Open
+**Severity:** Low · **Owner decision:** No · **Status:** Superseded by E-32 (Noto Sans Devanagari behind the phone's own font)
 
 **Conflict.** 02 says "Devanagari renders with Noto Sans Devanagari". 06 sets the type tokens to Baloo 2 (display) and Mukta (interface), which both cover Devanagari. Noto Sans Devanagari belongs to the rejected Clean utility option.
 
@@ -659,6 +659,8 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 1. **Visual direction: Apple-style with a blue accent.** The phone's own font (SF on Apple devices, Roboto on Android) with Noto Sans Devanagari for Hindi; large titles; grouped, rounded lists; a frosted bottom tab bar with the centre mic; soft depth instead of flat. The accent is a darkened system blue, `#0A66D8` (5.4:1 on white, so small text passes AA), not `#007AFF` (4.0:1). Turmeric survives only as the "low stock" fill behind dark text.
 2. **Process: a live style guide instead of mockups.** Tokens and components are built into a `/design` page in the app and checked on the owner's phone before any screen is built on them.
 3. **Dark mode follows the phone.** Light when the phone has no preference.
+
+Built as F-01 on Oct 29: native `<dialog>` for sheets and alerts instead of shadcn/Radix (focus trap, Escape and inert background come from the browser), one icon library (`lucide-react`), and solid soft tints so tinted text keeps 4.5:1 over any background.
 
 Unchanged from doc 06: U2 (follow phone language), U3 (four tabs and centre mic), U4 (list rows with category chips), icon plus word, one primary action per screen, 48 px targets, and the Check and confirm pattern.
 
