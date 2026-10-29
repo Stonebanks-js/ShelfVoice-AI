@@ -10,6 +10,7 @@ import { useLang } from "@/i18n/lang";
 import { uploadVoice } from "@/lib/audio/upload";
 import { buzz, useRecorder, type Recording } from "@/lib/audio/use-recorder";
 import { errorKey } from "@/lib/errors";
+import { voiceErrorKey } from "@/lib/voice";
 
 import { MicButton } from "./mic-button";
 
@@ -25,44 +26,50 @@ function primed(): boolean {
 
 // The mic, wired up (doc 06 "Mic button behaviour"): the first tap explains
 // why the microphone is needed and what to say, before the browser asks;
-// then tap to record, tap to stop, upload, and hand the stored path on.
-// Failures appear above the button with what to do next.
+// then tap to record, tap to stop, upload ("Listening…"), and hand the
+// stored path to `onUploaded` ("Understanding…" while it runs). Failures
+// appear above the button with what to do next; a retry reuses the clip.
 export function VoiceCapture({
   maxSeconds,
   onUploaded,
   onRecorded,
-  processing = false,
   paused = false,
   size = "tab",
 }: {
   maxSeconds: number;
-  onUploaded?: (path: string) => void; // omit to record without uploading (style guide)
+  onUploaded?: (path: string) => Promise<void> | void; // omit to record without uploading (style guide)
   onRecorded?: (recording: Recording) => void;
-  processing?: boolean; // the caller is turning the clip into changes
   paused?: boolean; // AI is resting (budget or breaker)
   size?: "tab" | "hero";
 }) {
   const { t } = useLang();
   const [primer, setPrimer] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<MessageKey | null>(null);
-  const pending = useRef<{ wav: Uint8Array<ArrayBuffer>; clientId: string } | null>(null);
+  const [stage, setStage] = useState<"idle" | "uploading" | "processing">("idle");
+  const [failure, setFailure] = useState<{ key: MessageKey; retry: boolean } | null>(null);
+  const pending = useRef<{ wav: Uint8Array<ArrayBuffer>; clientId: string; path?: string } | null>(null);
 
   const send = useCallback(async () => {
     const clip = pending.current;
     if (!clip || !onUploaded) return;
-    setUploading(true);
-    setUploadError(null);
+    setFailure(null);
     try {
-      const path = await uploadVoice(clip.wav, clip.clientId);
+      if (!clip.path) {
+        setStage("uploading");
+        clip.path = await uploadVoice(clip.wav, clip.clientId);
+      }
+      setStage("processing");
+      await onUploaded(clip.path);
       pending.current = null;
-      onUploaded(path);
-    } catch (failure) {
-      const key = errorKey(failure);
-      setUploadError(key === "error.generic" ? "mic.error.upload" : key);
+    } catch (error) {
+      // Before the upload finished, it's a sending problem; after, the
+      // recording is safe in Storage and only the understanding failed.
+      const key = clip.path ? voiceErrorKey(error) : errorKey(error) === "error.generic" ? "mic.error.upload" : errorKey(error);
+      const reRecord = key === "mic.error.nothingHeard" || key === "mic.error.badAudio" || key === "mic.paused";
+      if (reRecord) pending.current = null;
+      setFailure({ key, retry: !reRecord });
       buzz([40, 60, 40]);
     } finally {
-      setUploading(false);
+      setStage("idle");
     }
   }, [onUploaded]);
 
@@ -79,7 +86,7 @@ export function VoiceCapture({
 
   function press() {
     if (recorder.recording) return recorder.stop();
-    setUploadError(null);
+    setFailure(null);
     if (!primed()) return setPrimer(true);
     void recorder.start();
   }
@@ -98,13 +105,9 @@ export function VoiceCapture({
     ? "paused"
     : recorder.recording
       ? "recording"
-      : uploading
-        ? "uploading"
-        : processing
-          ? "processing"
-          : "idle";
-  const message: MessageKey | null = paused ? "mic.paused" : (recorder.error ?? uploadError);
-  const canRetry = uploadError !== null; // only send() sets it, and it keeps the clip
+      : stage;
+  const message: MessageKey | null = paused ? "mic.paused" : (recorder.error ?? failure?.key ?? null);
+  const canRetry = Boolean(failure?.retry);
 
   return (
     <div className="relative flex flex-col items-center">
@@ -128,7 +131,7 @@ export function VoiceCapture({
               aria-label={t("action.done")}
               onClick={() => {
                 recorder.setError(null);
-                setUploadError(null);
+                setFailure(null);
               }}
               className="-m-2 grid size-10 shrink-0 place-items-center text-ink-2"
             >
