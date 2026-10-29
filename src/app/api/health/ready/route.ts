@@ -26,6 +26,9 @@ export async function GET() {
   const db = adminClient();
   const checks: Record<string, boolean> = {};
 
+  // Timed on a warm connection: a cold function's TLS handshake to the
+  // database region (staging is in Seoul, E-28) isn't database slowness.
+  await db.from("shops").select("id").limit(1);
   const started = performance.now();
   const { error: dbError } = await db.from("shops").select("id").limit(1);
   checks.database = !dbError && performance.now() - started < 500;
