@@ -31,6 +31,9 @@ export default defineConfig({
   ],
   webServer: {
     command: `pnpm build && pnpm start --port ${port}`,
+    // Journeys never spend Meta credit: an AI call they forget to mock fails
+    // fast on a missing recording instead of reaching the live API.
+    env: { META_MODE: "recorded" },
     url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

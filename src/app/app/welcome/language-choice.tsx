@@ -50,7 +50,8 @@ export function LanguageChoice({ initial }: { initial: Lang }) {
         return;
       }
     }
-    router.replace("/app");
+    // Doc 06: language first (O-2), then voice setup (O-3).
+    router.replace("/app/setup");
     router.refresh();
   }
 

@@ -92,7 +92,7 @@ test.describe("signed-in entry", () => {
     await expect(page).toHaveURL("/app");
   });
 
-  test("a new owner picks a language, then lands in the app in it", async ({ page, context }) => {
+  test("a new owner picks a language, then sets up the shop in it", async ({ page, context }) => {
     const admin = localAdmin();
     const email = `owner-${Date.now()}@example.test`;
     const password = `Local-${Math.random().toString(36).slice(2)}-test`;
@@ -119,8 +119,8 @@ test.describe("signed-in entry", () => {
       await expect(page.getByRole("heading", { level: 1, name: "Choose your language" })).toBeVisible();
       expect(await blockingViolations(page)).toEqual([]);
       await page.getByRole("button", { name: "Continue" }).click();
-      await expect(page).toHaveURL("/app");
-      await expect(page.getByRole("heading", { level: 1, name: "Today" })).toBeVisible();
+      await expect(page).toHaveURL("/app/setup");
+      await expect(page.getByRole("heading", { level: 1, name: "Tell us about your shop" })).toBeVisible();
 
       const { data: shop } = await admin.from("shops").select("language").eq("owner_id", created.user.id).single();
       expect(shop?.language).toBe("en");

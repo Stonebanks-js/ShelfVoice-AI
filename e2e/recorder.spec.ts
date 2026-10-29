@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInToDemo } from "./support";
+import { blockingViolations } from "./support";
 
 // F-03 review gate: the mic records, explains itself the first time, stops,
 // and says what went wrong in plain words. The style guide's live recorder
@@ -76,24 +76,5 @@ test.describe("recorder on the style guide", () => {
   });
 });
 
-test.describe("owner mic", () => {
-  test.skip(!localSupabase, "needs the local Supabase stack");
-
-  test("records a command and stores it in the shop's voice folder", async ({ page }) => {
-    await signInToDemo(page);
-
-    const nav = page.getByRole("navigation", { name: "Main sections" });
-    await nav.getByRole("button", { name: "Tap to speak" }).click();
-    await page.getByRole("dialog", { name: "Speak to your shop" }).getByRole("button", { name: "Start speaking" }).click();
-    await expect(nav.getByRole("button", { name: "Recording, tap to stop" })).toHaveAttribute("aria-pressed", "true");
-    await expect(nav.getByText(/^0:\d\d \/ 0:30$/)).toBeVisible(); // timer against the 30-second limit
-    await page.waitForTimeout(1500); // more than the half-second mis-tap threshold
-    await nav.getByRole("button", { name: "Recording, tap to stop" }).click();
-    await expect(page.getByRole("status").filter({ hasText: "Recording sent" })).toBeVisible({ timeout: 15_000 });
-
-    // This session's own shop (other journeys make demo shops in parallel).
-    const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
-    const { data: files } = await localAdmin().storage.from("voice").list(`${shop.id}/owner`);
-    expect(files?.some((f) => f.name.endsWith(".wav"))).toBe(true);
-  });
-});
+// The owner's mic journey, from recording to Check and confirm, is in
+// check-confirm.spec.ts, with the AI step mocked so it never spends credit.
