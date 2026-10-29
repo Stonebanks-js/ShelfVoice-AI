@@ -25,7 +25,19 @@ export async function proxy(request: NextRequest) {
     },
   );
   // Validates the session and refreshes it if needed; must not be skipped.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Signed-in owners skip the sign-in page; the owner app needs a session.
+  const path = request.nextUrl.pathname;
+  const isApp = path === "/app" || path.startsWith("/app/");
+  if ((user && path === "/") || (!user && isApp)) {
+    const redirect = NextResponse.redirect(new URL(user ? "/app" : "/", request.url));
+    for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+    redirect.headers.set("x-request-id", requestId);
+    return redirect;
+  }
 
   response.headers.set("x-request-id", requestId);
   return response;

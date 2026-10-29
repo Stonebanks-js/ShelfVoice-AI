@@ -50,7 +50,7 @@ export default defineConfig({
       include: ["src/server/**/*.ts"],
       // Request-scoped glue that needs a live Next request (cookies) is
       // exercised by scripts/smoke-api.mjs instead.
-      exclude: ["**/*.test.ts", "src/server/owner.ts"],
+      exclude: ["**/*.test.ts", "src/server/owner.ts", "src/server/session.ts"],
       thresholds: { lines: 80 },
       reporter: ["text", "json-summary"],
     },
