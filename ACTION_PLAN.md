@@ -26,7 +26,7 @@ These are the points where the build stops and waits for the owner. Each one lis
 | C-07 | Phase 1, before W-03 | Create the Vercel project linked to the repo; set the env vars I list in the dashboard; add `VERCEL_TOKEN` and the Supabase access token as GitHub Actions secrets (or connect a Vercel MCP) | W-03, S1 (bom1 check), S6 |
 | C-08 | Phase 1, before W-03b | Create Axiom (dataset `shelfvoice`), Better Stack (4 monitors, 2 heartbeats, status page) and a Discord alert webhook; put their tokens and URLs in Vercel env | W-03b |
 | C-09 | Phase 1, during spike | Record 20 Hinglish clips across all 3 teammates (10 owner commands, 10 reviews) and take 1 shelf photo | S4, S5 |
-| C-10 | Phase 2, before W-07 | (in progress Oct 29) Create the Google Cloud OAuth client with the redirect URI I give you; enter its ID and secret in the Supabase dashboard; set the consent screen to production before real owners | W-07 |
+| C-10 | Phase 2, before W-07 | (done Oct 29: client created, app published, live sign-in verified) Create the Google Cloud OAuth client with the redirect URI I give you; enter its ID and secret in the Supabase dashboard; set the consent screen to production before real owners | W-07 |
 | C-11 | Phase 2, before W-08 | A mid-range Android phone on hand for mic and upload tests | W-08, W-24 |
 | C-12 | Phase 3, before W-14 | Create the Cloudflare Turnstile site; put the site key and secret in Vercel env | W-14 |
 | C-13 | Phase 3 | Record the audio fixtures (6 setup, 12 command, 10 review, 6 edge-case clips) and photo fixtures (5 shelf, 10 printed bills, 5 handwritten bills, 1 with GPS EXIF) | W-09, W-11, W-15, W-16, W-22 |
