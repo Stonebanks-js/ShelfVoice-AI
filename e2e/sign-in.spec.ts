@@ -106,7 +106,9 @@ test.describe("signed-in entry", () => {
     await page.getByRole("radio", { name: "English" }).click();
     await page.getByRole("button", { name: "Try the demo shop" }).click();
     await expect(page).toHaveURL("/app");
-    await expect(page.getByRole("navigation", { name: /Main sections|मुख्य हिस्से/ })).toBeVisible();
+    // The demo shop follows the language chosen on the sign-in screen.
+    await expect(page.getByRole("navigation", { name: "Main sections" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Today" })).toBeVisible();
     // Signed in, the sign-in page sends the owner back to the app.
     await page.goto("/");
     await expect(page).toHaveURL("/app");

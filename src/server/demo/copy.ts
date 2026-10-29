@@ -14,7 +14,7 @@ const IST_OFFSET_MS = 330 * 60_000;
 // Gives one anonymous demo user their own fresh copy of the demo shop (doc 03:
 // visitors never change each other's data). Written with the service role,
 // because only the server creates demo copies (errata E-29).
-export async function createDemoCopy(userId: string, now = new Date()): Promise<string> {
+export async function createDemoCopy(userId: string, now = new Date(), language: "hi" | "en" = "hi"): Promise<string> {
   const db = adminClient();
   const slug = `demo-${randomBytes(4).toString("hex")}`;
 
@@ -28,7 +28,7 @@ export async function createDemoCopy(userId: string, now = new Date()): Promise<
       address: DEMO_SHOP.address,
       phone: DEMO_SHOP.phone,
       hours: DEMO_SHOP.hours,
-      language: "hi",
+      language, // the language the visitor was using on sign-in
       is_published: true,
       is_demo: true,
       demo_expires_at: new Date(now.getTime() + DEMO_TTL_HOURS * 3_600_000).toISOString(),
