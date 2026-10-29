@@ -126,7 +126,7 @@ Every build task (W-xx) runs through the same loop. Each step comes from the doc
 | W-03b | Observability: next-axiom logging; request-ID middleware returning `x-request-id`; redaction helper; `onRequestError`; client errors to `/api/v1/client-errors` (rate-limited); Web Vitals; `/api/health` and `/api/health/ready`; Better Stack 4 monitors and 2 heartbeats (daily cron and nightly backup); status page; Discord webhook alerts | C | — | 05 p3–8, 07 p11 | E-14 | Logs reach Axiom; one forced error and one forced downtime alert in Discord | In progress: logger with redaction, request IDs, health endpoints, Axiom shipping, Discord alerts (errors, breaker, budget), onRequestError and nightly heartbeat done Oct 29 (E-31 item 10); Better Stack monitors set up by the team; client errors and Web Vitals come with the frontend |
 | W-03c | Security headers on every response: CSP (self, Supabase, Turnstile; Next.js nonces), HSTS, nosniff, Referrer-Policy, `frame-ancestors 'none'`, Permissions-Policy allowing mic and camera only on owner and review pages. CSRF: JSON-only, same-origin check | C | — | 03 p7 | — | Header test passes; DevTools check on all three surfaces | Not started |
 | W-04 | Meta client `src/server/ai/meta.ts`: OpenAI SDK at `META_BASE_URL`; Responses, transcribe and SAM; timeouts 30 s (Spark) and 20 s (Transcribe, SAM); one retry with jitter on 429 and 5xx; circuit breaker in `ai_breaker`; one `ai_calls` row per call (outcomes `OK`, `SCHEMA_REJECTED`, `TIMEOUT`, `RATE_LIMITED`, `ERROR`); spend caps (global, per shop, $100 total, off at 95%); `META_MODE` `recorded`, `live` and `replay-demo`; `pnpm record:meta` | C | — | 02 p7–9, 05 p4–8, 07 p9–10, 04 p9–10 | E-03, E-06, E-10, E-13 | Unit tests pass with recorded responses; each failure in 07's contract maps to the right outcome | Complete in code Oct 29: Meta client with caps, breaker, retry, ai_calls ledger, recorded mode; 17 unit + 14 AI job tests (E-30, E-31) |
-| W-06 | Design system: Signboard tokens, Baloo 2 and Mukta via `next/font`, shadcn theme, app shell with four tabs (Today, Stock, Orders, Reviews) and centre "Bolo" mic, Hindi/English dictionary, `lang` attributes, focus ring, dark-mode tokens | A | NFR | 06 p1–7, Key Screens | E-11, E-18, E-21 | Shell matches the mockups at 360 px; axe clean; no stray token values | Not started |
+| W-06 | (Replaced by F-01, E-32) Design system: Signboard tokens, Baloo 2 and Mukta via `next/font`, shadcn theme, app shell with four tabs (Today, Stock, Orders, Reviews) and centre "Bolo" mic, Hindi/English dictionary, `lang` attributes, focus ring, dark-mode tokens | A | NFR | 06 p1–7, Key Screens | E-11, E-18, E-21 | Shell matches the mockups at 360 px; axe clean; no stray token values | Not started |
 | W-05 | Day-1 spike S0 to S6 recorded | C | — | 09 p4–5 | — | All seven checks have a status and evidence in `spike/` | Not started |
 
 ---
@@ -182,6 +182,37 @@ Every build task (W-xx) runs through the same loop. Each step comes from the doc
 | W-22d | Design acceptance per screen (06 p11–12): tokens only, all states, 48 px controls, thumb-zone actions, no horizontal scroll at 320/360/768/1280, both languages fit, reduced motion, a teammate who didn't build it completes the task first time | A | — | 06 p11–12 | — | Checklist ticked for all 13 screens | Not started |
 | W-23 | Real-owner sessions with 3 shop owners, Nov 2–3: signed consent, a timed first-voice-note-to-storefront run (target under 3 minutes), quotes for the video, feedback on setup and confirm screens | A | — | 01 p5, 04 p12, 06 p12, 09 I4 | — | Signed consent and recordings saved for each owner | Not started |
 | D-08 | Video script and shot list, following 09's beats (Impact, Meta tooling, Technical depth, Demo); re-read the submission form on Nov 2 | A, Submitter | — | 09 p10–11 | — | Script and shot list ready by Nov 3 | Not started |
+
+---
+
+## Frontend build (from Oct 29, E-32)
+
+**Why this section:** the backend for W-04 to W-16 is live at https://shelfvoice.vercel.app; these tasks build the screens on it. Apple-style look with accent `#0A66D8`, dark mode following the phone, and a live `/design` style guide instead of mockups (E-32). Screen tasks finish the UI half of the W tasks they name. Solo builder: every row is the owner's to approve.
+
+**Review gate (R) after every F task, before it counts as done.** This is the "code review while connecting frontend and backend" step:
+
+1. Code review of the diff: correctness, security (no service key or secrets in client code, `check:bundle` passes), accessibility, and reuse of the design-system components.
+2. Contract check: the screen calls the real endpoint, handles every error code the route can return (400, 401, 403, 404, 409, 422, 429, 503) with the copy from doc 06, and shows loading, empty, error and offline states.
+3. Tests: Playwright flow for the screen with axe clean, at 360 px in light and dark; unit tests for any client logic (WAV encoder, timers).
+4. Live check: deployed to https://shelfvoice.vercel.app, the flow run once by hand with no console errors and no 5xx in Axiom.
+
+| ID | Task | Owner | Finishes | Done when | Status |
+|---|---|---|---|---|---|
+| F-01 | Design system and `/design` style guide: colour tokens (light and dark), system font plus Noto Sans Devanagari, type scale 14–40, spacing 4–48, radii; components Button, IconButton, List group and row, Input, Search, Switch, Segmented control, Chip, Badge, Sheet, Dialog, Toast, Skeleton, Empty state; Lucide icons with labels; Hindi/English dictionary with `lang`; app shell with frosted tab bar (Today, Stock, Orders, Reviews) and centre mic | Owner | W-06 | Owner approves `/design` on their phone; axe clean; no horizontal scroll at 320–430 px | Not started |
+| F-02 | Landing and sign-in O-1 (Continue with Google, Try the demo shop, language switch) and language choice O-2 | Owner | W-07 | Google and demo sign-in reach the app shell on the live site | Not started |
+| F-03 | MicButton (all states, tap to start and stop, 2:00 / 0:30 / 0:15 limits, ring, haptics, screen-reader labels), browser WAV encoder (16 kHz mono 16-bit), signed upload | Owner | W-08 | A recorded clip uploads and its WAV passes the server check | Not started |
+| F-04 | Voice setup O-3, Check and confirm O-4 (what we heard, change cards with edit and remove, Confirm all), undo toast (10 s) | Owner | W-09, W-11 | Speak a shop setup, confirm, undo; products appear and disappear | Not started |
+| F-05 | Today O-5: sales total, items running low, new reviews | Owner | W-20 | Demo shop shows real numbers | Not started |
+| F-06 | Stock O-6: search, category chips, rows with price, stock and in/out switch; tap edits | Owner | W-12 | Stock edits by tap and by voice update the row | Not started |
+| F-07 | Orders O-7: rows sorted by days left, order quantity, reason line, review flag, model explanation | Owner | W-13 | Demo shop's atta shows the review flag and a quantity | Not started |
+| F-08 | Reviews O-8: sentiment, transcript, item chips, play audio, hide | Owner | W-15 | Demo reviews render; hide works | Not started |
+| F-09 | My shop O-9: live preview, publish switch, QR download, share link, hours; delete shop with confirm (needs the W-17 endpoint) | Owner | W-17 | Publish and unpublish change the storefront; delete removes the shop | Not started |
+| F-10 | Camera O-10: bill photo (rear camera, resize to 1600 px JPEG, strip EXIF) into Check and confirm | Owner | W-16 | A printed bill photo becomes change cards | Not started |
+| F-11 | Public storefront P-1 `/s/[slug]` and voice review page P-2 `/r/[slug]` with invisible Turnstile | Owner | W-10, W-14 | A phone with no account can browse and leave a review | Not started |
+| F-12 | Admin A-1 `/admin` for `ADMIN_EMAILS`: credit used, AI success and p95, counts | Owner | W-20b | Shows today's numbers | Not started |
+| F-13 | Browser error reports to `/api/v1/client-errors`, Web Vitals, security headers and CSP | Owner | W-03b, W-03c | Errors reach Axiom; securityheaders.com grade A | Not started |
+| F-14 | Privacy page and README: data stored in Seoul, South Korea (E-28); what is recorded and for how long | Owner | E-28 | Linked from the storefront and the review page | Not started |
+| R-final | Whole-app review before the freeze: full code review, all Playwright flows, Lighthouse, a 360 px pass in both themes, then the C-09 clips reminder | Owner | W-22, W-22d | No open high findings | Not started |
 
 ---
 

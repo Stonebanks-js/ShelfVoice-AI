@@ -52,6 +52,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-29](#e-29-schema-decisions-made-while-building-w-02) | Schema decisions made while building W-02 | Medium | No | Applied |
 | [E-30](#e-30-meta-api-details-confirmed-by-the-spike) | Meta API details confirmed by the spike | Medium | No | Decided |
 | [E-31](#e-31-decisions-made-while-building-the-backend) | Decisions made while building the backend | Medium | No | Applied |
+| [E-32](#e-32-apple-style-visual-direction-replaces-signboard) | Apple-style visual direction replaces Signboard | Medium | Yes | Decided |
 
 ---
 
@@ -644,3 +645,27 @@ Building W-03, W-04, W-07 to W-15 surfaced these choices. Each follows the docum
 | 05 | 7 | Reliability patterns | Breaker opens after 5 consecutive failures |
 | 05 | — | Health checks | Readiness: faster of two Postgres reads, under 1500 ms (database in Seoul) |
 | 05 | 3 | Logging (O1) | Axiom via a `fetch` sink in the logger instead of `next-axiom` |
+
+---
+
+### E-32 Apple-style visual direction replaces Signboard
+
+**Severity:** Medium · **Owner decision:** Yes · **Status:** Decided (Oct 29)
+
+**Conflict.** Doc 06 U1 chose Signboard (leaf green and turmeric, Baloo 2 and Mukta, flat, no shadows), and U5 asked for mockups of 6 screens before building. On Oct 29 the owner asked for an Apple-like UI: clean components, rendered properly, responsive.
+
+**Decision (Oct 29, owner).**
+
+1. **Visual direction: Apple-style with a blue accent.** The phone's own font (SF on Apple devices, Roboto on Android) with Noto Sans Devanagari for Hindi; large titles; grouped, rounded lists; a frosted bottom tab bar with the centre mic; soft depth instead of flat. The accent is a darkened system blue, `#0A66D8` (5.4:1 on white, so small text passes AA), not `#007AFF` (4.0:1). Turmeric survives only as the "low stock" fill behind dark text.
+2. **Process: a live style guide instead of mockups.** Tokens and components are built into a `/design` page in the app and checked on the owner's phone before any screen is built on them.
+3. **Dark mode follows the phone.** Light when the phone has no preference.
+
+Unchanged from doc 06: U2 (follow phone language), U3 (four tabs and centre mic), U4 (list rows with category chips), icon plus word, one primary action per screen, 48 px targets, and the Check and confirm pattern.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 06 | 1 | U1 Visual direction | Signboard → Apple-style, accent `#0A66D8` |
+| 06 | 2 | U5 Visual mockups | Mockups → live `/design` style guide checked on a phone |
+| 06 | 5–7 | Tokens | Replaced by the tokens in `src/app/globals.css`; type scale, spacing and 48 px targets kept |
+| 06 | 6 | Dark mode | "Light is the default" → follows the phone |
+
