@@ -86,7 +86,8 @@ test("the tab-bar mic uploads the clip and opens Check and confirm", async ({ pa
   await page.route("**/api/v1/proposals/voice", async (route) => {
     const body = route.request().postDataJSON() as { path: string; kind: string };
     expect(body.kind).toBe("COMMAND");
-    expect(body.path).toMatch(new RegExp(`^${shopId}/owner/[0-9a-f-]{36}\\.wav$`));
+    expect(body.path.startsWith(`${shopId}/owner/`)).toBe(true);
+    expect(body.path.slice(`${shopId}/owner/`.length)).toMatch(/^[0-9a-f-]{36}\.wav$/);
     await route.fulfill({ status: 201, json: { proposal: { id }, question: "Did you mean the 70 g pack?", rejected: [] } });
   });
   await page.evaluate(() => localStorage.setItem("sv_mic_primed", "1"));
