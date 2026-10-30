@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleAlert, EyeOff, Eye, Frown, Hourglass, Meh, MessageSquareText, Pause, Play, QrCode, Smile } from "lucide-react";
+import { CircleAlert, EyeOff, Eye, Frown, Hourglass, Meh, MessageSquareText, MicOff, Pause, Play, QrCode, Smile } from "lucide-react";
 import { useRef, useState, type ReactNode } from "react";
 
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -23,6 +23,7 @@ const LOOK: Record<string, { icon: ReactNode; tone: IconTone; word: MessageKey }
   NEGATIVE: { icon: <Frown />, tone: "danger", word: "sentiment.NEGATIVE" },
   PENDING: { icon: <Hourglass />, tone: "gray", word: "reviews.pending" },
   FAILED: { icon: <MessageSquareText />, tone: "gray", word: "reviews.failed" },
+  SILENT: { icon: <MicOff />, tone: "gray", word: "reviews.silent" },
 };
 
 export function ReviewsScreen({
@@ -150,7 +151,9 @@ function ReviewCard({
   onHidden: (hidden: boolean) => void;
 }) {
   const { lang, t } = useLang();
-  const look = LOOK[review.status === "ANALYZED" ? (review.sentiment ?? "NEUTRAL") : review.status];
+  // A recording with no speech is analysed but has nothing to say.
+  const silent = review.status === "ANALYZED" && !review.transcript?.trim();
+  const look = LOOK[silent ? "SILENT" : review.status === "ANALYZED" ? (review.sentiment ?? "NEUTRAL") : review.status];
   const stockouts = new Set(review.stockout_product_ids);
   const items = review.mentioned_product_ids.filter((id) => productNames[id]);
   return (
@@ -174,7 +177,7 @@ function ReviewCard({
         </Button>
       </div>
 
-      {review.summary && <p className="text-headline font-semibold">{review.summary}</p>}
+      {review.summary && !silent && <p className="text-headline font-semibold">{review.summary}</p>}
       {review.transcript && (
         <blockquote className="border-l-3 border-separator pl-3 text-body text-ink-2">“{review.transcript}”</blockquote>
       )}
