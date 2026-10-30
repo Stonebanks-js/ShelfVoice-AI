@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
 
 // F-07 review gate: the order list (O-7) against the local database. AI
 // wording runs in recorded mode here, so every reason is the template
@@ -25,7 +25,7 @@ test("the customer-flagged atta leads, with a quantity and a reason", async ({ p
   expect(Number(qty)).toBeGreaterThan(0);
   await expect(first).toContainText(`Order ${qty}.`);
   expect(await blockingViolations(page)).toEqual([]);
-  await page.emulateMedia({ colorScheme: "dark" });
+  await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 });
 

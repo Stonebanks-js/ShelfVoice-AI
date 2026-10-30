@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInToDemo } from "./support";
 
 // F-09 review gate: My shop (O-9) against the local database: preview,
 // publish, review QR, details, hours, language, sign out and delete.
@@ -26,7 +26,7 @@ test("preview, publish switch and accessibility", async ({ page }) => {
   await expect(preview).toContainText(/Open now, closes|Closed, opens/);
   await expect(page.getByText("This is a demo shop.")).toBeVisible();
   expect(await blockingViolations(page)).toEqual([]);
-  await page.emulateMedia({ colorScheme: "dark" });
+  await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 
   await page.getByRole("switch", { name: "Show my shop to customers" }).click();

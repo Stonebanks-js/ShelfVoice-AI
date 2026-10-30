@@ -1,4 +1,3 @@
-import { revalidateTag } from "next/cache";
 import { after } from "next/server";
 import { z } from "zod";
 
@@ -8,6 +7,7 @@ import { readJson, route } from "@/server/http";
 import { log } from "@/server/log";
 import { requireShop } from "@/server/owner";
 import { confirmProposal, touchedProducts } from "@/server/proposals";
+import { refreshStorefront } from "@/server/storefront";
 
 const Body = z.object({ changes: Changes.optional() }).strict();
 
@@ -20,7 +20,7 @@ export const POST = route(async (request, ctx: RouteContext<"/api/v1/proposals/[
   const applied = await confirmProposal({ ...owner, requestId }, id, changes);
 
   after(async () => {
-    revalidateTag(`storefront:${owner.shop.slug}`, "max");
+    refreshStorefront(owner.shop.slug);
     try {
       await refreshForecasts(owner.shop.id, touchedProducts(applied));
     } catch (error) {

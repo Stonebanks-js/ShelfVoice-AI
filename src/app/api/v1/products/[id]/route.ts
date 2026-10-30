@@ -1,9 +1,9 @@
-import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { priceChangeAllowed } from "@/server/changes";
 import { ApiError, fromPostgres, readJson, route } from "@/server/http";
 import { requireShop } from "@/server/owner";
+import { refreshStorefront } from "@/server/storefront";
 
 // Stock counts change only through the movement log (decision K2), so a tap
 // edit can't set stock_qty directly; use POST /stock-movements instead.
@@ -34,7 +34,7 @@ export const PATCH = route(async (request, ctx: RouteContext<"/api/v1/products/[
   const { data, error } = await db.from("products").update(body).eq("id", id).is("archived_at", null).select("*").maybeSingle();
   if (error) throw fromPostgres(error);
   if (!data) throw new ApiError(404, "NOT_FOUND", "Product not found");
-  revalidateTag(`storefront:${shop.slug}`, "max");
+  refreshStorefront(shop.slug);
   return Response.json({ product: data });
 });
 
@@ -51,6 +51,6 @@ export const DELETE = route(async (_request, ctx: RouteContext<"/api/v1/products
     .maybeSingle();
   if (error) throw fromPostgres(error);
   if (!data) throw new ApiError(404, "NOT_FOUND", "Product not found");
-  revalidateTag(`storefront:${shop.slug}`, "max");
+  refreshStorefront(shop.slug);
   return new Response(null, { status: 204 });
 });

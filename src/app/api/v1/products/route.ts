@@ -1,4 +1,3 @@
-import { revalidateTag } from "next/cache";
 import { after } from "next/server";
 import { z } from "zod";
 
@@ -6,6 +5,7 @@ import { refreshForecasts } from "@/server/forecast/refresh";
 import { fromPostgres, readJson, route } from "@/server/http";
 import { log } from "@/server/log";
 import { requireShop } from "@/server/owner";
+import { refreshStorefront } from "@/server/storefront";
 
 // Owner catalog with stock and forecast (Stock tab, doc 06 O-6).
 export const GET = route(async () => {
@@ -45,7 +45,7 @@ export const POST = route(async (request, _ctx, { requestId }) => {
     .select("*")
     .single();
   if (error) throw fromPostgres(error);
-  revalidateTag(`storefront:${shop.slug}`, "max");
+  refreshStorefront(shop.slug);
   after(async () => {
     try {
       await refreshForecasts(shop.id, [data.id]);

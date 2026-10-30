@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockingViolations, localSupabase, ownTestAddress, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localSupabase, ownTestAddress, signInAsNewOwner, signInToDemo } from "./support";
 
 // F-05 review gate: Today (O-5) with the demo shop's real numbers, both
 // languages, both themes, and a new shop with nothing in it yet.
@@ -23,7 +23,7 @@ test("shows today's sales, what's running low and new reviews", async ({ page })
   await expect(page.getByRole("link", { name: /Atta was out of stock yesterday/ })).toContainText("Unhappy");
 
   expect(await blockingViolations(page)).toEqual([]);
-  await page.emulateMedia({ colorScheme: "dark" });
+  await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 
   await firstLow.click();

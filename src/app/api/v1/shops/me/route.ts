@@ -1,9 +1,9 @@
-import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { deleteShop } from "@/server/delete-shop";
 import { fromPostgres, readJson, route } from "@/server/http";
 import { requireOwner, requireShop } from "@/server/owner";
+import { refreshStorefront } from "@/server/storefront";
 
 // The signed-in owner and their shop (null until created).
 export const GET = route(async () => {
@@ -37,7 +37,7 @@ export const PATCH = route(async (request) => {
   const body = await readJson(request, Patch);
   const { data, error } = await db.from("shops").update(body).eq("id", shop.id).select("*").single();
   if (error) throw fromPostgres(error);
-  revalidateTag(`storefront:${shop.slug}`, "max");
+  refreshStorefront(shop.slug);
   return Response.json({ shop: data });
 });
 
@@ -45,7 +45,7 @@ export const PATCH = route(async (request) => {
 export const DELETE = route(async (_request, _ctx, { requestId }) => {
   const { db, user, shop } = await requireShop();
   await deleteShop({ shopId: shop.id, userId: user.id, requestId });
-  revalidateTag(`storefront:${shop.slug}`, "max");
+  refreshStorefront(shop.slug);
   await db.auth.signOut(); // clears the session cookie
   return new Response(null, { status: 204 });
 });
