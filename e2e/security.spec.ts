@@ -68,19 +68,20 @@ test("browser errors are reported without noise", async ({ page }) => {
   expect(JSON.parse((await errors())[0])).toMatchObject({ type: "error", page: "/design", message: expect.stringContaining("boom from a test") });
 });
 
-test("the error endpoint accepts reports and refuses junk and other sites", async ({ request }) => {
-  expect((await request.post("/api/v1/client-errors", { data: { type: "error", page: "/", message: "x" } })).status()).toBe(204);
-  expect((await request.post("/api/v1/client-errors", { data: { type: "vital", page: "/", name: "LCP", value: 1234.5, rating: "good" } })).status()).toBe(204);
-  expect((await request.post("/api/v1/client-errors", { data: { type: "error", page: "/" } })).status()).toBe(422);
-  const cross = await request.post("/api/v1/client-errors", {
-    headers: { origin: "https://evil.example" },
-    data: { type: "error", page: "/", message: "x" },
-  });
-  expect(cross.status()).toBe(403);
-});
-
 test.describe("with the local stack", () => {
   test.skip(!localSupabase, "needs the local Supabase stack");
+
+  // The rate limiter lives in the database, so this needs the local stack.
+  test("the error endpoint accepts reports and refuses junk and other sites", async ({ request }) => {
+    expect((await request.post("/api/v1/client-errors", { data: { type: "error", page: "/", message: "x" } })).status()).toBe(204);
+    expect((await request.post("/api/v1/client-errors", { data: { type: "vital", page: "/", name: "LCP", value: 1234.5, rating: "good" } })).status()).toBe(204);
+    expect((await request.post("/api/v1/client-errors", { data: { type: "error", page: "/" } })).status()).toBe(422);
+    const cross = await request.post("/api/v1/client-errors", {
+      headers: { origin: "https://evil.example" },
+      data: { type: "error", page: "/", message: "x" },
+    });
+    expect(cross.status()).toBe(403);
+  });
 
   test("no CSP violations across the owner app and the public pages", async ({ page, context }) => {
     const violations = watchCsp(page);
