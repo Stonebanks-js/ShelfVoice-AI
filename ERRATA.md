@@ -53,6 +53,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-30](#e-30-meta-api-details-confirmed-by-the-spike) | Meta API details confirmed by the spike | Medium | No | Decided |
 | [E-31](#e-31-decisions-made-while-building-the-backend) | Decisions made while building the backend | Medium | No | Applied |
 | [E-32](#e-32-apple-style-visual-direction-replaces-signboard) | Apple-style visual direction replaces Signboard | Medium | Yes | Decided |
+| [E-33](#e-33-content-security-policy-without-nonces) | Content Security Policy without nonces | Medium | No | Applied |
 
 ---
 
@@ -670,4 +671,28 @@ Unchanged from doc 06: U2 (follow phone language), U3 (four tabs and centre mic)
 | 06 | 2 | U5 Visual mockups | Mockups → live `/design` style guide checked on a phone |
 | 06 | 5–7 | Tokens | Replaced by the tokens in `src/app/globals.css`; type scale, spacing and 48 px targets kept |
 | 06 | 6 | Dark mode | "Light is the default" → follows the phone |
+
+---
+
+### E-33 Content Security Policy without nonces
+
+**Severity:** Medium · **Owner decision:** No · **Status:** Applied (Oct 30, F-13)
+
+**Conflict.** W-03c asks for a CSP with "Next.js nonces". Next 16's own guide says nonce-based CSP needs every page rendered per request and is incompatible with partial prerendering, which this app uses throughout (`cacheComponents`).
+
+**Resolution.** The CSP is set in `next.config.ts` without nonces, as the guide's "Without nonces" option:
+
+- Scripts from our own origin only (inline allowed, for Next's bootstrap), plus Cloudflare Turnstile.
+- Network calls, images and audio to our origin and the Supabase project only.
+- `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`; `upgrade-insecure-requests` when deployed.
+- Alongside it: HSTS (2 years, preload), `nosniff`, `X-Frame-Options: DENY`, `strict-origin-when-cross-origin`, a Permissions-Policy allowing only the camera and microphone, and `Cross-Origin-Opener-Policy: same-origin`.
+
+Inline script is the one gap against a nonce policy. It is acceptable here because React escapes all rendered text and `react/no-danger` is an ESLint error, so no user or model text reaches the page as markup (doc 03 TH-06). Next's experimental SRI hashes can close the gap after the hackathon.
+
+Browser errors and Web Vitals go to `POST /api/v1/client-errors` (rate-limited, no user text, IDs in paths replaced with `:id`), logged at warn level so Axiom groups them without paging Discord for each one.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 03 | 10 | Secrets, encryption and supply chain | CSP without nonces under partial prerendering; inline scripts allowed, third-party scripts limited to Turnstile |
+| 09 | 6 | W-03c | "Next.js nonces" → "header CSP from next.config (E-33)" |
 
