@@ -42,7 +42,7 @@ export function EmptyState({
 }: {
   icon: ReactNode;
   title: string;
-  body: string;
+  body?: string;
   action?: ReactNode;
 }) {
   return (
@@ -51,7 +51,7 @@ export function EmptyState({
         {icon}
       </span>
       <h3 className="text-headline font-semibold">{title}</h3>
-      <p className="max-w-xs text-body text-ink-2">{body}</p>
+      {body && <p className="max-w-xs text-body text-ink-2">{body}</p>}
       {action && <div className="mt-2 w-full max-w-xs">{action}</div>}
     </div>
   );
