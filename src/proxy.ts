@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { isAdminEmail } from "@/server/admin";
+
 // Runs before every page and API route (Next 16 "proxy", formerly
 // middleware): stamps a request ID for log correlation (doc 05) and refreshes
 // the Supabase session cookie once per request.
@@ -45,6 +47,15 @@ export async function proxy(request: NextRequest) {
     for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
     redirect.headers.set("x-request-id", requestId);
     return redirect;
+  }
+
+  // The admin page is a plain 404 to anyone not on ADMIN_EMAILS (W-20b);
+  // checked here so the status is a real 404, not a streamed one.
+  if ((path === "/admin" || path.startsWith("/admin/")) && !isAdminEmail(user?.email)) {
+    const hidden = NextResponse.rewrite(new URL("/_admin-hidden", request.url), { request: { headers } });
+    for (const cookie of response.cookies.getAll()) hidden.cookies.set(cookie);
+    hidden.headers.set("x-request-id", requestId);
+    return hidden;
   }
 
   response.headers.set("x-request-id", requestId);

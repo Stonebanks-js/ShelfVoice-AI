@@ -60,6 +60,8 @@ export interface BreakerState {
   state: "CLOSED" | "OPEN" | "HALF_OPEN";
   failures: number;
   openedAt: Date | null;
+  // Opened from the admin page: stays open until switched back.
+  manual?: boolean;
 }
 
 export interface AiLedger {
@@ -150,6 +152,7 @@ export function createMetaClient(options: MetaClientOptions) {
       throw new AiError("AI_PAUSED", "AI features are paused: the spending cap was reached");
     }
     const breaker = await options.ledger.breaker(provider);
+    if (breaker.manual) throw new AiError("AI_UNAVAILABLE", "The AI service is unavailable right now");
     if (breaker.state === "OPEN" && breaker.openedAt && now().getTime() - breaker.openedAt.getTime() < BREAKER.halfOpenAfterMs) {
       throw new AiError("AI_UNAVAILABLE", "The AI service is unavailable right now");
     }

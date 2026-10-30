@@ -25,6 +25,7 @@ export const ledger: AiLedger = {
       state: data?.state ?? "CLOSED",
       failures: data?.failures ?? 0,
       openedAt: data?.opened_at ? new Date(data.opened_at) : null,
+      manual: data?.manual ?? false,
     };
   },
   async saveBreaker(provider, state) {

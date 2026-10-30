@@ -31,6 +31,7 @@ const { restockList } = await import("@/server/restock");
 const { deleteShop } = await import("@/server/delete-shop");
 const { ledger } = await import("@/server/ai/index");
 const { ApiError } = await import("@/server/http");
+const { adminToday, setBreaker } = await import("@/server/admin");
 
 beforeEach(() => {
   fake.transcribe.mockReset();
@@ -247,6 +248,8 @@ describe("voice proposals", () => {
 
     const applied = await proposals.confirmProposal(owner, first.proposal.id);
     expect(applied[0]).toMatchObject({ op: "update_price", after: { price_paise: 1500 } });
+    const edited = async (id: string) => (await admin.from("proposals").select("owner_edited").eq("id", id).single()).data?.owner_edited;
+    expect(await edited(first.proposal.id)).toBe(false);
     const reverted = await proposals.undoProposal(owner, first.proposal.id);
     expect(reverted[0].undo).toBe("reverted");
     expect(proposals.touchedProducts(reverted)).toEqual([maggi!.id]);
@@ -289,6 +292,16 @@ describe("voice proposals", () => {
     fake.transcribe.mockRejectedValue(new AiError("AI_BAD_OUTPUT", "bad"));
     const clip2 = await uploadClip(owner);
     await expect(proposals.voiceProposal(owner, clip2, "COMMAND")).rejects.toMatchObject({ status: 422, code: "AI_NOT_UNDERSTOOD" });
+  });
+
+  it("marks a proposal the owner changed before confirming as edited", async () => {
+    const owner = await testOwner();
+    const { data: p } = await owner.db.from("products").insert({ shop_id: owner.shop.id, name: "Salt", price_paise: 2800 }).select("id").single();
+    const proposed = [{ op: "update_price" as const, product_id: p!.id, price_paise: 3000 }];
+    const { data: prop } = await owner.db.from("proposals").insert({ shop_id: owner.shop.id, kind: "COMMAND", changes: proposed }).select("id").single();
+    await proposals.confirmProposal(owner, prop!.id, [{ ...proposed[0], price_paise: 3200 }]);
+    const { data } = await admin.from("proposals").select("owner_edited").eq("id", prop!.id).single();
+    expect(data?.owner_edited).toBe(true);
   });
 
   it("refuses a confirmed price more than 10x the old one", async () => {
@@ -406,10 +419,54 @@ describe("rate limits and the AI ledger", () => {
     expect(after.totalUsd - before.totalUsd).toBeCloseTo(0.25, 6);
 
     const provider = `test-${randomUUID()}`;
-    expect(await ledger.breaker(provider)).toEqual({ state: "CLOSED", failures: 0, openedAt: null });
+    expect(await ledger.breaker(provider)).toEqual({ state: "CLOSED", failures: 0, openedAt: null, manual: false });
     const openedAt = new Date();
     await ledger.saveBreaker(provider, { state: "OPEN", failures: 5, openedAt });
-    expect(await ledger.breaker(provider)).toEqual({ state: "OPEN", failures: 5, openedAt });
+    expect(await ledger.breaker(provider)).toEqual({ state: "OPEN", failures: 5, openedAt, manual: false });
     await admin.from("ai_breaker").delete().eq("provider", provider);
+  });
+});
+
+describe("admin page numbers (W-20b)", () => {
+  it("counts today's AI calls, spend and confirmations", async () => {
+    const owner = await testOwner();
+    const before = await adminToday();
+    const jobCalls = (t: typeof before) => t.jobs.find((j) => j.job === "REVIEW") ?? { calls: 0, ok: 0 };
+    for (const [outcome, latencyMs] of [["OK", 1000], ["TIMEOUT", 20000]] as const) {
+      await ledger.record({
+        ctx: { job: "REVIEW", shopId: owner.shop.id },
+        model: "muse-spark-1.3",
+        inputTokens: 10,
+        cachedTokens: 0,
+        outputTokens: 5,
+        audioSeconds: 0,
+        costUsd: 0.01,
+        latencyMs,
+        retries: 0,
+        outcome,
+      });
+    }
+    const { data: prop } = await owner.db.from("proposals").insert({ shop_id: owner.shop.id, kind: "COMMAND", changes: [] }).select("id").single();
+    await proposals.confirmProposal(owner, prop!.id);
+
+    const after = await adminToday();
+    expect(jobCalls(after).calls - jobCalls(before).calls).toBe(2);
+    expect(jobCalls(after).ok - jobCalls(before).ok).toBe(1);
+    expect(after.jobs.find((j) => j.job === "REVIEW")?.p95Ms).toBeGreaterThan(0);
+    expect(after.spentTodayUsd - before.spentTodayUsd).toBeCloseTo(0.02, 6);
+    expect(after.confirmed - before.confirmed).toBe(1);
+    expect(after.confirmedUnedited - before.confirmedUnedited).toBe(1);
+    expect(after.budgetUsd).toBeGreaterThan(0);
+  });
+
+  it("keeps the AI paused while switched open, and switches back", async () => {
+    try {
+      await setBreaker(true, "test");
+      expect(await ledger.breaker("meta")).toMatchObject({ state: "OPEN", manual: true });
+      expect((await adminToday()).breaker).toMatchObject({ state: "OPEN", manual: true });
+    } finally {
+      await setBreaker(false, "test");
+    }
+    expect(await ledger.breaker("meta")).toEqual({ state: "CLOSED", failures: 0, openedAt: null, manual: false });
   });
 });

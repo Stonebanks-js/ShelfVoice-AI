@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "ai_breaker": {
                   Row: {
-                    "failures": number,"opened_at": string | null,"provider": string,"state": Database["public"]['Enums']["breaker_state"]
+                    "failures": number,"manual": boolean,"opened_at": string | null,"provider": string,"state": Database["public"]['Enums']["breaker_state"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "failures"?: number,"opened_at"?: string | null,"provider": string,"state"?: Database["public"]['Enums']["breaker_state"]
+                    "failures"?: number,"manual"?: boolean,"opened_at"?: string | null,"provider": string,"state"?: Database["public"]['Enums']["breaker_state"]
                   }
                   Update: {
-                    "failures"?: number,"opened_at"?: string | null,"provider"?: string,"state"?: Database["public"]['Enums']["breaker_state"]
+                    "failures"?: number,"manual"?: boolean,"opened_at"?: string | null,"provider"?: string,"state"?: Database["public"]['Enums']["breaker_state"]
                   }
                   Relationships: [
                     
@@ -149,14 +149,14 @@ isOneToOne: false
                   ]
                 },"proposals": {
                   Row: {
-                    "changes": NonNullable<Json>,"confirmed_changes": Json | null,"created_at": string,"decided_at": string | null,"id": string,"input_path": string | null,"kind": Database["public"]['Enums']["proposal_kind"],"shop_id": string,"status": Database["public"]['Enums']["proposal_status"],"transcript": string | null
+                    "changes": NonNullable<Json>,"confirmed_changes": Json | null,"created_at": string,"decided_at": string | null,"id": string,"input_path": string | null,"kind": Database["public"]['Enums']["proposal_kind"],"owner_edited": boolean | null,"shop_id": string,"status": Database["public"]['Enums']["proposal_status"],"transcript": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "changes"?: NonNullable<Json>,"confirmed_changes"?: Json | null,"created_at"?: string,"decided_at"?: string | null,"id"?: string,"input_path"?: string | null,"kind": Database["public"]['Enums']["proposal_kind"],"shop_id": string,"status"?: Database["public"]['Enums']["proposal_status"],"transcript"?: string | null
+                    "changes"?: NonNullable<Json>,"confirmed_changes"?: Json | null,"created_at"?: string,"decided_at"?: string | null,"id"?: string,"input_path"?: string | null,"kind": Database["public"]['Enums']["proposal_kind"],"owner_edited"?: boolean | null,"shop_id": string,"status"?: Database["public"]['Enums']["proposal_status"],"transcript"?: string | null
                   }
                   Update: {
-                    "changes"?: NonNullable<Json>,"confirmed_changes"?: Json | null,"created_at"?: string,"decided_at"?: string | null,"id"?: string,"input_path"?: string | null,"kind"?: Database["public"]['Enums']["proposal_kind"],"shop_id"?: string,"status"?: Database["public"]['Enums']["proposal_status"],"transcript"?: string | null
+                    "changes"?: NonNullable<Json>,"confirmed_changes"?: Json | null,"created_at"?: string,"decided_at"?: string | null,"id"?: string,"input_path"?: string | null,"kind"?: Database["public"]['Enums']["proposal_kind"],"owner_edited"?: boolean | null,"shop_id"?: string,"status"?: Database["public"]['Enums']["proposal_status"],"transcript"?: string | null
                   }
                   Relationships: [
                     {
@@ -287,7 +287,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "ai_spend":
+            "admin_today":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"ai_spend":
 { Args: { "p_shop_id"?: string }; Returns: {
               "shop_today_usd": number,"today_usd": number,"total_usd": number
             }[]
