@@ -168,6 +168,14 @@ describe("Meta client: circuit breaker (doc 05)", () => {
     expect(requests).toHaveLength(0);
   });
 
+  it("stays shut while switched open from the admin page, however long ago", async () => {
+    const { transport, requests } = scripted(sparkReply({ name: "a", price: 1 }));
+    const { ledger } = memoryLedger(undefined, { state: "OPEN", failures: 0, openedAt: new Date(now.getTime() - 3_600_000), manual: true });
+    const client = createMetaClient({ transport, ledger, budget, now: () => now });
+    await expect(client.structured(ctx, { instructions: "x", input: "y", schema })).rejects.toMatchObject({ code: "AI_UNAVAILABLE" });
+    expect(requests).toHaveLength(0);
+  });
+
   it("lets one probe through after 60 s and closes on success", async () => {
     const { transport } = scripted(sparkReply({ name: "a", price: 1 }));
     const { ledger, breakerState } = memoryLedger(undefined, { state: "OPEN", failures: 5, openedAt: new Date(now.getTime() - 61_000) });

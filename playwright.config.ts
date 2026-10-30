@@ -39,7 +39,8 @@ export default defineConfig({
     command: `pnpm build && pnpm start --port ${port}`,
     // Journeys never spend Meta credit: an AI call they forget to mock fails
     // fast on a missing recording instead of reaching the live API.
-    env: { META_MODE: "recorded" },
+    // One admin address per project, so the two never share a session.
+    env: { META_MODE: "recorded", ADMIN_EMAILS: "admin-phone-360@example.test,admin-desktop-1280@example.test" },
     url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

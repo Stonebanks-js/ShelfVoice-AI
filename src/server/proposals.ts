@@ -6,6 +6,7 @@ import { AiError } from "@/server/ai/meta";
 import { AUDIO_LIMITS, checkWav } from "@/server/audio";
 import { type Change, Changes, priceChangeAllowed } from "@/server/changes";
 import { ApiError, fromPostgres } from "@/server/http";
+import { log } from "@/server/log";
 import type { Owner, Shop } from "@/server/owner";
 import { adminClient } from "@/server/supabase";
 import type { Json } from "@/types/database";
@@ -149,6 +150,14 @@ export async function confirmProposal(ctx: Ctx, proposalId: string, edited?: Cha
 
   const { data, error } = await ctx.db.rpc("confirm_proposal", { p_proposal_id: proposalId, p_changes: toJson(changes) });
   if (error) throw fromPostgres(error);
+
+  // For the admin page's confirm-unedited rate (W-20b). Only the first
+  // confirm counts; a repeat of the same request changes nothing.
+  if (proposal.status === "PENDING") {
+    const ownerEdited = JSON.stringify(changes) !== JSON.stringify(Changes.parse(proposal.changes));
+    const { error: markError } = await adminClient().from("proposals").update({ owner_edited: ownerEdited }).eq("id", proposalId).is("owner_edited", null);
+    if (markError) log("warn", "proposal.mark_edited_failed", { requestId: ctx.requestId, proposalId, error: markError.message });
+  }
   return data as Array<{ op: string; product_id?: string }>;
 }
 
