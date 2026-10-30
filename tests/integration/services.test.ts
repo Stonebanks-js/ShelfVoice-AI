@@ -27,6 +27,7 @@ const proposals = await import("@/server/proposals");
 const { storeReview, analyseStoredReview } = await import("@/server/reviews");
 const { limit } = await import("@/server/abuse");
 const { todaySummary } = await import("@/server/today");
+const { restockList } = await import("@/server/restock");
 const { ledger } = await import("@/server/ai/index");
 const { ApiError } = await import("@/server/http");
 
@@ -124,6 +125,28 @@ describe("Today summary (doc 06 O-5)", () => {
     const otherShop = await createDemoCopy(other.user.id);
     const summary = await todaySummary(owner.db, otherShop);
     expect(summary).toMatchObject({ productCount: 0, salesPaise: 0, newReviews: 0 });
+  });
+});
+
+describe("order list (doc 06 O-7)", () => {
+  it("puts the customer-flagged atta first with a quantity and a reason quoting it", async () => {
+    const owner = await testOwner(false);
+    const shopId = await createDemoCopy(owner.user.id, new Date(), "en");
+    const { data: shop } = await owner.db.from("shops").select("*").eq("id", shopId).single();
+    const { items, leadTimeDays } = await restockList({ db: owner.db, user: owner.user, shop: shop!, requestId: owner.requestId });
+
+    expect(leadTimeDays).toBe(2);
+    expect(items[0]).toMatchObject({ name: "Aashirvaad Atta", customerFlagged: true, coldStart: false });
+    expect(items[0].orderQty).toBeGreaterThan(0);
+    expect(items[0].reason).toContain(String(items[0].orderQty));
+    // Flagged first, then fewest days left.
+    const rest = items.filter((i) => !i.customerFlagged).map((i) => i.daysLeft ?? 0);
+    expect(rest).toEqual([...rest].sort((a, b) => a - b));
+  });
+
+  it("is empty for a shop with nothing low", async () => {
+    const owner = await testOwner();
+    expect((await restockList({ ...owner, requestId: owner.requestId })).items).toEqual([]);
   });
 });
 

@@ -1,7 +1,10 @@
 import { revalidateTag } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 
+import { refreshForecasts } from "@/server/forecast/refresh";
 import { fromPostgres, readJson, route } from "@/server/http";
+import { log } from "@/server/log";
 import { requireShop } from "@/server/owner";
 
 // Owner catalog with stock and forecast (Stock tab, doc 06 O-6).
@@ -31,8 +34,9 @@ const NewProduct = z
   })
   .strict();
 
-// Add a product by tap (doc 02: direct catalog edits by tap).
-export const POST = route(async (request) => {
+// Add a product by tap (doc 02: direct catalog edits by tap). Its forecast
+// row is made right away, so a low count warns today, not after the nightly job.
+export const POST = route(async (request, _ctx, { requestId }) => {
   const { db, shop } = await requireShop();
   const body = await readJson(request, NewProduct);
   const { data, error } = await db
@@ -42,5 +46,12 @@ export const POST = route(async (request) => {
     .single();
   if (error) throw fromPostgres(error);
   revalidateTag(`storefront:${shop.slug}`, "max");
+  after(async () => {
+    try {
+      await refreshForecasts(shop.id, [data.id]);
+    } catch (failure) {
+      log("error", "forecast.refresh_failed", { requestId, shopId: shop.id, error: failure });
+    }
+  });
   return Response.json({ product: data }, { status: 201 });
 });
