@@ -58,6 +58,9 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
       .select("id, sentiment, summary, created_at")
       .eq("shop_id", shopId)
       .eq("is_hidden", false)
+      // Recordings with no speech say nothing worth showing; ones still being
+      // understood (no transcript yet) stay.
+      .or("transcript.is.null,transcript.neq.")
       .gte("created_at", iso(now.getTime() - 7 * DAY_MS))
       .order("created_at", { ascending: false })
       .limit(50),

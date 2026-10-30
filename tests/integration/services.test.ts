@@ -106,6 +106,19 @@ describe("Today summary (doc 06 O-5)", () => {
     expect(summary.reviews[0].sentiment).toBe("NEGATIVE");
   });
 
+  it("leaves silent recordings out but keeps ones still being understood", async () => {
+    const owner = await testOwner(false);
+    const shopId = await createDemoCopy(owner.user.id);
+    const consent_at = new Date().toISOString();
+    await admin.from("reviews").insert([
+      { shop_id: shopId, status: "ANALYZED", transcript: "", summary: "No speech heard.", consent_at },
+      { shop_id: shopId, status: "PENDING", transcript: null, consent_at },
+    ]);
+    const summary = await todaySummary(owner.db, shopId);
+    expect(summary.newReviews).toBe(3); // the demo's two, plus the pending one
+    expect(summary.reviews.map((r) => r.summary)).not.toContain("No speech heard.");
+  });
+
   it("is empty for a new shop", async () => {
     const owner = await testOwner();
     expect(await todaySummary(owner.db, owner.shop.id)).toEqual({
