@@ -299,6 +299,20 @@ const en = {
   "review.rate": "Too many reviews from this phone today. Please try again tomorrow.",
   "review.verify": "Couldn't check that you're a person. Please try again.",
   "review.recordAgain": "Record again",
+  "camera.scan": "Bill photo",
+  "camera.title": "Photo of a supplier's bill",
+  "camera.body": "We read what came in. You check every line before stock changes.",
+  "camera.tip1": "Lay the bill flat in good light",
+  "camera.tip2": "Fit the whole bill in the photo",
+  "camera.tip3": "Printed bills read best",
+  "camera.take": "Take photo",
+  "camera.choose": "Choose from gallery",
+  "camera.preview": "Your photo",
+  "camera.retake": "Retake",
+  "camera.use": "Use photo",
+  "camera.reading": "Reading the bill…",
+  "camera.error.read": "Couldn't read this bill. Try a clearer photo, flat and in good light.",
+  "camera.error.image": "This photo couldn't be used. Please take it again.",
 
 
 
@@ -605,6 +619,20 @@ const hi: Record<MessageKey, string> = {
   "review.rate": "आज इस फ़ोन से बहुत रिव्यू आ चुके। कृपया कल फिर कोशिश करें।",
   "review.verify": "यह पक्का नहीं हो पाया कि आप इंसान हैं। फिर से कोशिश करें।",
   "review.recordAgain": "फिर से रिकॉर्ड करें",
+  "camera.scan": "बिल की फ़ोटो",
+  "camera.title": "सप्लायर के बिल की फ़ोटो",
+  "camera.body": "हम पढ़ेंगे क्या आया। स्टॉक बदलने से पहले आप हर लाइन जाँचेंगे।",
+  "camera.tip1": "बिल को अच्छी रोशनी में सीधा रखें",
+  "camera.tip2": "पूरा बिल फ़ोटो में आए",
+  "camera.tip3": "छपे हुए बिल सबसे अच्छे पढ़े जाते हैं",
+  "camera.take": "फ़ोटो लें",
+  "camera.choose": "गैलरी से चुनें",
+  "camera.preview": "आपकी फ़ोटो",
+  "camera.retake": "फिर से लें",
+  "camera.use": "यह फ़ोटो लें",
+  "camera.reading": "बिल पढ़ रहे हैं…",
+  "camera.error.read": "यह बिल पढ़ा नहीं गया। साफ़ फ़ोटो लें, सीधी और अच्छी रोशनी में।",
+  "camera.error.image": "यह फ़ोटो काम नहीं आई। कृपया फिर से लें।",
 
 
 

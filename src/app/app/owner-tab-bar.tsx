@@ -7,7 +7,7 @@ import { VoiceCapture } from "@/components/shell/voice-capture";
 import { submitVoice } from "@/lib/voice";
 
 // Screens with their own bottom actions hide the tab bar.
-const FULL_SCREEN = ["/app/check/", "/app/setup"];
+const FULL_SCREEN = ["/app/check/", "/app/setup", "/app/camera"];
 
 // The live tab bar. The centre mic records a 30-second command (doc 06),
 // turns it into proposed changes, and opens Check and confirm.
