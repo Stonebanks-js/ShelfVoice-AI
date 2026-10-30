@@ -14,6 +14,16 @@ export async function blockingViolations(page: Page) {
     .map((v) => `${v.id}: ${v.nodes.map((n) => `${n.target.join(" ")} [${n.any[0]?.message ?? ""}]`).slice(0, 3).join(", ")}`);
 }
 
+// Switches to dark mode and waits for the repaint: right after the switch,
+// Chromium can briefly keep inherited text colours from the light theme,
+// which axe would measure as a contrast failure no reader ever sees.
+export async function darkMode(page: Page) {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.waitForFunction(() => getComputedStyle(document.body).color === "rgb(245, 245, 247)");
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.waitForTimeout(150);
+}
+
 function readLocalSupabase() {
   if (process.env.CI) return null;
   try {

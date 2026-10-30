@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
 
 // F-08 review gate: the review feed (O-8) against the local database:
 // sentiment, words, item chips, Hide and Show, filters, the 30-day audio.
@@ -35,7 +35,7 @@ test("the feed shows what customers said, newest first", async ({ page }) => {
   await expect(cards.first()).toContainText("Kal atta lene aaya tha");
   await expect(cards.first().getByText("Aashirvaad Atta: wanted, out of stock")).toBeVisible();
   expect(await blockingViolations(page)).toEqual([]);
-  await page.emulateMedia({ colorScheme: "dark" });
+  await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 
   await page.getByRole("button", { name: "Unhappy", exact: true }).click();

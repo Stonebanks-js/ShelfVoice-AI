@@ -1,4 +1,3 @@
-import { revalidateTag } from "next/cache";
 import { after } from "next/server";
 import { z } from "zod";
 
@@ -6,6 +5,7 @@ import { refreshForecasts } from "@/server/forecast/refresh";
 import { ApiError, fromPostgres, readJson, route } from "@/server/http";
 import { log } from "@/server/log";
 import { requireShop } from "@/server/owner";
+import { refreshStorefront } from "@/server/storefront";
 
 const Body = z
   .object({
@@ -42,7 +42,7 @@ export const POST = route(async (request, _ctx, { requestId }) => {
   }
 
   after(async () => {
-    revalidateTag(`storefront:${shop.slug}`, "max");
+    refreshStorefront(shop.slug);
     try {
       await refreshForecasts(shop.id, [body.product_id]);
     } catch (error) {

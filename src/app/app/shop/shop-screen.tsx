@@ -6,7 +6,8 @@ import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
 
 import { Button, buttonClass } from "@/components/ui/button";
-import { Badge, Segmented, Switch } from "@/components/ui/controls";
+import { OpenBadge } from "@/components/shell/open-badge";
+import { Segmented, Switch } from "@/components/ui/controls";
 import { PageHeader } from "@/components/ui/feedback";
 import { TextField } from "@/components/ui/field";
 import { ListGroup, ListRow } from "@/components/ui/list";
@@ -17,7 +18,7 @@ import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { formatPhone } from "@/lib/changes-view";
 import { errorKey } from "@/lib/errors";
-import { dayName, DAYS, formatTime, hasHours, hourRuns, openStatus, shopClock, type Day, type Hours } from "@/lib/hours";
+import { dayName, DAYS, formatTime, hasHours, hourRuns, type Day, type Hours } from "@/lib/hours";
 import { toE164 } from "@/server/changes";
 
 export interface OwnerShop {
@@ -220,26 +221,6 @@ export function ShopScreen({ shop, origin }: { shop: OwnerShop; origin: string }
         onConfirm={deleteShop}
       />
     </main>
-  );
-}
-
-// Doc 06 OpenNowBadge: "Open now" / "Closed, opens 7 AM", in the shop's time.
-export function OpenBadge({ hours, timeZone }: { hours: Hours; timeZone: string }) {
-  const { lang, t } = useLang();
-  const [now] = useState(() => new Date());
-  const status = openStatus(hours, now, timeZone);
-  const label = status.open
-    ? t("shop.closesAt", { time: formatTime(status.closesAt, lang) })
-    : status.opensAt === null || status.opensDay === null
-      ? t("shop.noHours")
-      : status.opensDay === shopClock(now, timeZone).day
-        ? t("shop.opensAt", { time: formatTime(status.opensAt, lang) })
-        : t("shop.opensOn", { day: dayName(status.opensDay, lang), time: formatTime(status.opensAt, lang) });
-  return (
-    // The minute can differ between the server's render and the browser's.
-    <span suppressHydrationWarning className="shrink-0">
-      <Badge tone={status.open ? "success" : "neutral"}>{label}</Badge>
-    </span>
   );
 }
 

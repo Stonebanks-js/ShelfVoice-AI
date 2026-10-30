@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
 
 // F-06 review gate: the Stock tab (O-6) against the local database: search,
 // chips, the in/out switch, edits by tap (price, count as a correction),
@@ -23,7 +23,7 @@ test("search, chips and accessibility", async ({ page }) => {
   await openStock(page);
   await expect(page.getByText("15 products")).toBeVisible();
   expect(await blockingViolations(page)).toEqual([]);
-  await page.emulateMedia({ colorScheme: "dark" });
+  await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 
   await page.getByRole("searchbox", { name: "Search products" }).fill("atta");

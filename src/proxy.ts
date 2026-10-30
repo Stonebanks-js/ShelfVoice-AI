@@ -9,6 +9,15 @@ export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
   headers.set("x-request-id", requestId);
 
+  // Customer pages never use a session: skip the auth round trip (doc 06:
+  // the storefront and review page load in 15 seconds or less on a phone).
+  const path = request.nextUrl.pathname;
+  if (path.startsWith("/s/") || path.startsWith("/r/")) {
+    const response = NextResponse.next({ request: { headers } });
+    response.headers.set("x-request-id", requestId);
+    return response;
+  }
+
   let response = NextResponse.next({ request: { headers } });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +39,6 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Signed-in owners skip the sign-in page; the owner app needs a session.
-  const path = request.nextUrl.pathname;
   const isApp = path === "/app" || path.startsWith("/app/");
   if ((user && path === "/") || (!user && isApp)) {
     const redirect = NextResponse.redirect(new URL(user ? "/app" : "/", request.url));
