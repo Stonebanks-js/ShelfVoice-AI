@@ -1,10 +1,10 @@
 "use client";
 
-import { CircleAlert, CircleCheck, Info, PackageCheck, Share } from "lucide-react";
+import { Camera, CircleAlert, CircleCheck, Info, PackageCheck, Share } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { EmptyState, PageHeader } from "@/components/ui/feedback";
 import { TextField } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/overlay";
@@ -47,11 +47,17 @@ export function OrdersScreen({ items, shopName }: { items: RestockItem[]; shopNa
         title={t("tab.orders")}
         subtitle={items.length ? t("orders.count", { n: items.length }) : undefined}
         trailing={
-          toOrder.length > 0 && (
-            <Button variant="tinted" icon={<Share aria-hidden className="size-5" />} onClick={share}>
-              {t("orders.share")}
-            </Button>
-          )
+          <div className="flex gap-2">
+            {/* Deliveries usually come with a bill: read it instead of typing. */}
+            <ButtonLink href="/app/camera" variant="gray" icon={<Camera aria-hidden className="size-5" />}>
+              {t("camera.scan")}
+            </ButtonLink>
+            {toOrder.length > 0 && (
+              <Button variant="tinted" icon={<Share aria-hidden className="size-5" />} onClick={share}>
+                {t("orders.share")}
+              </Button>
+            )}
+          </div>
         }
       />
 

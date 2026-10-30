@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Mic, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
+import { Camera, Minus, Mic, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -126,12 +126,18 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
   );
 }
 
+// Add by tap, or read a supplier's bill (O-10).
 function AddButton({ onClick }: { onClick: () => void }) {
   const { t } = useLang();
   return (
-    <Button variant="tinted" onClick={onClick} icon={<Plus aria-hidden className="size-5" />}>
-      {t("stock.add")}
-    </Button>
+    <div className="flex gap-2">
+      <ButtonLink href="/app/camera" variant="gray" icon={<Camera aria-hidden className="size-5" />}>
+        {t("camera.scan")}
+      </ButtonLink>
+      <Button variant="tinted" onClick={onClick} icon={<Plus aria-hidden className="size-5" />}>
+        {t("stock.add")}
+      </Button>
+    </div>
   );
 }
 
