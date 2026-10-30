@@ -5,9 +5,9 @@ import { analyseReview } from "@/server/ai/jobs";
 import { AiError } from "@/server/ai/meta";
 import { AUDIO_LIMITS, checkWav } from "@/server/audio";
 import { refreshForecasts } from "@/server/forecast/refresh";
-import { ApiError } from "@/server/http";
+import { ApiError, fromPostgres } from "@/server/http";
 import { log } from "@/server/log";
-import { adminClient } from "@/server/supabase";
+import { adminClient, type Db } from "@/server/supabase";
 
 export interface ReviewSubmission {
   reviewId: string;
@@ -99,3 +99,39 @@ export async function analyseStoredReview(reviewId: string, requestId?: string):
     return "PENDING";
   }
 }
+
+const AUDIO_URL_SECONDS = 3600;
+
+export interface FeedReview {
+  id: string;
+  status: "PENDING" | "ANALYZED" | "FAILED";
+  transcript: string | null;
+  sentiment: "POSITIVE" | "NEUTRAL" | "NEGATIVE" | null;
+  summary: string | null;
+  mentioned_product_ids: string[];
+  stockout_product_ids: string[];
+  is_hidden: boolean;
+  created_at: string;
+  audioUrl: string | null; // short-lived link while the audio exists
+  audioRemoved: boolean; // deleted after 30 days (decision P1)
+}
+
+// The owner's review feed (doc 06 O-8), newest first, under their RLS.
+export async function reviewFeed(db: Db, shopId: string, page = 1, pageSize = 20): Promise<FeedReview[]> {
+  const { data, error } = await db
+    .from("reviews")
+    .select("id, status, transcript, sentiment, summary, mentioned_product_ids, stockout_product_ids, is_hidden, audio_path, audio_deleted_at, created_at")
+    .eq("shop_id", shopId)
+    .order("created_at", { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+  if (error) throw fromPostgres(error);
+  return Promise.all(
+    data.map(async ({ audio_path, audio_deleted_at, ...review }) => {
+      const audioRemoved = Boolean(audio_deleted_at);
+      if (!audio_path || audioRemoved) return { ...review, audioUrl: null, audioRemoved };
+      const { data: signed } = await db.storage.from("voice").createSignedUrl(audio_path, AUDIO_URL_SECONDS);
+      return { ...review, audioUrl: signed?.signedUrl ?? null, audioRemoved };
+    }),
+  );
+}
+

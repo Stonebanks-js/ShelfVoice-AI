@@ -20,7 +20,7 @@
   --fill-strong: rgb(118 118 128 / 0.2);
   --segment: #ffffff; /* selected segment on the fill track */
   --ink: #1d1d1f; /* body text */
-  --ink-2: #6e6e73; /* secondary text, 4.5:1 on bg and surface */
+  --ink-2: #636368; /* secondary text: 5.3:1 on bg, 6:1 on surface, 4.8:1 on fill */
   --ink-3: #8e8e93; /* chevrons and placeholders only, never real text */
   --separator: rgb(60 60 67 / 0.18);
   --accent: #0a66d8; /* links, tinted text, 5.4:1 on white */
