@@ -124,8 +124,9 @@ function LowList({ summary, t }: { summary: TodaySummary; t: T }) {
       <ListGroup
         header={
           <span className="flex items-center justify-between">
-            <span>
-              {t("today.low.title")} {summary.lowCount > 0 && <span className="tabular-nums">· {summary.lowCount}</span>}
+            {/* Own colour classes: inherited colours can lag a live light/dark switch. */}
+            <span className="text-ink-2">
+              {t("today.low.title")} {summary.lowCount > 0 && <span className="text-ink-2 tabular-nums">· {summary.lowCount}</span>}
             </span>
             {summary.lowCount > 0 && <SeeAll href="/app/orders" t={t} />}
           </span>
@@ -178,9 +179,9 @@ function ReviewList({ summary, lang, now, t }: { summary: TodaySummary; lang: La
       <ListGroup
         header={
           <span className="flex items-center justify-between">
-            <span>
+            <span className="text-ink-2">
               {t("today.reviews.title")}
-              {summary.newReviews > 0 && <span> · {t("today.reviews.new", { n: summary.newReviews })}</span>}
+              {summary.newReviews > 0 && <span className="text-ink-2"> · {t("today.reviews.new", { n: summary.newReviews })}</span>}
             </span>
             {summary.newReviews > 0 && <SeeAll href="/app/reviews" t={t} />}
           </span>
