@@ -204,6 +204,23 @@ const en = {
   "stock.saved": "Saved",
   "stock.removed": "Removed",
   "stock.added": "{name} added",
+  "orders.count": "{n} to order",
+  "orders.orderLabel": "to order",
+  "orders.daysLabel": "days left",
+  "orders.dayLabel": "day left",
+  "orders.todayFigure": "Today",
+  "orders.todayLabel": "runs out",
+  "orders.coldReason": "Only {stock} left, at or below your warning level of {level}.",
+  "orders.empty.title": "Nothing to order right now",
+  "orders.empty.body": "Stock looks fine.",
+  "orders.cold": "Smart order list starts after 2 weeks of sales. Until then we warn you when stock is low.",
+  "orders.share": "Share",
+  "orders.shareTitle": "Order for {shop}",
+  "orders.copied": "Order list copied",
+  "orders.delivered": "Delivery arrived",
+  "orders.deliveredTitle": "How many {name} came?",
+  "orders.deliveredSaved": "{name}: {qty} added to stock",
+
 
 
 
@@ -412,6 +429,23 @@ const hi: Record<MessageKey, string> = {
   "stock.saved": "सेव हो गया",
   "stock.removed": "हटा दिया",
   "stock.added": "{name} जोड़ा गया",
+  "orders.count": "{n} मँगवाने हैं",
+  "orders.orderLabel": "मँगवाएँ",
+  "orders.daysLabel": "दिन बचे",
+  "orders.dayLabel": "दिन बचा",
+  "orders.todayFigure": "आज",
+  "orders.todayLabel": "ख़त्म",
+  "orders.coldReason": "सिर्फ़ {stock} बचे हैं, आपके तय स्तर {level} तक।",
+  "orders.empty.title": "अभी कुछ मँगवाना नहीं",
+  "orders.empty.body": "स्टॉक ठीक है।",
+  "orders.cold": "स्मार्ट ऑर्डर लिस्ट 2 हफ़्ते की बिक्री के बाद शुरू होगी। तब तक स्टॉक कम होने पर हम बताएँगे।",
+  "orders.share": "भेजें",
+  "orders.shareTitle": "{shop} का ऑर्डर",
+  "orders.copied": "ऑर्डर लिस्ट कॉपी हो गई",
+  "orders.delivered": "माल आ गया",
+  "orders.deliveredTitle": "{name} कितना आया?",
+  "orders.deliveredSaved": "{name}: स्टॉक में {qty} जोड़े",
+
 
 
 
