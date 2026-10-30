@@ -239,6 +239,43 @@ const en = {
   "reviews.empty.cta": "Get your QR",
   "reviews.none": "Nothing here yet.",
   "reviews.more": "Show more",
+  "shop.demo": "This is a demo shop. It's deleted after 24 hours.",
+  "shop.openNow": "Open now",
+  "shop.closesAt": "Open now, closes {time}",
+  "shop.opensAt": "Closed, opens {time}",
+  "shop.opensOn": "Closed, opens {day} {time}",
+  "shop.noHours": "Add your opening hours",
+  "shop.view": "View shop page",
+  "shop.shareLink": "Share link",
+  "shop.linkCopied": "Shop link copied",
+  "shop.page": "Shop page",
+  "shop.published": "Show my shop to customers",
+  "shop.publishedNote": "When off, customers see “This shop isn't open online right now”.",
+  "shop.publishedOn": "Your shop page is live",
+  "shop.publishedOff": "Your shop page is hidden",
+  "shop.qr": "Review QR for the counter",
+  "shop.qrTitle": "Leave a voice review",
+  "shop.qrBody": "Customers scan this and speak for 15 seconds. No app or sign-up.",
+  "shop.qrDownload": "Download to print",
+  "shop.details": "Details",
+  "shop.editDetails": "Edit details",
+  "shop.type": "Type of shop",
+  "shop.phone": "Phone",
+  "shop.about": "About the shop",
+  "shop.notSet": "Not set",
+  "shop.hours": "Opening hours",
+  "shop.editHours": "Edit hours",
+  "shop.closed": "Closed",
+  "shop.open": "Open",
+  "shop.opens": "Opens",
+  "shop.closes": "Closes",
+  "shop.copyMonday": "Use Monday's hours every day",
+  "shop.account": "Account",
+  "shop.signOut": "Sign out",
+  "shop.delete": "Delete my shop",
+  "shop.delete.title": "Delete your shop?",
+  "shop.delete.body": "Your shop page, products, stock history, reviews and recordings are deleted for good, and you're signed out. This can't be undone.",
+
 
 
 
@@ -484,6 +521,43 @@ const hi: Record<MessageKey, string> = {
   "reviews.empty.cta": "अपना QR लें",
   "reviews.none": "यहाँ अभी कुछ नहीं।",
   "reviews.more": "और दिखाएँ",
+  "shop.demo": "यह डेमो दुकान है। 24 घंटे बाद मिट जाएगी।",
+  "shop.openNow": "अभी खुली है",
+  "shop.closesAt": "अभी खुली है, {time} बजे बंद",
+  "shop.opensAt": "बंद है, {time} बजे खुलेगी",
+  "shop.opensOn": "बंद है, {day} {time} बजे खुलेगी",
+  "shop.noHours": "खुलने का समय जोड़ें",
+  "shop.view": "दुकान का पेज देखें",
+  "shop.shareLink": "लिंक भेजें",
+  "shop.linkCopied": "दुकान का लिंक कॉपी हो गया",
+  "shop.page": "दुकान का पेज",
+  "shop.published": "ग्राहकों को दुकान दिखाएँ",
+  "shop.publishedNote": "बंद होने पर ग्राहकों को दिखेगा “यह दुकान अभी ऑनलाइन नहीं है”।",
+  "shop.publishedOn": "आपकी दुकान का पेज चालू है",
+  "shop.publishedOff": "आपकी दुकान का पेज छिपा है",
+  "shop.qr": "काउंटर के लिए रिव्यू QR",
+  "shop.qrTitle": "आवाज़ में रिव्यू दें",
+  "shop.qrBody": "ग्राहक इसे स्कैन करके 15 सेकंड बोलते हैं। कोई ऐप या साइन-अप नहीं।",
+  "shop.qrDownload": "छापने के लिए डाउनलोड करें",
+  "shop.details": "जानकारी",
+  "shop.editDetails": "जानकारी बदलें",
+  "shop.type": "दुकान की किस्म",
+  "shop.phone": "फ़ोन",
+  "shop.about": "दुकान के बारे में",
+  "shop.notSet": "नहीं भरा",
+  "shop.hours": "खुलने का समय",
+  "shop.editHours": "समय बदलें",
+  "shop.closed": "बंद",
+  "shop.open": "खुली",
+  "shop.opens": "खुलती है",
+  "shop.closes": "बंद होती है",
+  "shop.copyMonday": "हर दिन सोमवार वाला समय",
+  "shop.account": "खाता",
+  "shop.signOut": "साइन आउट",
+  "shop.delete": "मेरी दुकान मिटाएँ",
+  "shop.delete.title": "अपनी दुकान मिटाएँ?",
+  "shop.delete.body": "आपकी दुकान का पेज, सामान, स्टॉक का रिकॉर्ड, रिव्यू और रिकॉर्डिंग हमेशा के लिए मिट जाएँगे, और आप साइन आउट हो जाएँगे। इसे वापस नहीं लाया जा सकता।",
+
 
 
 
@@ -496,7 +570,8 @@ const dictionaries: Record<Lang, Record<MessageKey, string>> = { en, hi };
 
 // Looks up a message and fills {name} placeholders.
 export function translate(lang: Lang, key: MessageKey, vars?: Record<string, string | number>): string {
-  const text = dictionaries[lang][key];
+  // Never crash a screen over a missing string: English, then the key itself.
+  const text = dictionaries[lang][key] ?? dictionaries.en[key] ?? key;
   return vars ? text.replace(/\{(\w+)\}/g, (match, name: string) => String(vars[name] ?? match)) : text;
 }
 

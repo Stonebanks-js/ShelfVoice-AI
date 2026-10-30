@@ -28,6 +28,7 @@ const { storeReview, analyseStoredReview, reviewFeed } = await import("@/server/
 const { limit } = await import("@/server/abuse");
 const { todaySummary } = await import("@/server/today");
 const { restockList } = await import("@/server/restock");
+const { deleteShop } = await import("@/server/delete-shop");
 const { ledger } = await import("@/server/ai/index");
 const { ApiError } = await import("@/server/http");
 
@@ -177,6 +178,34 @@ describe("review feed (doc 06 O-8)", () => {
     const other = await testOwner(false);
     const otherShop = await createDemoCopy(other.user.id);
     expect(await reviewFeed(owner.db, otherShop)).toEqual([]);
+  });
+});
+
+describe("delete my shop (doc 01 FR-16, W-17)", () => {
+  it("removes the shop, its rows, its files and the account, and nothing else", async () => {
+    const owner = await testOwner(false);
+    const shopId = await createDemoCopy(owner.user.id);
+    const bystander = await testOwner(false);
+    const otherShop = await createDemoCopy(bystander.user.id);
+    for (const path of [`${shopId}/owner/a.wav`, `${shopId}/reviews/b.wav`, `${otherShop}/owner/c.wav`]) {
+      await admin.storage.from("voice").upload(path, toneWav(1), { contentType: "audio/wav" });
+    }
+
+    await deleteShop({ shopId, userId: owner.user.id, requestId: owner.requestId });
+
+    const count = async (table: "products" | "stock_movements" | "reviews", id: string) =>
+      (await admin.from(table).select("*", { count: "exact", head: true }).eq("shop_id", id)).count;
+    expect((await admin.from("shops").select("id").eq("id", shopId)).data).toEqual([]);
+    expect(await count("products", shopId)).toBe(0);
+    expect(await count("stock_movements", shopId)).toBe(0);
+    expect(await count("reviews", shopId)).toBe(0);
+    expect((await admin.storage.from("voice").list(`${shopId}/owner`)).data).toEqual([]);
+    expect((await admin.storage.from("voice").list(`${shopId}/reviews`)).data).toEqual([]);
+    expect((await admin.auth.admin.getUserById(owner.user.id)).data.user).toBeNull();
+
+    // The other shop keeps everything.
+    expect(await count("products", otherShop)).toBe(15);
+    expect((await admin.storage.from("voice").list(`${otherShop}/owner`)).data).toHaveLength(1);
   });
 });
 
