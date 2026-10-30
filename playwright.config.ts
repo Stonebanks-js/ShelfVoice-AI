@@ -7,6 +7,7 @@ const port = Number(process.env.E2E_PORT ?? 3200);
 // permission granted without a prompt), so every project uses Chromium.
 export default defineConfig({
   testDir: "./e2e",
+  globalSetup: "./e2e/global-setup.ts",
   fullyParallel: true,
   // Locally, journeys share one laptop with Docker and the production server;
   // more workers starve the local Supabase stack and make uploads time out.
