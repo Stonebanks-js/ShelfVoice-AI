@@ -220,6 +220,26 @@ const en = {
   "orders.delivered": "Delivery arrived",
   "orders.deliveredTitle": "How many {name} came?",
   "orders.deliveredSaved": "{name}: {qty} added to stock",
+  "reviews.count": "{n} reviews",
+  "reviews.items": "Items mentioned",
+  "reviews.hiddenFilter": "Hidden",
+  "reviews.pending": "Understanding…",
+  "reviews.failed": "Couldn't understand this one",
+  "reviews.play": "Play recording",
+  "reviews.pause": "Pause recording",
+  "reviews.audioRemoved": "Recording removed after 30 days",
+  "reviews.hide": "Hide",
+  "reviews.show": "Show",
+  "reviews.hiddenNote": "Hidden from your shop page",
+  "reviews.hiddenToast": "Review hidden from your shop page",
+  "reviews.shownToast": "Review shown on your shop page",
+  "reviews.wantedOut": "{name}: wanted, out of stock",
+  "reviews.empty.title": "No reviews yet",
+  "reviews.empty.body": "Print your QR and keep it at the counter. Customers scan it and speak for 15 seconds.",
+  "reviews.empty.cta": "Get your QR",
+  "reviews.none": "Nothing here yet.",
+  "reviews.more": "Show more",
+
 
 
 
@@ -445,6 +465,26 @@ const hi: Record<MessageKey, string> = {
   "orders.delivered": "माल आ गया",
   "orders.deliveredTitle": "{name} कितना आया?",
   "orders.deliveredSaved": "{name}: स्टॉक में {qty} जोड़े",
+  "reviews.count": "{n} रिव्यू",
+  "reviews.items": "बताए गए सामान",
+  "reviews.hiddenFilter": "छिपे हुए",
+  "reviews.pending": "समझ रहे हैं…",
+  "reviews.failed": "यह समझ नहीं आया",
+  "reviews.play": "रिकॉर्डिंग सुनें",
+  "reviews.pause": "रिकॉर्डिंग रोकें",
+  "reviews.audioRemoved": "30 दिन बाद रिकॉर्डिंग हटा दी गई",
+  "reviews.hide": "छिपाएँ",
+  "reviews.show": "दिखाएँ",
+  "reviews.hiddenNote": "आपकी दुकान के पेज से छिपा है",
+  "reviews.hiddenToast": "रिव्यू दुकान के पेज से छिपा दिया",
+  "reviews.shownToast": "रिव्यू दुकान के पेज पर फिर दिखेगा",
+  "reviews.wantedOut": "{name}: चाहिए था, स्टॉक ख़त्म",
+  "reviews.empty.title": "अभी कोई रिव्यू नहीं",
+  "reviews.empty.body": "अपना QR छापकर काउंटर पर रखें। ग्राहक स्कैन करके 15 सेकंड बोलते हैं।",
+  "reviews.empty.cta": "अपना QR लें",
+  "reviews.none": "यहाँ अभी कुछ नहीं।",
+  "reviews.more": "और दिखाएँ",
+
 
 
 

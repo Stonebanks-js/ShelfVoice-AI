@@ -24,7 +24,7 @@ vi.mock("@/server/ai", async (importOriginal) => ({
 const { createDemoCopy } = await import("@/server/demo/copy");
 const { refreshForecasts } = await import("@/server/forecast/refresh");
 const proposals = await import("@/server/proposals");
-const { storeReview, analyseStoredReview } = await import("@/server/reviews");
+const { storeReview, analyseStoredReview, reviewFeed } = await import("@/server/reviews");
 const { limit } = await import("@/server/abuse");
 const { todaySummary } = await import("@/server/today");
 const { restockList } = await import("@/server/restock");
@@ -147,6 +147,36 @@ describe("order list (doc 06 O-7)", () => {
   it("is empty for a shop with nothing low", async () => {
     const owner = await testOwner();
     expect((await restockList({ ...owner, requestId: owner.requestId })).items).toEqual([]);
+  });
+});
+
+describe("review feed (doc 06 O-8)", () => {
+  it("lists reviews newest first with a play link only while the audio exists", async () => {
+    const owner = await testOwner(false);
+    const shopId = await createDemoCopy(owner.user.id, new Date(), "en");
+    const [newest, older] = await reviewFeed(owner.db, shopId);
+    expect(newest).toMatchObject({ sentiment: "NEGATIVE", audioUrl: null, audioRemoved: false });
+    expect(older.sentiment).toBe("POSITIVE");
+    expect(newest.stockout_product_ids).toHaveLength(1);
+
+    // Give the newest one a recording: the owner gets a signed link.
+    const path = `${shopId}/reviews/${newest.id}.wav`;
+    await admin.storage.from("voice").upload(path, toneWav(1), { contentType: "audio/wav" });
+    await admin.from("reviews").update({ audio_path: path }).eq("id", newest.id);
+    const [withAudio] = await reviewFeed(owner.db, shopId);
+    expect(withAudio.audioUrl).toMatch(/\/object\/sign\/voice\//);
+
+    // After 30 days the audio is gone and the feed says so.
+    await admin.from("reviews").update({ audio_deleted_at: new Date().toISOString() }).eq("id", newest.id);
+    const [removed] = await reviewFeed(owner.db, shopId);
+    expect(removed).toMatchObject({ audioUrl: null, audioRemoved: true });
+  });
+
+  it("shows nothing from another shop", async () => {
+    const owner = await testOwner();
+    const other = await testOwner(false);
+    const otherShop = await createDemoCopy(other.user.id);
+    expect(await reviewFeed(owner.db, otherShop)).toEqual([]);
   });
 });
 
