@@ -38,7 +38,9 @@ test("the review QR points at the shop's review page and downloads", async ({ pa
   const { slug } = await openShop(page);
   await page.getByRole("button", { name: "Review QR for the counter" }).click();
   const sheet = page.getByRole("dialog", { name: "Leave a voice review" });
-  await expect(sheet.getByRole("img", { name: new RegExp(`/r/${slug}$`) })).toBeVisible();
+  const qr = sheet.getByRole("img");
+  await expect(qr).toBeVisible();
+  expect((await qr.getAttribute("aria-label"))?.endsWith(`/r/${slug}`)).toBe(true);
   const download = page.waitForEvent("download");
   await sheet.getByRole("button", { name: "Download to print" }).click();
   expect((await download).suggestedFilename()).toBe("shelf-voice-review-qr.png");
