@@ -39,8 +39,9 @@ export function Switch({
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 size-[27px] rounded-full bg-white shadow-[0_2px_6px_rgb(0_0_0/0.2)] transition-transform duration-200",
-            checked && "translate-x-5",
+            "absolute top-0.5 left-0.5 size-[27px] rounded-full shadow-[0_2px_6px_rgb(0_0_0/0.2)] transition-transform duration-200",
+            // On, the knob takes the on-accent colour so it shows on the light track in dark mode.
+            checked ? "translate-x-5 bg-on-accent" : "bg-white",
           )}
         />
       </span>
@@ -136,7 +137,7 @@ const BADGE: Record<BadgeTone, string> = {
   success: "bg-success-soft text-success",
   danger: "bg-danger-soft text-danger",
   check: "bg-check-soft text-check",
-  low: "bg-turmeric text-on-turmeric",
+  low: "bg-fill-strong text-ink",
 };
 
 // Status badge: icon plus word, never colour alone (doc 06).

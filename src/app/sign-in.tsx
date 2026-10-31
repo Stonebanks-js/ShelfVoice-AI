@@ -1,27 +1,46 @@
 "use client";
 
-import { CircleAlert, MessageSquareText, Mic, ShoppingCart, Store } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
+import { LogoMark, Wordmark } from "@/components/brand/logo";
+import { VoiceBars } from "@/components/shell/mic-button";
 import { buttonClass, Button } from "@/components/ui/button";
 import { Segmented } from "@/components/ui/controls";
-import { IconTile } from "@/components/ui/list";
 import type { Lang, MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { errorKey } from "@/lib/errors";
 
-function Feature({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
+// What the app does, shown rather than listed: a spoken line becomes two
+// priced products, as it will on the owner's own shop page.
+function Example() {
+  const { t } = useLang();
   return (
-    <li className="flex gap-4">
-      <IconTile icon={icon} />
-      <div>
-        <p className="text-body font-semibold">{title}</p>
-        <p className="text-footnote text-ink-2">{body}</p>
+    <figure className="flex flex-col gap-2">
+      <div className="rounded-lg bg-surface p-4 shadow-card">
+        <p className="flex items-center gap-2 border-b border-separator pb-3 text-body font-medium">
+          <VoiceBars className="size-5 shrink-0 text-voice" />
+          {t("signin.example.said")}
+        </p>
+        <dl className="flex flex-col gap-2 pt-3 text-body">
+          {(
+            [
+              ["signin.example.item1", "₹14"],
+              ["signin.example.item2", "₹10"],
+            ] as const
+          ).map(([name, price]) => (
+            <div key={name} className="flex justify-between gap-4">
+              <dt>{t(name)}</dt>
+              <dd className="font-semibold tabular-nums">{price}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
-    </li>
+      <figcaption className="px-1 text-footnote text-ink-2">{t("signin.example.note")}</figcaption>
+    </figure>
   );
 }
 
@@ -61,22 +80,15 @@ export function SignIn({ failed }: { failed: boolean }) {
 
       <div className="flex flex-1 flex-col justify-center gap-8 py-10">
         <div className="flex flex-col gap-4">
-          <span
-            aria-hidden
-            className="grid size-20 place-items-center rounded-[1.375rem] bg-accent-fill text-on-accent shadow-mic"
-          >
-            <Mic className="size-10" />
-          </span>
+          <LogoMark className="-ml-2 h-24 w-auto self-start" />
           <div>
-            <h1 className="font-display text-large-title font-bold tracking-tight">{t("app.name")}</h1>
+            <h1 className="text-large-title">
+              <Wordmark name={t("app.name")} />
+            </h1>
             <p className="mt-1 text-headline text-ink-2">{t("app.tagline")}</p>
           </div>
         </div>
-        <ul className="flex flex-col gap-5">
-          <Feature icon={<Store />} title={t("signin.voice.title")} body={t("signin.voice.body")} />
-          <Feature icon={<ShoppingCart />} title={t("signin.restock.title")} body={t("signin.restock.body")} />
-          <Feature icon={<MessageSquareText />} title={t("signin.reviews.title")} body={t("signin.reviews.body")} />
-        </ul>
+        <Example />
       </div>
 
       {/* Doc 06: the primary action sits in the thumb zone. */}
@@ -107,7 +119,7 @@ export function SignIn({ failed }: { failed: boolean }) {
   );
 }
 
-// Google's "G", drawn on a white disc so it reads on the blue button.
+// Google's "G", drawn on a white disc so it reads on the black button.
 function GoogleMark() {
   return (
     <span aria-hidden className="grid size-6 place-items-center rounded-full bg-white">

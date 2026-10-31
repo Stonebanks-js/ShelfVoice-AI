@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
 
+import { drawLogo, LOGO } from "@/components/brand/logo";
 import { Button, buttonClass } from "@/components/ui/button";
 import { OpenBadge } from "@/components/shell/open-badge";
 import { Segmented, Switch } from "@/components/ui/controls";
@@ -244,7 +245,8 @@ function QrSheet({ url, shopName, onClose }: { url: string; shopName: string; on
     return d;
   }, [qr, size]);
 
-  // A printable card: shop name, the QR and what to do, as a PNG.
+  // A printable card: shop name, the QR and what to do, as a PNG, signed with
+  // the logo so customers know what they are scanning.
   function download() {
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
@@ -252,7 +254,7 @@ function QrSheet({ url, shopName, onClose }: { url: string; shopName: string; on
     const ctx = canvas.getContext("2d")!;
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, 1200, 1600);
-    ctx.fillStyle = "#1d1d1f";
+    ctx.fillStyle = LOGO.ink;
     ctx.textAlign = "center";
     ctx.font = "bold 72px system-ui, sans-serif";
     ctx.fillText(shopName, 600, 170, 1080);
@@ -262,8 +264,9 @@ function QrSheet({ url, shopName, onClose }: { url: string; shopName: string; on
     const offset = (1200 - cell * size) / 2;
     for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) if (qr.isDark(r, c)) ctx.fillRect(offset + c * cell, 360 + r * cell, cell, cell);
     ctx.font = "36px system-ui, sans-serif";
-    ctx.fillStyle = "#636368";
+    ctx.fillStyle = "#5f5f5f";
     ctx.fillText(url.replace(/^https?:\/\//, ""), 600, 360 + size * cell + 110, 1080);
+    signCard(ctx);
     const link = document.createElement("a");
     link.download = "shelf-voice-review-qr.png";
     link.href = canvas.toDataURL("image/png");
@@ -286,13 +289,28 @@ function QrSheet({ url, shopName, onClose }: { url: string; shopName: string; on
         <p className="text-center text-body text-ink-2">{t("shop.qrBody")}</p>
         <div className="rounded-lg bg-white p-4">
           <svg role="img" aria-label={`QR: ${url}`} viewBox={`-2 -2 ${size + 4} ${size + 4}`} className="size-56" shapeRendering="crispEdges">
-            <path d={path} fill="#1d1d1f" />
+            <path d={path} fill="#101010" />
           </svg>
         </div>
         <p className="text-footnote break-all text-ink-2">{url}</p>
       </div>
     </Sheet>
   );
+}
+
+// The logo and "Shelf Voice" centred along the bottom of the QR card.
+function signCard(ctx: CanvasRenderingContext2D) {
+  const mark = 96;
+  const name = "Shelf Voice";
+  ctx.font = "bold 48px system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  const markWidth = (mark * LOGO.full.width) / LOGO.full.height;
+  const left = (1200 - (markWidth + 20 + ctx.measureText(name).width)) / 2;
+  const top = 1450;
+  const used = drawLogo(ctx, left, top, mark);
+  ctx.fillStyle = LOGO.ink;
+  ctx.fillText(name, left + used + 20, top + mark / 2 + 4);
 }
 
 function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void }) {

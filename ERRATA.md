@@ -55,6 +55,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-32](#e-32-apple-style-visual-direction-replaces-signboard) | Apple-style visual direction replaces Signboard | Medium | Yes | Decided |
 | [E-33](#e-33-content-security-policy-without-nonces) | Content Security Policy without nonces | Medium | No | Applied |
 | [E-34](#e-34-festival-calendar-dates-windows-and-factors) | Festival calendar dates, windows and factors | Low | No | Applied |
+| [E-35](#e-35-bag-logo-in-black-white-and-the-logos-red) | Bag logo in black, white and the logo's red | Medium | Yes | Applied |
 
 ---
 
@@ -719,3 +720,24 @@ The calendar ends in December 2027; a 2028 seed is needed before then.
 |---|---|---|---|
 | 07 | 5 | `festival_calendar` | Add the source of each date, the windows and the factors (E-34) |
 | 07 | 5 | `product_forecasts` | Add `festival text` (the festival that raised the forecast, or null) |
+
+---
+
+### E-35 Bag logo in black, white and the logo's red
+
+**Severity:** Medium · **Owner decision:** Yes · **Status:** Applied (Nov 1)
+
+**Gap.** No document defines a logo. E-32 set a blue accent (`#0A66D8`) close to stock iOS blue; the UI review on Oct 31 found it, and the screens built on it, read as generic.
+
+**Decision (Nov 1, owner).** The owner supplied the logo: a black shopping bag with five white voice bars inside and a deep-red orbit around it (`brand/logo/shelf-voice-logo-original.png`, redrawn as SVG in `brand/logo`). From mockups of every screen in light and dark (four colour directions, then two built from the logo), the owner chose "Logo Native": iOS grouped lists with the logo's colours. A Shelf S logo in peacock teal and marigold, drafted earlier the same night, was dropped; its files are in `brand/archive/shelf-s`.
+
+1. **Colour.** Black, white and one red, from the logo. The bag's black `#101010` is the primary button colour and text colour; in dark mode the bag turns light, so primary buttons are `#F2F2F2` with black text. The orbit's red `#B80A16` (6.8:1 with white) means voice: the Bolo button and recording. Out of stock and "please check" use the same red, always with an icon and words. Dark mode uses `#F2484F` for that red, because `#B80A16` is only 3.1:1 on black. In stock and happy reviews read by icon and word, not green. Marigold and turmeric are gone; low stock is a grey pill.
+2. **Logo use.** The full logo on Welcome, the customer pages and the printed QR card; inside the owner's tabs the shop name is the title. Under 40 px (favicon, tab icon) the mark drops the orbit, which blurs at that size. The app draws it from `src/components/brand/logo.tsx`.
+3. **Bolo button and tab bar.** The mic is a red circle with the logo's five voice bars, not a microphone. The tab bar is a floating frosted capsule with four tabs and the Bolo button beside it (the iOS 26 shape), replacing the full-width bar with the mic in the centre slot.
+4. **Lists.** Row icons sit plain, without the tinted square behind them.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 06 | 1 | U1 Visual direction | Accent `#0A66D8` → black `#101010` (light `#F2F2F2` in dark); voice red `#B80A16` (`#F2484F` in dark); turmeric removed (E-35) |
+| 06 | 1 | U3 Owner app navigation | "Bottom tabs + centre mic" → four tabs on a floating capsule with the Bolo button beside it (E-35) |
+| 06 | 5–7 | Tokens | Add the logo and the `voice` token; record, marigold and turmeric tokens removed (`src/app/globals.css`) |

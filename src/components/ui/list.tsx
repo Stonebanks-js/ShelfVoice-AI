@@ -28,16 +28,17 @@ export function ListGroup({
 export type IconTone = "accent" | "success" | "danger" | "check" | "gray";
 
 const TONE: Record<IconTone, string> = {
-  accent: "bg-accent-soft text-accent",
-  success: "bg-success-soft text-success",
-  danger: "bg-danger-soft text-danger",
-  check: "bg-check-soft text-check",
-  gray: "bg-fill text-ink-2",
+  accent: "text-ink",
+  success: "text-success",
+  danger: "text-danger",
+  check: "text-check",
+  gray: "text-ink-2",
 };
 
+// A row's leading icon, plain as in SF Symbols lists: no tinted square (E-35).
 export function IconTile({ icon, tone = "accent" }: { icon: ReactNode; tone?: IconTone }) {
   return (
-    <span aria-hidden className={cn("grid size-8 shrink-0 place-items-center rounded-sm [&>svg]:size-[18px]", TONE[tone])}>
+    <span aria-hidden className={cn("grid size-8 shrink-0 place-items-center [&>svg]:size-[22px] [&>svg]:stroke-[1.75]", TONE[tone])}>
       {icon}
     </span>
   );
