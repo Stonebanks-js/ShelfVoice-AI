@@ -52,6 +52,14 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
     }
   }
 
+  // Close the sheet before the list reloads: adding the first product swaps
+  // the empty screen for the list, which would otherwise reopen it blank.
+  const saved = async (message: string) => {
+    setEditing(null);
+    toast.show({ message });
+    await reload();
+  };
+
   if (products.length === 0) {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
@@ -68,7 +76,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
             }
           />
         </div>
-        {editing && <ProductSheet product={editing} onClose={() => setEditing(null)} onSaved={reload} />}
+        {editing && <ProductSheet product={editing} onClose={() => setEditing(null)} onSaved={saved} />}
       </main>
     );
   }
@@ -115,11 +123,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
         <ProductSheet
           product={editing}
           onClose={() => setEditing(null)}
-          onSaved={async (message) => {
-            setEditing(null);
-            toast.show({ message });
-            await reload();
-          }}
+          onSaved={saved}
         />
       )}
     </main>
@@ -235,9 +239,12 @@ function ProductSheet({
         await onSaved(t("stock.added", { name }));
         return;
       }
-      await api(`/api/v1/products/${product.id}`, { method: "PATCH", json: fields });
+      // An item with no count yet set to 0 has nothing to move: it's simply
+      // out of stock.
+      const noneLeft = count === 0 && product.stock_qty === null;
+      await api(`/api/v1/products/${product.id}`, { method: "PATCH", json: noneLeft ? { ...fields, is_in_stock: false } : fields });
       // Counts change only through the movement log (decision K2).
-      if (count !== null && count !== product.stock_qty) {
+      if (count !== null && count !== product.stock_qty && !noneLeft) {
         await api("/api/v1/stock-movements", {
           json: { product_id: product.id, kind: "CORRECTION", qty: count - (product.stock_qty ?? 0), idempotency_key: crypto.randomUUID() },
         });

@@ -3,7 +3,7 @@
 // every stored number and checks every product ID (doc 02 guardrails).
 import { z } from "zod";
 
-import { type Change, priceChangeAllowed, rupeesToPaise, toE164 } from "@/server/changes";
+import { Change, priceChangeAllowed, rupeesToPaise, toE164 } from "@/server/changes";
 
 import type { AiContext, MetaClient } from "./meta";
 
@@ -309,6 +309,13 @@ export async function interpretCommand(
   // With tool_choice "auto" the model may reply in words instead of calling
   // ask_clarification; that reply is the question to show the owner.
   if (calls.length === 0 && text?.trim()) result.question = text.trim().slice(0, 200);
+  // A value the change schema refuses (say, a misheard ₹1,50,000) drops that
+  // change only, instead of failing the whole proposal after paying for it.
+  result.changes = result.changes.filter((change) => {
+    const valid = Change.safeParse(change).success;
+    if (!valid) result.rejected.push(`${change.op}: value out of range`);
+    return valid;
+  });
   if (unclear.size && !result.question) {
     const names = [...unclear.values()].slice(0, 3);
     const list = names.length === 2 ? names.join(language === "hi" ? " या " : " or ") : names.join(", ");

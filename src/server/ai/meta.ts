@@ -189,6 +189,7 @@ export function createMetaClient(options: MetaClientOptions) {
     const started = performance.now();
     let retries = 0;
     let outcome: AiOutcome = "ERROR";
+    let refusedRequest = false;
     let usage: Omit<CallRecord, "ctx" | "model" | "latencyMs" | "retries" | "outcome"> = {
       inputTokens: 0,
       cachedTokens: 0,
@@ -210,6 +211,9 @@ export function createMetaClient(options: MetaClientOptions) {
           if (res.status >= 500) throw new RetryableError("ERROR");
           if (res.status !== 200) {
             outcome = "ERROR";
+            // A refusal of this one request (bad audio, say) isn't an outage;
+            // only auth failures count against the breaker.
+            refusedRequest = res.status < 500 && res.status !== 401 && res.status !== 403;
             throw new AiError("AI_UNAVAILABLE", `Meta API returned ${res.status}`);
           }
           const parsed = parse(res.body);
@@ -234,7 +238,7 @@ export function createMetaClient(options: MetaClientOptions) {
       const latencyMs = Math.round(performance.now() - started);
       await options.ledger.record({ ctx, model, latencyMs, retries, outcome, ...usage });
       // Bad output means the service answered, so it doesn't count against the breaker.
-      await settleBreaker(provider, breaker, outcome === "OK" || outcome === "SCHEMA_REJECTED");
+      await settleBreaker(provider, breaker, outcome === "OK" || outcome === "SCHEMA_REJECTED" || refusedRequest);
     }
   }
 

@@ -62,8 +62,10 @@ export function ShopScreen({ shop, origin }: { shop: OwnerShop; origin: string }
       try {
         await navigator.share({ title: shop.name, url: shopUrl });
         return;
-      } catch {
-        // Cancelled or unavailable: copy instead.
+      } catch (error) {
+        // The owner closed the share sheet: do nothing more.
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        // Share unavailable here: copy instead.
       }
     }
     try {
@@ -385,7 +387,13 @@ function HoursSheet({ hours, onClose }: { hours: Hours; onClose: () => void }) {
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
-  const update = (day: Day, patch: Partial<{ open: boolean; from: string; to: string }>) => setWeek({ ...week, [day]: { ...week[day], ...patch } });
+  // Days the owner changed here. The rest are saved exactly as they were,
+  // so a lunch break (two time ranges, from voice setup) isn't lost.
+  const [touched, setTouched] = useState<Set<Day>>(() => new Set());
+  const update = (day: Day, patch: Partial<{ open: boolean; from: string; to: string }>) => {
+    setWeek({ ...week, [day]: { ...week[day], ...patch } });
+    setTouched(new Set(touched).add(day));
+  };
 
   async function save() {
     if (DAYS.some((d) => week[d].open && week[d].from >= week[d].to)) return setError("error.invalidChange");
@@ -394,7 +402,9 @@ function HoursSheet({ hours, onClose }: { hours: Hours; onClose: () => void }) {
     try {
       await api("/api/v1/shops/me", {
         method: "PATCH",
-        json: { hours: Object.fromEntries(DAYS.map((d) => [d, week[d].open ? [[week[d].from, week[d].to]] : []])) },
+        json: {
+          hours: Object.fromEntries(DAYS.map((d) => [d, !touched.has(d) ? hours[d] : week[d].open ? [[week[d].from, week[d].to]] : []])),
+        },
       });
       toast.show({ message: t("stock.saved") });
       onClose();

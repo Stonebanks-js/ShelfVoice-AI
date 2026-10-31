@@ -52,6 +52,10 @@ export function useTurnstile(siteKey: string) {
           appearance: "interaction-only",
           callback: (token: string) => pending.current?.resolve(token),
           "error-callback": () => pending.current?.reject(new Error("turnstile error")),
+          // A challenge left unanswered, or a browser Turnstile can't run in,
+          // must end the wait so the page can offer Try again.
+          "timeout-callback": () => pending.current?.reject(new Error("turnstile timeout")),
+          "unsupported-callback": () => pending.current?.reject(new Error("turnstile unsupported")),
           "expired-callback": () => api.reset(id),
         });
         widget.current = { api, id };
@@ -73,7 +77,18 @@ export function useTurnstile(siteKey: string) {
     const { api, id } = widget.current;
     api.reset(id);
     return new Promise<string>((resolve, reject) => {
-      pending.current = { resolve, reject };
+      // Belt and braces: never wait more than a minute for a token.
+      const limit = setTimeout(() => reject(new Error("turnstile timeout")), 60_000);
+      pending.current = {
+        resolve: (value) => {
+          clearTimeout(limit);
+          resolve(value);
+        },
+        reject: (error) => {
+          clearTimeout(limit);
+          reject(error);
+        },
+      };
       api.execute(id);
     });
   }, []);

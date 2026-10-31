@@ -183,6 +183,14 @@ describe("Meta client: circuit breaker (doc 05)", () => {
     expect(breakerState()).toEqual({ state: "CLOSED", failures: 0, openedAt: null });
   });
 
+  it("doesn't count Meta refusing one request (a 400) as an outage", async () => {
+    const { transport } = scripted({ status: 400, body: {} });
+    const { ledger, breakerState } = memoryLedger(undefined, { state: "CLOSED", failures: 4, openedAt: null });
+    const client = createMetaClient({ transport, ledger, budget, sleep: noSleep, now: () => now });
+    await expect(client.structured(ctx, { instructions: "x", input: "y", schema })).rejects.toMatchObject({ code: "AI_UNAVAILABLE" });
+    expect(breakerState()).toEqual({ state: "CLOSED", failures: 0, openedAt: null });
+  });
+
   it("opens after the fifth failure", async () => {
     const { transport } = scripted({ status: 500, body: {} }, { status: 500, body: {} });
     const { ledger, breakerState } = memoryLedger(undefined, { state: "CLOSED", failures: 4, openedAt: null });
