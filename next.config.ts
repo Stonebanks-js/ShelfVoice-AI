@@ -41,6 +41,12 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    // Vercel restores .next/cache between releases, and a warm Turbopack
+    // build served a stale globals.css: a release shipped new components with
+    // the previous colour tokens (E-35, Nov 1). Release builds compile fresh.
+    turbopackFileSystemCacheForBuild: false,
+  },
   // Browser error reports carry the deploy they came from (doc 05).
   env: { NEXT_PUBLIC_RELEASE: process.env.RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev" },
   async headers() {
