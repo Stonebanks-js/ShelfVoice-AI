@@ -29,17 +29,23 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client-17
 
-      # The session pooler connection string: GitHub runners have no IPv6,
-      # which Supabase's direct connection needs. Rows and schema only;
-      # recordings and photos stay in Storage.
+      # Through the session pooler: GitHub runners have no IPv6,
+      # which Supabase's direct connection needs. The password goes in on its
+      # own, so characters like @ in it need no URL encoding. Rows and schema
+      # only; recordings and photos stay in Storage.
       - name: Dump and encrypt
         env:
-          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGHOST: aws-0-ap-northeast-2.pooler.supabase.com
+          PGPORT: "5432"
+          PGUSER: postgres.idrhitepkksjgwqauael
+          PGDATABASE: postgres
+          PGSSLMODE: require
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
           set -o pipefail
           name="shelfvoice-$(date -u +%Y-%m-%d).dump.gpg"
-          /usr/lib/postgresql/17/bin/pg_dump "$DATABASE_URL" --format=custom --no-owner --no-privileges \
+          /usr/lib/postgresql/17/bin/pg_dump --format=custom --no-owner --no-privileges \
             | gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase "$PASSPHRASE" --output "$name"
           [ "$(stat -c %s "$name")" -gt 10000 ] || { echo "Backup is suspiciously small"; exit 1; }
           echo "BACKUP=$name" >> "$GITHUB_ENV"
@@ -55,7 +61,9 @@ jobs:
       - name: Heartbeat
         if: always() && env.HEARTBEAT != ''
         run: |
-          url="${HEARTBEAT%/}"
+          # Spaces or quotes pasted around the secret would break the URL.
+          url=$(printf '%s' "$HEARTBEAT" | tr -d '[:space:]"' | tr -d "'")
+          url="${url%/}"
           [ "${{ job.status }}" = "success" ] || url="$url/fail"
           curl -fsS -X POST "$url" > /dev/null
 
@@ -74,7 +82,8 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-publishable
           SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-role
-        run: pnpm exec vitest run tests/live
+        # Live calls take seconds each; the default 5 s limit is for unit tests.
+        run: pnpm exec vitest run tests/live --testTimeout=90000
       - name: Tell Discord about a failure
         if: failure()
         env:
