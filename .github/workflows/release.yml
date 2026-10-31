@@ -1,0 +1,94 @@
+# Doc 08 release path (W-03): every green CI run on main is migrated and
+# deployed here, and only here (Vercel's own deploys from main are off in
+# vercel.json). One Supabase project serves the live app (E-28), so there is
+# one migrate step. From the freeze, the "production" environment needs the
+# owner's approval for each run (E-07).
+name: release
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One release at a time, in order; a newer one waits rather than cancels.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  SUPABASE_PROJECT_REF: idrhitepkksjgwqauael
+  SITE: https://shelfvoice.vercel.app
+  VERCEL_CLI: vercel@64.3.1
+
+jobs:
+  release:
+    name: Migrate, deploy and check
+    # Pushes to main whose CI passed, or a manual run.
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.SHA }}
+      - uses: ./.github/actions/setup
+
+      # Migrations first: new code may read new columns (doc 07 migration order).
+      - name: Apply database migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          pnpm exec supabase db push --linked --yes
+
+      # Built here with the production env vars from Vercel, then uploaded as is.
+      - name: Build
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          echo "RELEASE=${SHA::7}" >> "$GITHUB_ENV"
+          npx --yes "$VERCEL_CLI" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          RELEASE="${SHA::7}" npx --yes "$VERCEL_CLI" build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy to production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes "$VERCEL_CLI" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      # Doc 04 release verification: the new release answers, the database is
+      # reachable, and the pages owners and customers open first load.
+      - name: Smoke test
+        run: |
+          for _ in $(seq 1 30); do
+            live=$(curl -fsS "$SITE/api/health" | jq -r .release || true)
+            [ "$live" = "$RELEASE" ] && break
+            sleep 10
+          done
+          [ "$live" = "$RELEASE" ] || { echo "Live release is '$live', expected '$RELEASE'"; exit 1; }
+          curl -fsS -o /dev/null "$SITE/api/health/ready"
+          for path in / /privacy; do
+            curl -fsS -o /dev/null "$SITE$path"
+          done
+          echo "Release $RELEASE is live."
+
+      - name: Tell Discord
+        if: always()
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_ALERT_WEBHOOK_URL }}
+          OUTCOME: ${{ job.status }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -n "$WEBHOOK" ] || exit 0
+          if [ "$OUTCOME" = "success" ]; then text="Released ${SHA::7} to $SITE"; else text="Release of ${SHA::7} failed ($OUTCOME): $RUN"; fi
+          curl -fsS -H "content-type: application/json" -d "$(jq -n --arg t "$text" '{content: $t}')" "$WEBHOOK" > /dev/null
