@@ -33,7 +33,7 @@ export async function refreshForecasts(shopId: string, productIds?: string[], no
       .gte("created_at", new Date(now.getTime() - FORECAST.stockoutBoostDays * DAY_MS).toISOString()),
     db
       .from("festival_calendar")
-      .select("starts_on, ends_on, factor, categories")
+      .select("name, starts_on, ends_on, factor, categories")
       .lte("starts_on", istDate(today + 7))
       .gte("ends_on", istDate(today)),
   ]);
@@ -76,12 +76,14 @@ export async function refreshForecasts(shopId: string, productIds?: string[], no
       if (m.kind === "SALE" && i < dailySales.length) dailySales[i] += m.qty;
     }
 
-    const festivalFactor = Math.max(
-      1,
-      ...festivalsRes.data!
-        .filter((f) => f.categories.length === 0 || (product.category !== null && f.categories.includes(product.category)))
-        .map((f) => Number(f.factor)),
-    );
+    // Doc 02: the biggest bump of any festival within 7 days that covers
+    // this product's category (or every category). Categories are free
+    // text, so they're compared without case.
+    const category = product.category?.trim().toLowerCase() ?? null;
+    const festival = festivalsRes
+      .data!.filter((f) => f.categories.length === 0 || (category !== null && f.categories.some((c) => c.toLowerCase() === category)))
+      .reduce<{ name: string; factor: number } | null>((best, f) => (Number(f.factor) > (best?.factor ?? 1) ? { name: f.name, factor: Number(f.factor) } : best), null);
+    const festivalFactor = festival?.factor ?? 1;
     const boostUntil = flaggedUntil.get(product.id);
     const f = forecast({
       dailySales,
@@ -103,6 +105,7 @@ export async function refreshForecasts(shopId: string, productIds?: string[], no
       reorder_point: f.reorderPoint === null ? null : Math.ceil(f.reorderPoint),
       order_qty: f.needsReorder ? f.orderQty : 0,
       stockout_boost_until: boostUntil !== undefined && boostUntil >= today ? istDate(boostUntil) : null,
+      festival: festival?.name ?? null,
       computed_at: now.toISOString(),
     };
   });
