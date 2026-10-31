@@ -20,6 +20,7 @@ export function OwnerTabBar() {
       mic={
         <VoiceCapture
           maxSeconds={30}
+          queueAs="COMMAND"
           onUploaded={async (path) => {
             const id = await submitVoice(path, "COMMAND");
             router.push(`/app/check/${id}`);

@@ -39,6 +39,7 @@ export function SetupScreen() {
         <VoiceCapture
           size="hero"
           maxSeconds={120}
+          queueAs="SETUP"
           onUploaded={async (path) => {
             const id = await submitVoice(path, "SETUP");
             router.push(`/app/check/${id}`);

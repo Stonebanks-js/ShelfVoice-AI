@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import { ClipQueueProvider } from "@/components/shell/clip-queue";
 import { ToastProvider } from "@/components/ui/toast";
 import { LangProvider } from "@/i18n/lang";
 import { ownerState, requestLang } from "@/server/session";
@@ -25,8 +26,10 @@ async function AppFrame({ children }: { children: React.ReactNode }) {
   return (
     <LangProvider initial={lang}>
       <ToastProvider>
-        <div className="flex min-h-dvh flex-col pb-[calc(env(safe-area-inset-bottom)+6rem)]">{children}</div>
-        {state.shop && <OwnerTabBar />}
+        <ClipQueueProvider ownerId={state.user.id}>
+          <div className="flex min-h-dvh flex-col pb-[calc(env(safe-area-inset-bottom)+6rem)]">{children}</div>
+          {state.shop && <OwnerTabBar />}
+        </ClipQueueProvider>
       </ToastProvider>
     </LangProvider>
   );

@@ -10,8 +10,10 @@ import { useLang } from "@/i18n/lang";
 import { uploadVoice } from "@/lib/audio/upload";
 import { buzz, useRecorder, type Recording } from "@/lib/audio/use-recorder";
 import { errorKey } from "@/lib/errors";
+import { isConnectionProblem } from "@/lib/offline/clip-queue";
 import { voiceErrorKey } from "@/lib/voice";
 
+import { useClipQueue } from "./clip-queue";
 import { MicButton } from "./mic-button";
 
 const PRIMED_KEY = "sv_mic_primed";
@@ -29,20 +31,25 @@ function primed(): boolean {
 // then tap to record, tap to stop, upload ("Listening…"), and hand the
 // stored path to `onUploaded` ("Understanding…" while it runs). Failures
 // appear above the button with what to do next; a retry reuses the clip.
+// With `queueAs`, a clip that can't reach the server waits on the phone and
+// is sent when the connection is back (F-03b).
 export function VoiceCapture({
   maxSeconds,
   onUploaded,
   onRecorded,
   paused = false,
   size = "tab",
+  queueAs,
 }: {
   maxSeconds: number;
   onUploaded?: (path: string) => Promise<void> | void; // omit to record without uploading (style guide)
   onRecorded?: (recording: Recording) => void;
   paused?: boolean; // AI is resting (budget or breaker)
   size?: "tab" | "hero";
+  queueAs?: "COMMAND" | "SETUP";
 }) {
   const { t } = useLang();
+  const queue = useClipQueue();
   const [primer, setPrimer] = useState(false);
   const [stage, setStage] = useState<"idle" | "uploading" | "processing">("idle");
   const [failure, setFailure] = useState<{ key: MessageKey; retry: boolean } | null>(null);
@@ -52,6 +59,15 @@ export function VoiceCapture({
     const clip = pending.current;
     if (!clip || !onUploaded) return;
     setFailure(null);
+    const waitForConnection = async () => {
+      if (!queue || !queueAs) return false;
+      await queue({ clientId: clip.clientId, kind: queueAs, wav: clip.wav, path: clip.path ?? null });
+      pending.current = null;
+      buzz(30);
+      return true;
+    };
+    // No signal at all: straight to the queue, without a 30-second wait.
+    if (!navigator.onLine && (await waitForConnection().catch(() => false))) return;
     try {
       if (!clip.path) {
         setStage("uploading");
@@ -61,6 +77,7 @@ export function VoiceCapture({
       await onUploaded(clip.path);
       pending.current = null;
     } catch (error) {
+      if (isConnectionProblem(error) && (await waitForConnection().catch(() => false))) return;
       // Before the upload finished, it's a sending problem; after, the
       // recording is safe in Storage and only the understanding failed.
       const key = clip.path ? voiceErrorKey(error) : errorKey(error) === "error.generic" ? "mic.error.upload" : errorKey(error);
@@ -71,7 +88,7 @@ export function VoiceCapture({
     } finally {
       setStage("idle");
     }
-  }, [onUploaded]);
+  }, [onUploaded, queue, queueAs]);
 
   const recorder = useRecorder({
     maxSeconds,
