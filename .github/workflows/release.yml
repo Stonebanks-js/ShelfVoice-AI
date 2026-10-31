@@ -89,6 +89,9 @@ jobs:
           OUTCOME: ${{ job.status }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          # Spaces or quotes pasted around the secret would break the URL.
+          WEBHOOK=$(printf '%s' "$WEBHOOK" | tr -d '[:space:]"' | tr -d "'")
           [ -n "$WEBHOOK" ] || exit 0
           if [ "$OUTCOME" = "success" ]; then text="Released ${SHA::7} to $SITE"; else text="Release of ${SHA::7} failed ($OUTCOME): $RUN"; fi
-          curl -fsS -H "content-type: application/json" -d "$(jq -n --arg t "$text" '{content: $t}')" "$WEBHOOK" > /dev/null
+          # A message that doesn't arrive mustn't fail a release that worked.
+          curl -fsS -H "content-type: application/json" -d "$(jq -n --arg t "$text" '{content: $t}')" "$WEBHOOK" > /dev/null             || echo "::warning::Couldn't post to Discord; check the DISCORD_ALERT_WEBHOOK_URL secret"

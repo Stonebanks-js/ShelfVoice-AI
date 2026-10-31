@@ -81,5 +81,6 @@ jobs:
           WEBHOOK: ${{ secrets.DISCORD_ALERT_WEBHOOK_URL }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          WEBHOOK=$(printf '%s' "$WEBHOOK" | tr -d '[:space:]"' | tr -d "'")
           [ -n "$WEBHOOK" ] || exit 0
-          curl -fsS -H "content-type: application/json" -d "$(jq -n --arg t "Nightly live AI evals failed: $RUN" '{content: $t}')" "$WEBHOOK" > /dev/null
+          curl -fsS -H "content-type: application/json" -d "$(jq -n --arg t "Nightly live AI evals failed: $RUN" '{content: $t}')" "$WEBHOOK" > /dev/null             || echo "::warning::Couldn't post to Discord; check the DISCORD_ALERT_WEBHOOK_URL secret"
