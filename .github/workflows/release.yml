@@ -52,19 +52,15 @@ jobs:
           pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF"
           pnpm exec supabase db push --linked --yes
 
-      # Built here with the production env vars from Vercel, then uploaded as is.
-      - name: Build
+      # Vercel builds it, with the production env vars it holds (sensitive
+      # ones can't be pulled out to build here). RELEASE names the build and
+      # the running app, since CLI deploys carry no git variables.
+      - name: Deploy to production
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           echo "RELEASE=${SHA::7}" >> "$GITHUB_ENV"
-          npx --yes "$VERCEL_CLI" pull --yes --environment=production --token="$VERCEL_TOKEN"
-          RELEASE="${SHA::7}" npx --yes "$VERCEL_CLI" build --prod --token="$VERCEL_TOKEN"
-
-      - name: Deploy to production
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: npx --yes "$VERCEL_CLI" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          npx --yes "$VERCEL_CLI" deploy --prod --yes --token="$VERCEL_TOKEN"             --build-env RELEASE="${SHA::7}" --env RELEASE="${SHA::7}"
 
       # Doc 04 release verification: the new release answers, the database is
       # reachable, and the pages owners and customers open first load.
