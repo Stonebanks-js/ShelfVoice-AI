@@ -91,14 +91,14 @@ isOneToOne: false
                   ]
                 },"product_forecasts": {
                   Row: {
-                    "computed_at": string,"days_left": number | null,"explanation": string | null,"explanation_lang": string | null,"explanation_on": string | null,"level": number,"order_qty": number | null,"product_id": string,"reorder_point": number | null,"shop_id": string,"sigma": number,"stockout_boost_until": string | null
+                    "computed_at": string,"days_left": number | null,"explanation": string | null,"explanation_lang": string | null,"explanation_on": string | null,"festival": string | null,"level": number,"order_qty": number | null,"product_id": string,"reorder_point": number | null,"shop_id": string,"sigma": number,"stockout_boost_until": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "computed_at"?: string,"days_left"?: number | null,"explanation"?: string | null,"explanation_lang"?: string | null,"explanation_on"?: string | null,"level": number,"order_qty"?: number | null,"product_id": string,"reorder_point"?: number | null,"shop_id": string,"sigma": number,"stockout_boost_until"?: string | null
+                    "computed_at"?: string,"days_left"?: number | null,"explanation"?: string | null,"explanation_lang"?: string | null,"explanation_on"?: string | null,"festival"?: string | null,"level": number,"order_qty"?: number | null,"product_id": string,"reorder_point"?: number | null,"shop_id": string,"sigma": number,"stockout_boost_until"?: string | null
                   }
                   Update: {
-                    "computed_at"?: string,"days_left"?: number | null,"explanation"?: string | null,"explanation_lang"?: string | null,"explanation_on"?: string | null,"level"?: number,"order_qty"?: number | null,"product_id"?: string,"reorder_point"?: number | null,"shop_id"?: string,"sigma"?: number,"stockout_boost_until"?: string | null
+                    "computed_at"?: string,"days_left"?: number | null,"explanation"?: string | null,"explanation_lang"?: string | null,"explanation_on"?: string | null,"festival"?: string | null,"level"?: number,"order_qty"?: number | null,"product_id"?: string,"reorder_point"?: number | null,"shop_id"?: string,"sigma"?: number,"stockout_boost_until"?: string | null
                   }
                   Relationships: [
                     {

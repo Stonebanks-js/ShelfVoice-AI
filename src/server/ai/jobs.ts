@@ -373,6 +373,8 @@ export interface ExplainInput {
   stock: number;
   leadTimeDays: number;
   customerFlagged: boolean;
+  // A festival within the next 7 days that raised the quantity.
+  festival?: string | null;
   language: "hi" | "en";
 }
 
@@ -382,19 +384,20 @@ const explanationJson = { type: "object", additionalProperties: false, required:
 export function templateExplanation(i: ExplainInput): string {
   const d = Math.round(i.dailyDemand * 10) / 10;
   return i.language === "hi"
-    ? `${i.productName}: roz lagbhag ${d} bikta hai, ${i.stock} bacha hai. ${i.orderQty} mangwa lo.${i.customerFlagged ? " Ek grahak ne iske baare mein poocha tha." : ""}`
-    : `${i.productName}: sells about ${d} a day and ${i.stock} are left. Order ${i.orderQty}.${i.customerFlagged ? " A customer asked for this." : ""}`;
+    ? `${i.productName}: roz lagbhag ${d} bikta hai, ${i.stock} bacha hai. ${i.orderQty} mangwa lo.${i.festival ? ` ${i.festival} paas hai.` : ""}${i.customerFlagged ? " Ek grahak ne iske baare mein poocha tha." : ""}`
+    : `${i.productName}: sells about ${d} a day and ${i.stock} are left. Order ${i.orderQty}.${i.festival ? ` ${i.festival} is coming up.` : ""}${i.customerFlagged ? " A customer asked for this." : ""}`;
 }
 
 // The model only words the sentence; it must quote the computed numbers
 // exactly (doc 04: 100% numbers match), or the template is used.
 export async function explainRestock(ai: MetaClient, ctx: AiContext, input: ExplainInput): Promise<string> {
   try {
-    const out = await ai.structured({ ...ctx, job: "EXPLANATION", promptVersion: "explain@v1" }, {
+    const out = await ai.structured({ ...ctx, job: "EXPLANATION", promptVersion: "explain@v2" }, {
       instructions: [
         "Write one short, friendly sentence telling a kirana owner why to reorder an item.",
         `Language: ${input.language === "hi" ? "Hinglish (Hindi in Latin script)" : "simple English"}.`,
         "Quote the numbers you are given exactly; never change, round or add numbers.",
+        "If a festival is coming, mention it by name.",
       ].join(" "),
       input: JSON.stringify({
         item: input.productName,
@@ -403,6 +406,7 @@ export async function explainRestock(ai: MetaClient, ctx: AiContext, input: Expl
         sells_per_day: Math.round(input.dailyDemand * 10) / 10,
         supplier_days: input.leadTimeDays,
         customer_asked_for_it: input.customerFlagged,
+        festival_coming: input.festival ?? null,
       }),
       schema: { name: "restock_explanation", json: explanationJson, zod: z.object({ sentence: z.string().trim().min(1).max(300) }) },
       maxOutputTokens: 400,

@@ -54,6 +54,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-31](#e-31-decisions-made-while-building-the-backend) | Decisions made while building the backend | Medium | No | Applied |
 | [E-32](#e-32-apple-style-visual-direction-replaces-signboard) | Apple-style visual direction replaces Signboard | Medium | Yes | Decided |
 | [E-33](#e-33-content-security-policy-without-nonces) | Content Security Policy without nonces | Medium | No | Applied |
+| [E-34](#e-34-festival-calendar-dates-windows-and-factors) | Festival calendar dates, windows and factors | Low | No | Applied |
 
 ---
 
@@ -696,3 +697,25 @@ Browser errors and Web Vitals go to `POST /api/v1/client-errors` (rate-limited, 
 | 03 | 10 | Secrets, encryption and supply chain | CSP without nonces under partial prerendering; inline scripts allowed, third-party scripts limited to Turnstile |
 | 09 | 6 | W-03c | "Next.js nonces" → "header CSP from next.config (E-33)" |
 
+---
+
+### E-34 Festival calendar dates, windows and factors
+
+**Severity:** Low · **Owner decision:** No · **Status:** Applied (Oct 31, W-19, migration `20261031090000`)
+
+**Gap.** 07 (K6) asks for about 15 hand-picked 2026–27 festivals that move stock, and 02 applies a festival factor when one is within 7 days, but neither gives the dates' source, how long each festival lasts, or the factors.
+
+**Resolution.**
+
+- **Dates** are checked against the DoPT holiday orders (2026 list of 3 July 2025; 2027 gazetted list of 16 July 2026) and Drik Panchang's New Delhi calendar. The migration names each source.
+- **Windows** cover the whole festival: Dhanteras to Bhai Dooj for Diwali, Nahay Khay to the dawn offering for Chhath, both Holi dates, and a day either side of moon-sighted dates (Eid, Bakrid).
+- **Factors** are 1.5 for Diwali across the shop, 1.4 for Holi and Eid, and 1.2 to 1.3 for the rest, each limited to the categories it moves. They are configuration values to tune against real sales after launch.
+- **Categories** are compared without case, since owners and the model write them freely.
+- **Owners see why:** the forecast stores which festival applied, and the restock reason names it ("Diwali is coming up.").
+
+The calendar ends in December 2027; a 2028 seed is needed before then.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 07 | 5 | `festival_calendar` | Add the source of each date, the windows and the factors (E-34) |
+| 07 | 5 | `product_forecasts` | Add `festival text` (the festival that raised the forecast, or null) |

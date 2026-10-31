@@ -32,7 +32,7 @@ export interface RestockItem {
 export async function restockList({ db, shop, requestId }: Owner & { shop: Shop; requestId: string }): Promise<{ leadTimeDays: number; items: RestockItem[] }> {
   const { data, error } = await db
     .from("products")
-    .select("id, name, unit, stock_qty, low_stock_level, product_forecasts(level, days_left, reorder_point, order_qty, stockout_boost_until, explanation, explanation_on)")
+    .select("id, name, unit, stock_qty, low_stock_level, product_forecasts(level, days_left, reorder_point, order_qty, stockout_boost_until, festival, explanation, explanation_on)")
     .eq("shop_id", shop.id)
     .is("archived_at", null)
     .not("stock_qty", "is", null);
@@ -54,6 +54,7 @@ export async function restockList({ db, shop, requestId }: Owner & { shop: Shop;
         stock: product.stock_qty!,
         leadTimeDays: shop.lead_time_days,
         customerFlagged: f!.stockout_boost_until !== null,
+        festival: f!.festival,
         language,
       };
       const cached = f!.explanation_on === today() && f!.explanation?.includes(String(input.orderQty)) ? f!.explanation : null;

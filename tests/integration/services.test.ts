@@ -82,6 +82,60 @@ describe("demo copy and forecasts", () => {
     const owner = await testOwner();
     expect(await refreshForecasts(owner.shop.id)).toBe(0);
   });
+
+  // W-19: forecasts rise in the 7 days before a seeded festival, only for
+  // the categories it covers (compared without case).
+  it("raises the forecast before a calendar festival", { timeout: 60_000 }, async () => {
+    const owner = await testOwner();
+    const shop_id = owner.shop.id;
+    const { data: products } = await admin
+      .from("products")
+      .insert([
+        { shop_id, name: "Amul Milk", category: "dairy", price_paise: 3000, stock_qty: 1000 },
+        { shop_id, name: "Kurkure", category: "Snacks", price_paise: 2000, stock_qty: 1000 },
+      ])
+      .select("id, name")
+      .throwOnError();
+    // Ten a day of each from Oct 1 to Nov 11, 2026; each refresh only counts
+    // sales up to its own day, so demand stays steady at every date below.
+    const sales = products!.flatMap((p) =>
+      Array.from({ length: 42 }, (_, i) => ({
+        shop_id,
+        product_id: p.id,
+        kind: "SALE" as const,
+        qty: 10,
+        source: "TAP" as const,
+        occurred_at: new Date(Date.UTC(2026, 9, 1 + i, 6)).toISOString(),
+        idempotency_key: `${p.id}-${i}`,
+      })),
+    );
+    await admin.from("stock_movements").insert(sales).throwOnError();
+    const forecasts = async () => {
+      const { data } = await admin.from("product_forecasts").select("product_id, reorder_point, festival").eq("shop_id", shop_id);
+      const by = (name: string) => data!.find((f) => f.product_id === products!.find((p) => p.name === name)!.id)!;
+      return { milk: by("Amul Milk"), kurkure: by("Kurkure") };
+    };
+
+    // Oct 20: Diwali (Nov 6) is 17 days away, so no bump yet.
+    await refreshForecasts(shop_id, undefined, new Date("2026-10-20T06:00:00Z"));
+    const before = await forecasts();
+    expect(before.milk.festival).toBeNull();
+    expect(before.milk.reorder_point).toBe(before.kurkure.reorder_point);
+
+    // Oct 31: Diwali is 6 days away and covers every category.
+    await refreshForecasts(shop_id, undefined, new Date("2026-10-31T06:00:00Z"));
+    const diwali = await forecasts();
+    expect(diwali.milk.festival).toBe("Diwali");
+    expect(diwali.kurkure.festival).toBe("Diwali");
+    expect(diwali.milk.reorder_point!).toBeGreaterThan(before.milk.reorder_point!);
+
+    // Nov 12: Diwali is over; Chhath (Nov 13) covers dairy, not snacks.
+    await refreshForecasts(shop_id, undefined, new Date("2026-11-12T06:00:00Z"));
+    const chhath = await forecasts();
+    expect(chhath.milk.festival).toBe("Chhath");
+    expect(chhath.kurkure.festival).toBeNull();
+    expect(chhath.milk.reorder_point!).toBeGreaterThan(chhath.kurkure.reorder_point!);
+  });
 });
 
 describe("Today summary (doc 06 O-5)", () => {
