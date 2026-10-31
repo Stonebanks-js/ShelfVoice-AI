@@ -29,8 +29,10 @@ export function OrdersScreen({ items, shopName }: { items: RestockItem[]; shopNa
       try {
         await navigator.share({ text });
         return;
-      } catch {
-        // Cancelled, or share unavailable here: fall through to copying.
+      } catch (error) {
+        // The owner closed the share sheet: do nothing more.
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        // Share unavailable here: fall through to copying.
       }
     }
     try {

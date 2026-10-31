@@ -7,7 +7,12 @@ import { reviewFeed } from "@/server/reviews";
 export const GET = route(async (request) => {
   const { db, shop } = await requireShop();
   const url = new URL(request.url);
-  const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
-  const pageSize = Math.min(50, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20)));
+  // Anything that isn't a whole number falls back to the default.
+  const int = (name: string, fallback: number) => {
+    const n = Number(url.searchParams.get(name) ?? fallback);
+    return Number.isInteger(n) ? n : fallback;
+  };
+  const page = Math.max(1, int("page", 1));
+  const pageSize = Math.min(50, Math.max(1, int("pageSize", 20)));
   return Response.json({ reviews: await reviewFeed(db, shop.id, page, pageSize), page, pageSize });
 });

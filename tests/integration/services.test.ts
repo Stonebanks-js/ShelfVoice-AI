@@ -445,6 +445,46 @@ describe("customer reviews", () => {
   });
 });
 
+// R-final: one owner can't reach another shop through the database directly.
+describe("cross-shop protection", () => {
+  it("a forged undo can't archive or reprice another shop's product", async () => {
+    const victim = await testOwner();
+    const { data: product } = await victim.db.from("products").insert({ shop_id: victim.shop.id, name: "Maggi", price_paise: 1400 }).select("id").single();
+    const attacker = await testOwner();
+    const { data: forged } = await attacker.db.from("proposals").insert({ shop_id: attacker.shop.id, kind: "COMMAND" }).select("id").single();
+    // What an owner's own client may write to a pending proposal.
+    const { error: writeError } = await attacker.db
+      .from("proposals")
+      .update({
+        status: "CONFIRMED",
+        decided_at: new Date().toISOString(),
+        confirmed_changes: [
+          { op: "add_product", product_id: product!.id },
+          { op: "update_price", product_id: product!.id, before: { price_paise: 1 }, after: { price_paise: 1400 } },
+        ],
+      })
+      .eq("id", forged!.id);
+    expect(writeError).toBeNull();
+
+    const result = await proposals.undoProposal(attacker, forged!.id);
+    expect(result.map((r) => r.undo)).toEqual(["skipped: not in this shop", "skipped: not in this shop"]);
+    const { data: after } = await admin.from("products").select("price_paise, archived_at").eq("id", product!.id).single();
+    expect(after).toEqual({ price_paise: 1400, archived_at: null });
+  });
+
+  it("an owner can edit their shop's details but not its slug or demo status", async () => {
+    const owner = await testOwner();
+    const { error: nameError } = await owner.db.from("shops").update({ name: "Renamed Kirana" }).eq("id", owner.shop.id);
+    expect(nameError).toBeNull();
+    for (const change of [{ slug: "sbi-kyc-help" }, { is_demo: true }, { demo_expires_at: null }, { lead_time_days: 9 }]) {
+      const { error } = await owner.db.from("shops").update(change).eq("id", owner.shop.id);
+      expect(error?.code).toBe("42501");
+    }
+    const { data } = await admin.from("shops").select("name, slug").eq("id", owner.shop.id).single();
+    expect(data).toEqual({ name: "Renamed Kirana", slug: owner.shop.slug });
+  });
+});
+
 describe("rate limits and the AI ledger", () => {
   it("allows up to the limit, then refuses with 429", async () => {
     const key = `test:${randomUUID()}`;

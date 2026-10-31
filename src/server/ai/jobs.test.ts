@@ -57,6 +57,20 @@ describe("voice command checks", () => {
     expect(r.question).toBeNull();
   });
 
+  it("drops only the change with an out-of-range value", async () => {
+    const r = await interpretCommand(
+      answering(
+        { name: "add_product", arguments: { name: "Gold coin", unit: null, price_rupees: 150_000, category: null } },
+        { name: "record_delivery", arguments: { product_id: id(2), qty: 24 } },
+      ),
+      ctx,
+      "gold coin 1,50,000 ka add karo, aur 24 Parle-G aaye",
+      catalog,
+    );
+    expect(r.changes).toEqual([{ op: "record_delivery", product_id: id(2), qty: 24 }]);
+    expect(r.rejected).toEqual(["add_product: value out of range"]);
+  });
+
   it("only compares names that appear in the transcript", () => {
     // A shared brand, but the alias picks one out.
     expect(rivalsFor(catalog[2], "Tata namak do packet bike", catalog)).toEqual([]);

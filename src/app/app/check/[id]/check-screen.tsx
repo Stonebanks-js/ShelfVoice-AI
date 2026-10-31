@@ -172,7 +172,7 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
                     <span
                       className={cn(
                         "grid size-7 place-items-center rounded-full border-2",
-                        item.selected ? "border-accent-fill bg-accent-fill text-on-accent" : "border-ink-3",
+                        item.selected ? "border-accent-fill bg-accent-fill text-on-accent" : "border-ink-2",
                       )}
                     >
                       {item.selected && <Check aria-hidden className="size-4" strokeWidth={3} />}

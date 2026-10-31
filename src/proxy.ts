@@ -8,8 +8,12 @@ import { isAdminEmail } from "@/server/admin";
 // the Supabase session cookie once per request.
 export async function proxy(request: NextRequest) {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
-  const headers = new Headers(request.headers);
-  headers.set("x-request-id", requestId);
+  const forwarded = () => {
+    const headers = new Headers(request.headers);
+    headers.set("x-request-id", requestId);
+    return headers;
+  };
+  let headers = forwarded();
 
   // Customer pages and the privacy page never use a session: skip the auth
   // round trip (doc 06: the storefront and review page load in 15 seconds or
@@ -29,7 +33,10 @@ export async function proxy(request: NextRequest) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (toSet) => {
+          // Pages and routes must see the refreshed cookies, not the ones
+          // the browser sent, or they'd refresh the session a second time.
           for (const { name, value } of toSet) request.cookies.set(name, value);
+          headers = forwarded();
           response = NextResponse.next({ request: { headers } });
           for (const { name, value, options } of toSet) response.cookies.set(name, value, options);
         },

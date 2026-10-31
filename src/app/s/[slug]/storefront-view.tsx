@@ -116,7 +116,7 @@ export function StorefrontView({ shop }: { shop: Storefront }) {
                       <span
                         className={cn(
                           "grid size-7 place-items-center rounded-full border-2",
-                          on ? "border-accent-fill bg-accent-fill text-on-accent" : "border-ink-3",
+                          on ? "border-accent-fill bg-accent-fill text-on-accent" : "border-ink-2",
                         )}
                       >
                         {on && <Check aria-hidden className="size-4" strokeWidth={3} />}

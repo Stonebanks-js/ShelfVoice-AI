@@ -44,6 +44,9 @@ export function useRecorder({ maxSeconds, onRecorded }: { maxSeconds: number; on
     frame: number;
     nodes: AudioNode[];
   } | null>(null);
+  // Set while the browser is asking for the mic, and while the screen is shown.
+  const starting = useRef(false);
+  const mounted = useRef(true);
   const onRecordedRef = useRef(onRecorded);
   useEffect(() => {
     onRecordedRef.current = onRecorded;
@@ -77,8 +80,7 @@ export function useRecorder({ maxSeconds, onRecorded }: { maxSeconds: number; on
     onRecordedRef.current({ wav, durationMs: Math.round(durationMs) });
   }, [teardown]);
 
-  const start = useCallback(async () => {
-    if (session.current) return;
+  const begin = useCallback(async () => {
     setError(null);
     setElapsedMs(0);
     if (!navigator.mediaDevices?.getUserMedia || typeof AudioContext === "undefined") {
@@ -119,6 +121,14 @@ export function useRecorder({ maxSeconds, onRecorded }: { maxSeconds: number; on
       nodes.push(processor);
     }
 
+    // The screen closed while the mic was starting: release it at once.
+    if (!mounted.current) {
+      for (const node of nodes) node.disconnect();
+      for (const track of stream.getTracks()) track.stop();
+      void context.close();
+      return;
+    }
+
     const samples = new Float32Array(analyser.fftSize);
     const startedAt = performance.now();
     const meter = () => {
@@ -138,15 +148,34 @@ export function useRecorder({ maxSeconds, onRecorded }: { maxSeconds: number; on
       timer: window.setInterval(() => {
         const ms = performance.now() - startedAt;
         setElapsedMs(ms);
-        if (ms >= maxSeconds * 1000) stop(); // doc 06: stops by itself at the limit
+        // Doc 06: stops by itself at the limit; only ever this recording.
+        if (ms >= maxSeconds * 1000 && session.current?.startedAt === startedAt) stop();
       }, 100),
     };
     setRecording(true);
     buzz(30);
   }, [maxSeconds, stop]);
 
+  const start = useCallback(async () => {
+    // A second tap while the browser is still asking for the mic must not
+    // start a second session (the first would never be released).
+    if (session.current || starting.current) return;
+    starting.current = true;
+    try {
+      await begin();
+    } finally {
+      starting.current = false;
+    }
+  }, [begin]);
+
   // Leaving the screen mid-recording releases the microphone.
-  useEffect(() => () => void teardown(), [teardown]);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      teardown();
+    };
+  }, [teardown]);
 
   return { recording, elapsedMs, level, error, setError, start, stop };
 }
