@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 
 import { env } from "@/env/server";
+import { runCleanup } from "@/server/cleanup";
 import { refreshForecasts } from "@/server/forecast/refresh";
 import { log } from "@/server/log";
 import { analyseStoredReview } from "@/server/reviews";
@@ -15,14 +16,17 @@ function authorised(request: Request): boolean {
   return timingSafeEqual(Buffer.from(given), Buffer.from(expected));
 }
 
-// Nightly job (doc 02 "Background jobs"): refresh every shop's forecasts,
-// retry reviews still waiting for analysis, and expire pending proposals
-// older than 24 hours (doc 07). Vercel cron calls it with CRON_SECRET.
+// Nightly job (doc 02 "Background jobs"): the daily cleanup first (W-17b:
+// expired proposals and demo shops, old recordings, photos and logs of AI
+// calls), then every shop's forecasts and reviews still waiting for
+// analysis. Vercel cron calls it with CRON_SECRET; running it daily also
+// keeps the free Supabase project from pausing.
 export async function GET(request: Request) {
   if (!authorised(request)) return Response.json({ error: { code: "UNAUTHORISED", message: "Not allowed" } }, { status: 401 });
   const db = adminClient();
   const started = Date.now();
-  const result = { forecasts: 0, reviewsRetried: 0, reviewsAnalysed: 0, proposalsExpired: 0, failures: 0 };
+  const cleanup = await runCleanup();
+  const result = { forecasts: 0, reviewsRetried: 0, reviewsAnalysed: 0, failures: cleanup.failures };
 
   const { data: shops } = await db.from("shops").select("id");
   for (const shop of shops ?? []) {
@@ -45,15 +49,7 @@ export async function GET(request: Request) {
     if ((await analyseStoredReview(review.id)) === "ANALYZED") result.reviewsAnalysed += 1;
   }
 
-  const { data: expired } = await db
-    .from("proposals")
-    .update({ status: "EXPIRED", decided_at: new Date().toISOString() })
-    .eq("status", "PENDING")
-    .lt("created_at", new Date(Date.now() - 86_400_000).toISOString())
-    .select("id");
-  result.proposalsExpired = expired?.length ?? 0;
-
-  log(result.failures ? "warn" : "info", "cron.nightly.finished", { ...result, durationMs: Date.now() - started });
+  log(result.failures ? "warn" : "info", "cron.nightly.finished", { ...result, cleanup, durationMs: Date.now() - started });
 
   // Doc 05: Better Stack alerts if this ping is 2 hours late; /fail reports
   // a run that finished with errors.
@@ -65,5 +61,5 @@ export async function GET(request: Request) {
       log("warn", "cron.heartbeat_failed", { error });
     }
   }
-  return Response.json(result);
+  return Response.json({ ...result, cleanup });
 }

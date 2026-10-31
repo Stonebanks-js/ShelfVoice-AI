@@ -28,7 +28,10 @@ describe("nightly cron", () => {
   it("runs and pings the heartbeat", { timeout: 120_000 }, async () => {
     const res = await GET(new Request("http://localhost/api/cron/nightly", { headers: { authorization: `Bearer ${secret}` } }));
     expect(res.status).toBe(200);
-    expect((await res.json()).failures).toBe(0);
+    const body = await res.json();
+    expect(body.failures).toBe(0);
+    // The daily cleanup runs first (W-17b).
+    expect(body.cleanup).toMatchObject({ failures: 0, proposalsExpired: expect.any(Number), demoShopsDeleted: expect.any(Number) });
     expect(pings).toEqual(["https://uptime.example/api/v1/heartbeat/abc"]);
   });
 });
