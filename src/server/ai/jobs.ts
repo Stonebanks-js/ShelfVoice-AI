@@ -210,7 +210,36 @@ export interface CommandResult {
   rejected: string[];
 }
 
-export async function interpretCommand(ai: MetaClient, ctx: AiContext, transcript: string, catalog: CatalogItem[]): Promise<CommandResult> {
+// Words as spoken, without punctuation: "Parle-G" and "parle g" compare equal.
+// Marks (\p{M}) stay, or Devanagari words would split at every vowel sign.
+const words = (text: string) => ` ${text.toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, " ").trim()} `;
+
+// How specifically the transcript names a product: the longest of its name,
+// aliases or brand (first word) that appears in it, or 0 if none does.
+function nameMatch(product: CatalogItem, spoken: string): number {
+  const keys = [product.name, product.name.split(/\s+/)[0], ...product.aliases].map((k) => words(k).trim()).filter(Boolean);
+  return Math.max(0, ...keys.filter((k) => spoken.includes(` ${k} `)).map((k) => k.length));
+}
+
+// Other products the transcript names at least as specifically as the one
+// the model chose ("Maggi" with two Maggi products). Doc 01: ask, don't
+// guess. When the transcript doesn't name the chosen product in catalog
+// words at all (say, Devanagari), there's nothing to compare, so the
+// model's choice stands.
+export function rivalsFor(product: CatalogItem, transcript: string, catalog: CatalogItem[]): CatalogItem[] {
+  const spoken = words(transcript);
+  const own = nameMatch(product, spoken);
+  if (own === 0) return [];
+  return catalog.filter((other) => other.id !== product.id && nameMatch(other, spoken) >= own);
+}
+
+export async function interpretCommand(
+  ai: MetaClient,
+  ctx: AiContext,
+  transcript: string,
+  catalog: CatalogItem[],
+  language: "hi" | "en" = "en",
+): Promise<CommandResult> {
   const { calls, text } = await ai.tools({ ...ctx, job: "COMMAND", promptVersion: "command@v1" }, {
     instructions: [
       "You turn a kirana shop owner's spoken command into tool calls on their catalog.",
@@ -227,6 +256,8 @@ export async function interpretCommand(ai: MetaClient, ctx: AiContext, transcrip
 
   const byId = new Map(catalog.map((p) => [p.id, p]));
   const result: CommandResult = { changes: [], question: null, rejected: [] };
+  // Products whose change is held back because the words fit more than one.
+  const unclear = new Map<string, string>();
   for (const call of calls) {
     const schema = ToolArgs[call.name as keyof typeof ToolArgs];
     const parsed = schema?.safeParse(call.arguments);
@@ -249,6 +280,11 @@ export async function interpretCommand(ai: MetaClient, ctx: AiContext, transcrip
       result.rejected.push(`${call.name}: unknown product`);
       continue;
     }
+    const rivals = rivalsFor(product, transcript, catalog);
+    if (rivals.length) {
+      for (const p of [product, ...rivals]) unclear.set(p.id, p.name);
+      continue;
+    }
     if (call.name === "update_price") {
       const paise = rupeesToPaise(args.price_rupees as number);
       if (!priceChangeAllowed(product.price_paise, paise)) {
@@ -262,7 +298,10 @@ export async function interpretCommand(ai: MetaClient, ctx: AiContext, transcrip
       else if (a.in_stock !== null) result.changes.push({ op: "set_in_stock", product_id: product.id, in_stock: a.in_stock });
     } else if (call.name === "record_sale") {
       const a = args as z.infer<typeof ToolArgs.record_sale>;
-      result.changes.push({ op: "record_sale", product_id: product.id, qty: a.qty, unit_price_paise: a.price_rupees === null ? null : rupeesToPaise(a.price_rupees) });
+      // A price that only repeats the catalog's wasn't something the owner
+      // said (doc 04: the model never adds numbers); the sale uses it anyway.
+      const paise = a.price_rupees === null ? null : rupeesToPaise(a.price_rupees);
+      result.changes.push({ op: "record_sale", product_id: product.id, qty: a.qty, unit_price_paise: paise === product.price_paise ? null : paise });
     } else if (call.name === "record_delivery") {
       result.changes.push({ op: "record_delivery", product_id: product.id, qty: args.qty as number });
     }
@@ -270,6 +309,11 @@ export async function interpretCommand(ai: MetaClient, ctx: AiContext, transcrip
   // With tool_choice "auto" the model may reply in words instead of calling
   // ask_clarification; that reply is the question to show the owner.
   if (calls.length === 0 && text?.trim()) result.question = text.trim().slice(0, 200);
+  if (unclear.size && !result.question) {
+    const names = [...unclear.values()].slice(0, 3);
+    const list = names.length === 2 ? names.join(language === "hi" ? " या " : " or ") : names.join(", ");
+    result.question = (language === "hi" ? `आपका मतलब कौन सा था: ${list}?` : `Which one did you mean: ${list}?`).slice(0, 200);
+  }
   return result;
 }
 

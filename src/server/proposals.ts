@@ -103,7 +103,7 @@ export async function voiceProposal(ctx: Ctx, path: string, kind: "SETUP" | "COM
       const changes = await extractSetup(ai, aiCtx, transcript);
       return { proposal: await store(ctx, "SETUP", path, transcript, changes), question: null, rejected: [] as string[] };
     }
-    const result = await interpretCommand(ai, aiCtx, transcript, catalog);
+    const result = await interpretCommand(ai, aiCtx, transcript, catalog, ctx.shop.language === "en" ? "en" : "hi");
     return { proposal: await store(ctx, "COMMAND", path, transcript, result.changes), question: result.question, rejected: result.rejected };
   } catch (error) {
     if (error instanceof ApiError) throw error;
