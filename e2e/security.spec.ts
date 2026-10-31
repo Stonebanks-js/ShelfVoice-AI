@@ -72,7 +72,14 @@ test.describe("with the local stack", () => {
   test.skip(!localSupabase, "needs the local Supabase stack");
 
   // The rate limiter lives in the database, so this needs the local stack.
-  test("the error endpoint accepts reports and refuses junk and other sites", async ({ request }) => {
+  // Its own test address: every page in a full run sends Web Vitals from
+  // the shared local one, which can use up its 60 a minute.
+  test("the error endpoint accepts reports and refuses junk and other sites", async ({ playwright }) => {
+    const octet = () => Math.floor(Math.random() * 254) + 1;
+    const request = await playwright.request.newContext({
+      baseURL: test.info().project.use.baseURL,
+      extraHTTPHeaders: { "x-forwarded-for": `10.${octet()}.${octet()}.${octet()}` },
+    });
     expect((await request.post("/api/v1/client-errors", { data: { type: "error", page: "/", message: "x" } })).status()).toBe(204);
     expect((await request.post("/api/v1/client-errors", { data: { type: "vital", page: "/", name: "LCP", value: 1234.5, rating: "good" } })).status()).toBe(204);
     expect((await request.post("/api/v1/client-errors", { data: { type: "error", page: "/" } })).status()).toBe(422);
@@ -80,6 +87,7 @@ test.describe("with the local stack", () => {
       headers: { origin: "https://evil.example" },
       data: { type: "error", page: "/", message: "x" },
     });
+    await request.dispose();
     expect(cross.status()).toBe(403);
   });
 

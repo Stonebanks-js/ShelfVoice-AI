@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Download, ExternalLink, Info, Languages, LogOut, MapPin, Phone, QrCode, Share, Store, Tag, Trash2 } from "lucide-react";
+import { Clock, Download, ExternalLink, Info, Languages, LogOut, MapPin, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
@@ -201,6 +201,7 @@ export function ShopScreen({ shop, origin }: { shop: OwnerShop; origin: string }
         </ListGroup>
 
         <ListGroup header={t("shop.account")}>
+          <ListRow icon={<ShieldCheck />} iconTone="gray" title={t("privacy.link")} href={`/privacy?lang=${lang}`} />
           <ListRow icon={<LogOut />} iconTone="gray" title={t("shop.signOut")} onClick={signOut} />
           <ListRow icon={<Trash2 />} iconTone="danger" title={<span className="text-danger">{t("shop.delete")}</span>} onClick={() => setConfirmDelete(true)} />
         </ListGroup>
