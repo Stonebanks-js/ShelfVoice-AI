@@ -4,6 +4,7 @@ import { CircleAlert, CircleCheck, Mic, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import { LogoMark } from "@/components/brand/logo";
 import { MicButton } from "@/components/shell/mic-button";
 import { Button } from "@/components/ui/button";
 import type { MessageKey } from "@/i18n/dictionary";
@@ -150,6 +151,13 @@ export function ReviewFlow({ slug, shopName, siteKey }: { slug: string; shopName
       </div>
       {/* Turnstile shows itself here only if Cloudflare needs a tap. */}
       <div ref={containerRef} className="flex justify-center" />
+      <Link
+        href="/"
+        className="mt-4 inline-flex min-h-11 items-center gap-1.5 self-center text-footnote text-ink-2 underline-offset-4 hover:underline"
+      >
+        <LogoMark orbit={false} className="h-4 w-auto text-ink-2" />
+        {t("store.madeWith")}
+      </Link>
     </main>
   );
 }

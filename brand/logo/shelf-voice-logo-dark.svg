@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="350 140 840 740" role="img" aria-label="Shelf Voice">
+  <!-- Dark backgrounds: light bag, dark bars, brighter red, keyline in the background colour -->
+  <path d="M640 362V318C640 238 698 189 767 189C836 189 893 238 893 318V362" fill="none" stroke="#F2F2F2" stroke-width="53"/>
+  <path d="M580 362H952C980 362 1001 382 1005 410L1063 785C1068 825 1037 857 997 857H537C497 857 466 825 471 785L527 410C531 382 552 362 580 362Z" fill="#F2F2F2"/>
+  <g stroke="#101010" stroke-width="38" stroke-linecap="round">
+    <path d="M632 535V577"/>
+    <path d="M699 501V607"/>
+    <path d="M767 451V647"/>
+    <path d="M834 501V607"/>
+    <path d="M901 532V574"/>
+  </g>
+  <path d="M476 620C410 660 360 720 383 760C410 805 520 815 640 805C800 792 980 735 1090 640C1170 570 1175 495 1032 450C1100 482 1120 540 1060 610C960 715 760 770 590 772C470 773 410 745 433 690C442 668 456 645 476 620Z" fill="#F2484F" stroke="#101010" stroke-width="22" paint-order="stroke"/>
+</svg>

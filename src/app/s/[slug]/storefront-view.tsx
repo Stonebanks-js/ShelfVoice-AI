@@ -1,9 +1,11 @@
 "use client";
 
-import { Check, ChevronRight, MapPin, Mic, Phone } from "lucide-react";
+import { Check, ChevronRight, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { LogoMark } from "@/components/brand/logo";
+import { VoiceBars } from "@/components/shell/mic-button";
 import { OpenBadge } from "@/components/shell/open-badge";
 import { buttonClass } from "@/components/ui/button";
 import { Badge, Chip } from "@/components/ui/controls";
@@ -132,8 +134,8 @@ export function StorefrontView({ shop }: { shop: Storefront }) {
 
       <footer className="mt-auto flex flex-col gap-4 px-4 pt-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <Link href={`/r/${shop.slug}`} className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-card active:bg-fill">
-          <span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-full bg-accent-fill text-on-accent">
-            <Mic className="size-6" />
+          <span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-full bg-voice text-on-voice">
+            <VoiceBars className="size-6" />
           </span>
           <span className="flex flex-1 flex-col">
             <span className="text-body font-semibold">{t("store.review")}</span>
@@ -142,7 +144,8 @@ export function StorefrontView({ shop }: { shop: Storefront }) {
           <ChevronRight aria-hidden className="size-5 text-ink-3" />
         </Link>
         <p className="flex items-center justify-center gap-2 text-footnote text-ink-2">
-          <Link href="/" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+          <Link href="/" className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:underline">
+            <LogoMark orbit={false} className="h-4 w-auto text-ink-2" />
             {t("store.madeWith")}
           </Link>
           <span aria-hidden>·</span>

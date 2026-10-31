@@ -59,7 +59,7 @@ async function Admin() {
   const date = new Intl.DateTimeFormat("en-IN", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Kolkata" }).format(now);
   const time = new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(now);
   const used = Math.min(1, today.spentTotalUsd / today.budgetUsd);
-  const tone = used >= 0.8 ? "bg-danger" : used >= 0.5 ? "bg-turmeric" : "bg-accent";
+  const tone = used >= 0.8 ? "bg-danger" : used >= 0.5 ? "bg-ink-2" : "bg-accent";
 
   return (
     <main lang="en" className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-10">

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { LogoMark } from "@/components/brand/logo";
 import { MicButton } from "@/components/shell/mic-button";
 import { TabBar } from "@/components/shell/tab-bar";
 import { VoiceCapture } from "@/components/shell/voice-capture";
@@ -57,7 +58,7 @@ function Section({ title, note, children }: { title: string; note?: string; chil
 }
 
 const SWATCHES: Array<{ name: string; className: string; use: string }> = [
-  { name: "accent", className: "bg-accent-fill", use: "Primary buttons, links, active tab" },
+  { name: "accent", className: "bg-accent-fill", use: "Primary buttons, links, active tab (the logo's black)" },
   { name: "ink", className: "bg-ink", use: "Body text" },
   { name: "ink-2", className: "bg-ink-2", use: "Secondary text" },
   { name: "bg", className: "bg-bg", use: "Page background" },
@@ -66,8 +67,7 @@ const SWATCHES: Array<{ name: string; className: string; use: string }> = [
   { name: "success", className: "bg-success", use: "In stock, good reviews" },
   { name: "danger", className: "bg-danger", use: "Out of stock, delete, errors" },
   { name: "check", className: "bg-check", use: "Please check" },
-  { name: "turmeric", className: "bg-turmeric", use: "Low-stock fill only" },
-  { name: "record", className: "bg-record", use: "Mic while recording" },
+  { name: "voice", className: "bg-voice", use: "The logo's red: Bolo button, recording" },
 ];
 
 const PRODUCTS = [
@@ -91,7 +91,7 @@ function Guide({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => 
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-10 pb-16">
-      <PageHeader title="Design" subtitle="Shelf Voice · E-32" />
+      <PageHeader title="Design" subtitle="Shelf Voice · E-32, E-35" />
 
       {/* Preview controls stay at the top so every section can be checked both ways. */}
       <div className="sticky top-0 z-30 flex flex-col gap-2 border-b border-separator bg-chrome px-4 py-3 backdrop-blur-xl">
@@ -116,7 +116,15 @@ function Guide({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => 
         />
       </div>
 
-      <Section title="Colour" note="Every text pair passes 4.5:1. Turmeric never carries text on white.">
+      <Section title="Logo" note="Full logo on Welcome and customer pages; under 40 px, the mark without the orbit.">
+        <div className="mx-4 flex items-end gap-6 rounded-lg bg-surface p-4 text-ink shadow-card">
+          <LogoMark cut="stroke-surface" className="h-24 w-auto" />
+          <LogoMark orbit={false} cut="stroke-surface" className="h-10 w-auto" />
+          <LogoMark orbit={false} cut="stroke-surface" className="h-4 w-auto" />
+        </div>
+      </Section>
+
+      <Section title="Colour" note="Every text pair passes 4.5:1. Black, white and the logo's red; red always comes with an icon and words.">
         <ul className="grid grid-cols-2 gap-3 px-4 sm:grid-cols-3">
           {SWATCHES.map((s) => (
             <li key={s.name} className="flex items-center gap-3 rounded-md bg-surface p-3 shadow-card">

@@ -7,7 +7,8 @@ import { cn } from "@/lib/cn";
 export type ButtonVariant = "filled" | "tinted" | "gray" | "plain" | "destructive";
 export type ButtonSize = "md" | "lg";
 
-// Doc 06: at least 48 px tall; one filled (primary) button per screen.
+// Doc 06: at least 48 px tall; one filled (primary) button per screen. Filled
+// is the logo's black (light in dark mode); tinted is the outlined secondary.
 export function buttonClass(variant: ButtonVariant = "filled", size: ButtonSize = "md", className?: string) {
   return cn(
     "inline-flex items-center justify-center gap-2 font-semibold select-none transition-[background-color,transform,opacity] duration-150",
@@ -15,7 +16,7 @@ export function buttonClass(variant: ButtonVariant = "filled", size: ButtonSize 
     size === "md" && "min-h-12 rounded-md px-4 text-body",
     size === "lg" && "min-h-[3.25rem] w-full rounded-lg px-6 text-body",
     variant === "filled" && "bg-accent-fill text-on-accent active:bg-accent-pressed",
-    variant === "tinted" && "bg-accent-soft text-accent",
+    variant === "tinted" && "border border-fill-strong bg-surface text-ink active:bg-fill",
     variant === "gray" && "bg-fill text-ink active:bg-fill-strong",
     variant === "plain" && "text-accent active:opacity-60",
     variant === "destructive" && "bg-danger-soft text-danger",

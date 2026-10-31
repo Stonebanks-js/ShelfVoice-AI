@@ -99,7 +99,7 @@ function ReorderRow({ item, onDelivered }: { item: RestockItem; onDelivered: () 
         <div
           className={cn(
             "flex w-16 shrink-0 flex-col items-center rounded-md py-2",
-            urgent ? "bg-turmeric text-on-turmeric" : "bg-fill text-ink",
+            urgent ? "bg-danger-soft text-danger" : "bg-fill text-ink",
           )}
         >
           {whole === null ? (

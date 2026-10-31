@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircle, Mic } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 
 import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
@@ -12,10 +12,20 @@ const clock = (ms: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 };
 
-// The one memorable element (doc 06): a large round button that behaves the
-// same everywhere. Idle is a 72 px filled circle; while recording, a ring
-// fills clockwise toward the time limit with live level bars inside and a
-// timer under it; while sending and thinking the ring spins slowly.
+// The logo's five voice bars (short, tall, tallest, tall, short), as an icon.
+export function VoiceBars({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round">
+      <path d="M4 10.5v3M8 8v8M12 5v14M16 8v8M20 10.5v3" />
+    </svg>
+  );
+}
+
+// The one memorable element (doc 06), drawn from the logo (E-35): a red
+// circle with the logo's five voice bars, the same everywhere. While
+// recording, a ring fills clockwise toward the time limit and the bars move
+// with the voice; while sending and thinking the ring spins slowly. In the
+// tab bar the timer floats above the button; as a hero it sits under it.
 export function MicButton({
   state,
   onPress,
@@ -57,7 +67,7 @@ export function MicButton({
   const circumference = 2 * Math.PI * r;
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div className="relative flex flex-col items-center gap-1.5">
       <button
         type="button"
         aria-label={label}
@@ -66,10 +76,10 @@ export function MicButton({
         onClick={onPress}
         className={cn(
           "relative grid place-items-center rounded-full transition-[background-color,transform] duration-200 active:scale-95 disabled:active:scale-100",
-          hero ? "size-24" : "size-[72px]",
-          state === "recording" && "bg-record text-white",
+          hero ? "size-24" : "size-16",
+          state === "recording" && "bg-voice text-on-voice",
           state === "paused" && "bg-fill-strong text-ink-2",
-          (state === "idle" || busy) && "bg-accent-fill text-on-accent shadow-mic",
+          (state === "idle" || busy) && "bg-voice text-on-voice shadow-mic",
         )}
       >
         {/* Ring: fills clockwise with time while recording, spins while busy. */}
@@ -87,7 +97,7 @@ export function MicButton({
               fill="none"
               strokeWidth="4"
               strokeLinecap="round"
-              className={state === "recording" ? "stroke-record" : "stroke-accent"}
+              className="stroke-voice"
               strokeDasharray={circumference}
               strokeDashoffset={state === "recording" ? circumference * (1 - progress) : circumference * 0.72}
             />
@@ -106,19 +116,23 @@ export function MicButton({
         ) : busy ? (
           <LoaderCircle aria-hidden className={cn("animate-spin", hero ? "size-10" : "size-8")} />
         ) : (
-          <Mic aria-hidden className={hero ? "size-10" : "size-8"} />
+          <VoiceBars className={hero ? "size-11" : "size-8"} />
         )}
       </button>
-      <span
-        aria-hidden
-        className={cn(
-          "font-semibold tabular-nums",
-          hero ? "text-body" : "text-footnote",
-          state === "recording" ? "text-danger" : "text-ink-2",
-        )}
-      >
-        {caption}
-      </span>
+      {(hero || state !== "idle") && (
+        <span
+          aria-hidden
+          className={cn(
+            "font-semibold whitespace-nowrap tabular-nums",
+            hero
+              ? "text-body"
+              : "absolute bottom-full mb-2 rounded-full bg-surface px-3 py-1 text-footnote shadow-float",
+            state === "recording" ? "text-danger" : "text-ink-2",
+          )}
+        >
+          {caption}
+        </span>
+      )}
     </div>
   );
 }

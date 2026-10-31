@@ -1,10 +1,16 @@
 @import "tailwindcss";
 
 /*
- * Shelf Voice design tokens (ERRATA E-32: Apple-style, accent #0A66D8, dark
- * mode follows the phone). Every colour pair used for text is checked at
- * 4.5:1 or better. Components use these through Tailwind classes such as
- * bg-surface, text-ink-2 and border-separator; no raw colour values in TSX.
+ * Shelf Voice design tokens (ERRATA E-32: Apple-style, dark mode follows the
+ * phone; E-35: black, white and one red, taken from the logo). Every colour
+ * pair used for text is checked at 4.5:1 or better. Components use these
+ * through Tailwind classes such as bg-surface, text-ink-2 and
+ * border-separator; no raw colour values in TSX.
+ *
+ * The logo's black bag is the primary action colour (light in dark mode, as
+ * the bag turns light there). Its red orbit means voice: the Bolo button,
+ * recording, and things that need the owner now (out of stock, please check),
+ * always with an icon and words.
  *
  * Theme: light by default, dark when the phone asks for it. data-theme on any
  * element forces one theme inside it (the /design page uses this to preview).
@@ -13,35 +19,34 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f2f2f7; /* grouped page background */
+  --bg: #f3f3f3; /* grouped page background */
   --surface: #ffffff; /* list groups, cards, sheets */
-  --surface-2: #f7f7f9; /* raised inside a surface */
-  --fill: rgb(118 118 128 / 0.12); /* inputs, segmented track, chips */
-  --fill-strong: rgb(118 118 128 / 0.2);
+  --surface-2: #f7f7f7; /* raised inside a surface */
+  --fill: rgb(118 118 118 / 0.12); /* inputs, segmented track, chips, low-stock pills */
+  --fill-strong: rgb(118 118 118 / 0.2);
   --segment: #ffffff; /* selected segment on the fill track */
-  --ink: #1d1d1f; /* body text */
-  --ink-2: #636368; /* secondary text: 5.3:1 on bg, 6:1 on surface, 4.8:1 on fill */
-  --ink-3: #8e8e93; /* chevrons and placeholders only, never real text */
-  --separator: rgb(60 60 67 / 0.18);
-  --accent: #0a66d8; /* links, tinted text, 5.4:1 on white */
-  --accent-fill: #0a66d8; /* filled buttons, white text on it */
-  --accent-pressed: #0855b4;
-  --accent-soft: #e7f0fc; /* solid, so --accent on it stays 4.7:1 on any background */
+  --ink: #101010; /* body text; the logo's black */
+  --ink-2: #5f5f5f; /* secondary text: 5.8:1 on bg, 6.4:1 on surface, 5:1 on fill */
+  --ink-3: #8e8e8e; /* chevrons and placeholders only, never real text */
+  --separator: rgb(60 60 60 / 0.16);
+  --accent: #101010; /* links, tinted text, selected tab */
+  --accent-fill: #101010; /* primary buttons, white text on it (19:1) */
+  --accent-pressed: #3a3a3a;
+  --accent-soft: #ebebeb; /* secondary buttons and notes; --accent on it 16:1 */
   --on-accent: #ffffff;
-  --danger: #c4291c;
-  --danger-soft: #fdecea;
-  --success: #157033;
-  --success-soft: #e8f5ec;
-  --check: #9a5b00; /* "please check" text, on --check-soft */
-  --check-soft: #fff4d6;
-  --turmeric: #f2b705; /* low-stock fill, only behind --on-turmeric text */
-  --on-turmeric: #1d1d1f;
-  --record: #d1291b; /* mic while recording, white icon on it in both themes */
-  --chrome: rgb(249 249 251 / 0.78); /* frosted bars */
+  --voice: #b80a16; /* the logo's red: Bolo button, recording; white icon on it 6.8:1 */
+  --on-voice: #ffffff;
+  --danger: #b80a16; /* 6.1:1 on bg, 5.8:1 on danger-soft */
+  --danger-soft: #fbe9ea;
+  --success: #101010; /* in stock and happy read by icon and word, not colour */
+  --success-soft: #ebebeb;
+  --check: #b80a16; /* "please check": needs the owner, like danger, with its own icon */
+  --check-soft: #fbe9ea;
+  --chrome: rgb(250 250 250 / 0.78); /* frosted bars */
   --scrim: rgb(0 0 0 / 0.32);
   --elev-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 8px rgb(0 0 0 / 0.04);
   --elev-float: 0 8px 24px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.08);
-  --elev-mic: 0 6px 20px rgb(10 102 216 / 0.38), 0 2px 6px rgb(0 0 0 / 0.12);
+  --elev-mic: 0 6px 16px rgb(0 0 0 / 0.18), 0 2px 4px rgb(0 0 0 / 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -54,26 +59,27 @@
     --fill-strong: rgb(118 118 128 / 0.36);
     --segment: #5a5a5e;
     --ink: #f5f5f7;
-    --ink-2: #98989f;
-    --ink-3: #636366;
+    --ink-2: #a1a1a6;
+    --ink-3: #8e8e93;
     --separator: rgb(84 84 88 / 0.6);
-    --accent: #4da3ff;
-    --accent-fill: #0a6fe8;
-    --accent-pressed: #0a5fc8;
-    --accent-soft: #10233b;
-    --on-accent: #ffffff;
-    --danger: #ff6961;
-    --danger-soft: #3a1a18;
-    --success: #32d74b;
-    --success-soft: #0f2a17;
-    --check: #ffcc4d;
-    --check-soft: #2b2410;
-    --turmeric: #f2b705;
-    --chrome: rgb(22 22 24 / 0.78);
+    --accent: #f5f5f7;
+    --accent-fill: #f2f2f2;
+    --accent-pressed: #d6d6d6;
+    --accent-soft: #2c2c2e;
+    --on-accent: #101010;
+    --voice: #f2484f;
+    --on-voice: #ffffff;
+    --danger: #f2484f;
+    --danger-soft: #2d1012;
+    --success: #f5f5f7;
+    --success-soft: #2c2c2e;
+    --check: #f2484f;
+    --check-soft: #2d1012;
+    --chrome: rgb(30 30 32 / 0.78);
     --scrim: rgb(0 0 0 / 0.56);
     --elev-card: none;
     --elev-float: 0 8px 24px rgb(0 0 0 / 0.5);
-    --elev-mic: 0 6px 20px rgb(10 111 232 / 0.45), 0 2px 6px rgb(0 0 0 / 0.4);
+    --elev-mic: 0 6px 16px rgb(0 0 0 / 0.5);
   }
 }
 
@@ -86,26 +92,27 @@
   --fill-strong: rgb(118 118 128 / 0.36);
   --segment: #5a5a5e;
   --ink: #f5f5f7;
-  --ink-2: #98989f;
-  --ink-3: #636366;
+  --ink-2: #a1a1a6; /* 6.6:1 on surface, 5.4:1 on surface-2 */
+  --ink-3: #8e8e93;
   --separator: rgb(84 84 88 / 0.6);
-  --accent: #4da3ff;
-  --accent-fill: #0a6fe8;
-  --accent-pressed: #0a5fc8;
-  --accent-soft: #10233b;
-  --on-accent: #ffffff;
-  --danger: #ff6961;
-  --danger-soft: #3a1a18;
-  --success: #32d74b;
-  --success-soft: #0f2a17;
-  --check: #ffcc4d;
-  --check-soft: #2b2410;
-  --turmeric: #f2b705;
-  --chrome: rgb(22 22 24 / 0.78);
+  --accent: #f5f5f7;
+  --accent-fill: #f2f2f2; /* the bag turns light; black text on it 17:1 */
+  --accent-pressed: #d6d6d6;
+  --accent-soft: #2c2c2e;
+  --on-accent: #101010;
+  --voice: #f2484f; /* the logo red is 3.1:1 on black, too dim; this is 4.7:1 on surface */
+  --on-voice: #ffffff;
+  --danger: #f2484f;
+  --danger-soft: #2d1012; /* danger on it 4.9:1 */
+  --success: #f5f5f7;
+  --success-soft: #2c2c2e;
+  --check: #f2484f;
+  --check-soft: #2d1012;
+  --chrome: rgb(30 30 32 / 0.78);
   --scrim: rgb(0 0 0 / 0.56);
   --elev-card: none;
   --elev-float: 0 8px 24px rgb(0 0 0 / 0.5);
-  --elev-mic: 0 6px 20px rgb(10 111 232 / 0.45), 0 2px 6px rgb(0 0 0 / 0.4);
+  --elev-mic: 0 6px 16px rgb(0 0 0 / 0.5);
 }
 
 @theme inline {
@@ -130,9 +137,8 @@
   --color-success-soft: var(--success-soft);
   --color-check: var(--check);
   --color-check-soft: var(--check-soft);
-  --color-turmeric: var(--turmeric);
-  --color-on-turmeric: var(--on-turmeric);
-  --color-record: var(--record);
+  --color-voice: var(--voice);
+  --color-on-voice: var(--on-voice);
   --color-chrome: var(--chrome);
   --color-scrim: var(--scrim);
 
