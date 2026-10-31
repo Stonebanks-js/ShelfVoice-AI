@@ -13,7 +13,7 @@ import { cn } from "@/lib/cn";
 import type { Storefront } from "@/server/storefront";
 
 export function StorefrontView({ shop }: { shop: Storefront }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [category, setCategory] = useState<string | null>(null);
   const [ticked, setTicked] = useState<Set<string>>(new Set());
 
@@ -141,9 +141,15 @@ export function StorefrontView({ shop }: { shop: Storefront }) {
           </span>
           <ChevronRight aria-hidden className="size-5 text-ink-3" />
         </Link>
-        <Link href="/" className="self-center text-footnote text-ink-2 underline-offset-4 hover:underline">
-          {t("store.madeWith")}
-        </Link>
+        <p className="flex items-center justify-center gap-2 text-footnote text-ink-2">
+          <Link href="/" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+            {t("store.madeWith")}
+          </Link>
+          <span aria-hidden>·</span>
+          <Link href={`/privacy?lang=${lang}#customers`} className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+            {t("privacy.link")}
+          </Link>
+        </p>
       </footer>
     </main>
   );

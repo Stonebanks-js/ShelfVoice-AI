@@ -11,10 +11,11 @@ export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
   headers.set("x-request-id", requestId);
 
-  // Customer pages never use a session: skip the auth round trip (doc 06:
-  // the storefront and review page load in 15 seconds or less on a phone).
+  // Customer pages and the privacy page never use a session: skip the auth
+  // round trip (doc 06: the storefront and review page load in 15 seconds or
+  // less on a phone).
   const path = request.nextUrl.pathname;
-  if (path.startsWith("/s/") || path.startsWith("/r/")) {
+  if (path.startsWith("/s/") || path.startsWith("/r/") || path === "/privacy") {
     const response = NextResponse.next({ request: { headers } });
     response.headers.set("x-request-id", requestId);
     return response;

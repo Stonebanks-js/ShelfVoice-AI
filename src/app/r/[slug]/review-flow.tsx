@@ -16,7 +16,7 @@ type Step = "consent" | "record" | "sending" | "done" | "failed";
 const LIMIT_SECONDS = 15; // doc 06: reviews stop by themselves at 15 seconds
 
 export function ReviewFlow({ slug, shopName, siteKey }: { slug: string; shopName: string; siteKey: string }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [step, setStep] = useState<Step>("consent");
   const [failure, setFailure] = useState<MessageKey | null>(null);
   const clip = useRef<{ recording: Recording; reviewId: string } | null>(null);
@@ -80,7 +80,15 @@ export function ReviewFlow({ slug, shopName, siteKey }: { slug: string; shopName
 
       <div className="flex flex-1 flex-col items-center justify-center gap-6 py-10">
         {step === "consent" && (
-          <p className="rounded-lg bg-surface p-4 text-body shadow-card">{t("review.consent")}</p>
+          <div className="flex flex-col gap-2 rounded-lg bg-surface p-4 shadow-card">
+            <p className="text-body">{t("review.consent")}</p>
+            <Link
+              href={`/privacy?lang=${lang}#customers`}
+              className="inline-flex min-h-11 items-center self-start text-footnote font-semibold text-accent underline-offset-4 hover:underline"
+            >
+              {t("privacy.review")}
+            </Link>
+          </div>
         )}
 
         {(step === "record" || step === "sending") && (

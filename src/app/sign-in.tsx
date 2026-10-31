@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleAlert, MessageSquareText, Mic, ShoppingCart, Store } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
@@ -95,6 +96,12 @@ export function SignIn({ failed }: { failed: boolean }) {
           {t("signin.demo")}
         </Button>
         <p className="text-center text-footnote text-ink-2">{t("signin.demoNote")}</p>
+        <Link
+          href={`/privacy?lang=${lang}`}
+          className="inline-flex min-h-11 items-center self-center text-footnote text-ink-2 underline-offset-4 hover:underline"
+        >
+          {t("privacy.link")}
+        </Link>
       </div>
     </main>
   );
