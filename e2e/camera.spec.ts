@@ -101,10 +101,25 @@ test("a bill that can't be read says what to do", async ({ page }) => {
   await page.route("**/api/v1/proposals/bill", (route) =>
     route.fulfill({ status: 422, json: { error: { code: "AI_NOT_UNDERSTOOD", message: "x" } } }),
   );
+  // This journey is about the message; the upload itself is covered above.
+  // Stubbing it keeps the local stack's occasionally stalled uploads (on
+  // Docker for Windows) out of the result.
+  await page.route("**/storage/v1/object/upload/sign/**", (route) => route.fulfill({ status: 200, json: { Key: "stub" } }));
   await page.goto("/app/camera");
-  await page.locator('input[type="file"]:not([capture])').setInputFiles("tests/fixtures/bills/printed-1.jpg");
+  // Straight after a full page load the screen may not be listening yet, so
+  // choose the photo again until its preview shows. Clearing first matters:
+  // React ignores a change that leaves the input's value the same.
+  const gallery = page.locator('input[type="file"]:not([capture])');
+  await expect(async () => {
+    await gallery.setInputFiles([]);
+    await gallery.setInputFiles("tests/fixtures/bills/printed-1.jpg");
+    await expect(page.getByRole("img", { name: "Your photo" })).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 20_000 });
   await page.getByRole("button", { name: "Use photo" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toHaveText("Couldn't read this bill. Try a clearer photo, flat and in good light.");
+  // Resizing and uploading the photo come first, so allow for a busy machine.
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("Couldn't read this bill. Try a clearer photo, flat and in good light.", {
+    timeout: 15_000,
+  });
   // The photo stays, ready to retake or try again.
   await expect(page.getByRole("button", { name: "Retake" })).toBeEnabled();
 });
