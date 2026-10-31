@@ -19,7 +19,10 @@ export function redact(value: unknown, depth = 0): unknown {
 }
 
 // Doc 05: each deploy is tagged with its git SHA so errors tie to a release.
-export const release = () => process.env.RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev";
+// NEXT_PUBLIC_RELEASE is fixed at build time (next.config), which covers
+// deploys from release.yml, where Vercel sets no git variables at runtime.
+export const release = () =>
+  process.env.RELEASE || process.env.NEXT_PUBLIC_RELEASE || process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || "dev";
 
 // Work that must finish without delaying the response: after() inside a
 // request (Vercel keeps the function alive for it), else once the current
