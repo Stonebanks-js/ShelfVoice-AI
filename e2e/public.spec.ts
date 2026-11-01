@@ -39,25 +39,26 @@ test.describe("storefront", () => {
     await expect(page.getByText(/Open now, closes|Closed, opens/)).toBeVisible();
     await expect(page.getByRole("link", { name: "Call" })).toHaveAttribute("href", "tel:+919876543210");
     const products = page.getByRole("region", { name: "Products" });
-    await expect(products.getByText("Maggi 2-Minute Noodles")).toBeVisible();
+    await expect(products.getByText("Maggi 2-Minute Noodles · 70 g")).toBeVisible();
     // Never a stock count, only in or out (errata E-05).
     await expect(products).not.toContainText("18");
     expect(await blockingViolations(page)).toEqual([]);
     await darkMode(page);
     expect(await blockingViolations(page)).toEqual([]);
 
-    // Ticked items go into the WhatsApp message.
-    await page.getByRole("checkbox", { name: /Maggi/ }).click();
-    await page.getByRole("checkbox", { name: /Parle-G/ }).click();
-    const whatsapp = page.getByRole("link", { name: "Ask about 2 items on WhatsApp" });
+    // The cart also goes as a WhatsApp message, with quantities (V-04).
+    await page.getByRole("button", { name: /^Add Maggi/ }).click();
+    await page.getByRole("button", { name: /^One more Maggi/ }).click();
+    await page.getByRole("button", { name: /^Add Parle-G/ }).click();
+    const whatsapp = page.getByRole("link", { name: "Order on WhatsApp" });
     const href = decodeURIComponent((await whatsapp.getAttribute("href"))!);
     expect(href.startsWith("https://wa.me/919876543210?text=")).toBe(true);
     expect(href).toContain("Hello Sharma Kirana Store, is this available?");
-    expect(href).toContain("• Maggi 2-Minute Noodles (70 g)");
+    expect(href).toContain("• Maggi 2-Minute Noodles (70 g) × 2");
 
     await page.getByRole("button", { name: "Dairy", exact: true }).click();
-    await expect(products.getByText("Amul Butter")).toBeVisible();
-    await expect(products.getByText("Maggi 2-Minute Noodles")).toBeHidden();
+    await expect(products.getByText(/^Amul Butter/)).toBeVisible();
+    await expect(products.getByText(/^Maggi 2-Minute Noodles/)).toBeHidden();
     await expect(page.getByRole("link", { name: /Leave a voice review/ })).toHaveAttribute("href", `/r/${shop.slug}`);
   });
 
@@ -66,14 +67,14 @@ test.describe("storefront", () => {
     const { data: maggi } = await localAdmin().from("products").select("id").eq("shop_id", shop.id).like("name", "Maggi%").single();
     const customer = await (await browser.newContext()).newPage();
     await customer.goto(`/s/${shop.slug}`);
-    await expect(customer.getByRole("checkbox", { name: /Maggi/ })).toBeVisible();
+    await expect(customer.getByRole("button", { name: /^Add Maggi/ })).toBeVisible();
 
     // The owner's edits revalidate the cached storefront.
     await page.evaluate((id) => fetch(`/api/v1/products/${id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ is_in_stock: false }) }), maggi!.id);
     await customer.reload();
     const row = customer.getByRole("listitem").filter({ hasText: "Maggi 2-Minute Noodles" });
     await expect(row).toContainText("Out of stock");
-    await expect(row.getByRole("checkbox")).toHaveCount(0);
+    await expect(row.getByRole("button", { name: /^Add/ })).toHaveCount(0);
 
     await page.evaluate((id) => fetch(`/api/v1/shops/${id}/publish`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ published: false }) }), shop.id);
     await customer.reload();

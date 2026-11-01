@@ -14,6 +14,7 @@ export const RETENTION = {
   ipHashDays: 7,
   proposalDays: 90,
   aiCallDays: 90,
+  orderDays: 90, // customer orders: name, phone, address (V-04)
   rateLimitDays: 2,
   pendingProposalHours: 24,
   // Uploaded but never turned into a proposal or a review.
@@ -28,6 +29,7 @@ export interface CleanupResult {
   proposalsExpired: number;
   proposalsDeleted: number;
   aiCallsDeleted: number;
+  ordersDeleted: number;
   rateLimitsDeleted: number;
   ipHashesCleared: number;
   demoShopsDeleted: number;
@@ -87,6 +89,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupResult> {
     proposalsExpired: 0,
     proposalsDeleted: 0,
     aiCallsDeleted: 0,
+    ordersDeleted: 0,
     rateLimitsDeleted: 0,
     ipHashesCleared: 0,
     demoShopsDeleted: 0,
@@ -126,6 +129,14 @@ export async function runCleanup(now = new Date()): Promise<CleanupResult> {
     const { count, error } = await db.from("ai_calls").delete({ count: "exact" }).lt("created_at", ago(now, RETENTION.aiCallDays * DAY_MS));
     if (error) throw error;
     result.aiCallsDeleted = count ?? 0;
+  });
+
+  // Customer orders hold a name, phone number and maybe an address: gone
+  // after 90 days, as the privacy page says. The sales they logged stay.
+  await step("delete_orders", async () => {
+    const { count, error } = await db.from("orders").delete({ count: "exact" }).lt("created_at", ago(now, RETENTION.orderDays * DAY_MS));
+    if (error) throw error;
+    result.ordersDeleted = count ?? 0;
   });
 
   await step("delete_rate_limits", async () => {

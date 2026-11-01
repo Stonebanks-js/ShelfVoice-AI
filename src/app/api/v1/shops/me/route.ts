@@ -28,6 +28,7 @@ const Patch = z
     description: z.string().trim().max(500).nullable().optional(),
     hours: Hours.nullable().optional(),
     language: z.enum(["hi", "en"]).optional(),
+    delivers: z.boolean().optional(),
     ...ShopLocation,
   })
   .strict()

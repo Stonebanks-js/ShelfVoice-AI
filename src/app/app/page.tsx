@@ -1,4 +1,4 @@
-import { Camera, CircleAlert, Frown, History, Meh, MessageSquareText, Mic, Package, ReceiptText, Smile, Store, TrendingDown, TrendingUp } from "lucide-react";
+import { Camera, CircleAlert, Frown, History, Meh, MessageSquareText, Mic, Package, ReceiptText, ShoppingBag, Smile, Store, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
@@ -46,6 +46,7 @@ async function Today() {
 
       {summary.productCount > 0 && (
         <>
+          <OrdersList summary={summary} lang={lang} now={now} t={t} />
           <SalesCard summary={summary} weekday={weekday.split(",")[0]} t={t} />
           <LowList summary={summary} t={t} />
           <ReviewList summary={summary} lang={lang} now={now} t={t} />
@@ -111,7 +112,7 @@ function LowList({ summary, t }: { summary: TodaySummary; t: T }) {
             <span className="text-ink-2">
               {t("today.low.title")} {summary.lowCount > 0 && <span className="text-ink-2 tabular-nums">· {summary.lowCount}</span>}
             </span>
-            {summary.lowCount > 0 && <SeeAll href="/app/orders" t={t} />}
+            {summary.lowCount > 0 && <SeeAll href="/app/restock" t={t} />}
           </span>
         }
       >
@@ -122,7 +123,7 @@ function LowList({ summary, t }: { summary: TodaySummary; t: T }) {
             <ListRow
               key={item.id}
               wrap
-              href="/app/orders"
+              href="/app/restock"
               icon={<Package />}
               iconTone="check"
               title={item.name}
@@ -222,6 +223,46 @@ function RecentList({ summary, lang, now, t }: { summary: TodaySummary; lang: La
               icon={KIND_ICON[change.kind]}
               title={t(`home.recent.${change.kind}`)}
               subtitle={`${t("toast.saved", { n: change.changes })} · ${ago(change.decidedAt)}`}
+            />
+          ))
+        )}
+      </ListGroup>
+    </div>
+  );
+}
+
+// New customer orders, first on Home so none waits (V-04).
+function OrdersList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
+  const when = new Intl.RelativeTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { numeric: "auto" });
+  const ago = (iso: string) => {
+    const minutes = Math.round((new Date(iso).getTime() - now.getTime()) / 60_000);
+    return Math.abs(minutes) < 60 ? when.format(minutes, "minute") : when.format(Math.round(minutes / 60), "hour");
+  };
+  const count = summary.newOrders.length;
+  return (
+    <div className="px-4">
+      <ListGroup
+        header={
+          <span className="flex items-center justify-between">
+            <span className="text-ink-2">
+              {t("home.requests.title")} {count > 0 && <span className="text-ink-2">· {t("home.requests.new", { n: count })}</span>}
+            </span>
+            {count > 0 && <SeeAll href="/app/orders" t={t} />}
+          </span>
+        }
+      >
+        {count === 0 ? (
+          <ListRow icon={<ShoppingBag />} iconTone="gray" title={t("home.requests.none")} href="/app/orders" />
+        ) : (
+          summary.newOrders.slice(0, 3).map((order) => (
+            <ListRow
+              key={order.id}
+              href="/app/orders"
+              icon={<ShoppingBag />}
+              iconTone="check"
+              title={order.name}
+              subtitle={`${order.code} · ${order.items === 1 ? t("cart.item1") : t("cart.items", { n: order.items })} · ${ago(order.createdAt)}`}
+              value={<Badge tone="check">{t("orders.status.NEW")}</Badge>}
             />
           ))
         )}

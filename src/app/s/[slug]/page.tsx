@@ -20,7 +20,7 @@ export default async function StorefrontPage({ params }: PageProps<"/s/[slug]">)
   if (!shop) notFound();
   return (
     <LangProvider initial={shop.language}>
-      <StorefrontView shop={shop} />
+      <StorefrontView shop={shop} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} />
     </LangProvider>
   );
 }

@@ -70,6 +70,7 @@ Data is stored with **Supabase in Seoul, South Korea** (ap-northeast-2), not in 
 | Owner voice notes | 7 days; the understood words stay with each confirmed change for 90 days |
 | Bill and shelf photos | 30 days |
 | Customer review audio | 30 days; the words, sentiment and items stay until the shop is deleted |
+| Customer orders (name, phone, address) | 90 days; the sales they logged stay |
 | Hashed IP address on a review | 7 days (the hash's salt changes daily; raw IPs are never stored) |
 | Logs (Axiom) | Up to 30 days; never voice, transcripts, names or phone numbers |
 

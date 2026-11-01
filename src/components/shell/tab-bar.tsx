@@ -14,7 +14,7 @@ type Icon = ComponentType<{ className?: string; strokeWidth?: number; "aria-hidd
 // My shop holds the products and their stock, and adding more (V-02, E-36).
 const TABS: Array<{ href: string; label: MessageKey; icon: Icon; also?: string[] }> = [
   { href: "/app", label: "tab.home", icon: House },
-  { href: "/app/shop", label: "tab.shop", icon: Store, also: ["/app/stock", "/app/add"] },
+  { href: "/app/shop", label: "tab.shop", icon: Store, also: ["/app/stock", "/app/add", "/app/restock"] },
   { href: "/app/orders", label: "tab.orders", icon: ReceiptText },
   { href: "/app/reviews", label: "tab.reviews", icon: MessageSquareText },
 ];

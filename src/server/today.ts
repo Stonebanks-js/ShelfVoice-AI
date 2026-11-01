@@ -18,6 +18,8 @@ export interface TodaySummary {
   newReviews: number;
   // The last few voice or photo changes the owner confirmed (V-02).
   recent: Array<{ id: string; kind: "SETUP" | "COMMAND" | "BILL" | "SHELF"; changes: number; decidedAt: string }>;
+  // Customer orders waiting for the owner (V-04).
+  newOrders: Array<{ id: string; code: string; name: string; items: number; createdAt: string }>;
 }
 
 type Sale = { qty: number; unit_price_paise: number | null; products: { price_paise: number | null } | { price_paise: number | null }[] | null };
@@ -47,7 +49,7 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
       .lte("occurred_at", iso(to))
       .limit(5000);
 
-  const [today, lastWeek, products, reviews, recent] = await Promise.all([
+  const [today, lastWeek, products, reviews, recent, orders] = await Promise.all([
     sales(dayStart, now.getTime()),
     sales(lastWeekStart, lastWeekNow),
     db
@@ -74,8 +76,15 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
       .not("decided_at", "is", null)
       .order("decided_at", { ascending: false })
       .limit(3),
+    db
+      .from("orders")
+      .select("id, code, customer_name, created_at, order_items(qty)")
+      .eq("shop_id", shopId)
+      .eq("status", "NEW")
+      .order("created_at", { ascending: false })
+      .limit(20),
   ]);
-  for (const r of [today, lastWeek, products, reviews, recent]) if (r.error) throw r.error;
+  for (const r of [today, lastWeek, products, reviews, recent, orders]) if (r.error) throw r.error;
 
   const low = products
     .data!.map((p) => ({ p, f: Array.isArray(p.product_forecasts) ? p.product_forecasts[0] : p.product_forecasts }))
@@ -104,6 +113,13 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
       kind: p.kind,
       changes: Array.isArray(p.confirmed_changes) ? p.confirmed_changes.length : 0,
       decidedAt: p.decided_at!,
+    })),
+    newOrders: orders.data!.map((o) => ({
+      id: o.id,
+      code: o.code,
+      name: o.customer_name,
+      items: o.order_items.reduce((n, i) => n + i.qty, 0),
+      createdAt: o.created_at,
     })),
   };
 }
