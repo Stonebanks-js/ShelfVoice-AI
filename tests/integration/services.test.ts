@@ -384,23 +384,48 @@ describe("bill proposals", () => {
         { name: "Smudged line", qty: null, unit: null, product_id: null },
       ],
     });
-    const { proposal } = await proposals.billProposal(owner, upload.path);
+    const { proposal } = await proposals.photoProposal(owner, upload.path, "bill");
     expect(proposal.kind).toBe("BILL");
     expect(proposal.changes).toEqual([
       { op: "record_delivery", product_id: p!.id, qty: 48 },
-      { op: "add_product", name: "Haldiram Bhujia", unit: "pkt", stock_qty: 12 },
+      // A new item gets a typical price from the ready-made lists, to check.
+      { op: "add_product", name: "Haldiram Bhujia", unit: "pkt", stock_qty: 12, category: "Snacks", price_paise: 5500, aliases: ["bhujia", "भुजिया"] },
     ]);
     await proposals.confirmProposal(owner, proposal.id);
     const { data: after } = await owner.db.from("products").select("stock_qty").eq("id", p!.id).single();
     expect(after!.stock_qty).toBe(58);
-    expect((await proposals.billProposal(owner, upload.path)).proposal.id).toBe(proposal.id);
+    expect((await proposals.photoProposal(owner, upload.path, "bill")).proposal.id).toBe(proposal.id);
+  });
+
+  it("reads a shelf photo into new products, skipping ones the shop has", async () => {
+    const owner = await testOwner();
+    const { data: salt } = await owner.db.from("products").insert({ shop_id: owner.shop.id, name: "Tata Salt", unit: "1 kg" }).select("id").single();
+    const upload = await proposals.signedUpload(owner, "shelf", randomUUID());
+    const jpeg = readFileSync(path.join(process.cwd(), "tests/fixtures/bills/printed-1.jpg"));
+    await owner.db.storage.from("photos").uploadToSignedUrl(upload.path, upload.token, jpeg, { contentType: "image/jpeg" });
+    fake.structured.mockResolvedValue({
+      products: [
+        { name: "Tata Salt", unit: "1 kg", product_id: salt!.id },
+        { name: "Parle-G", unit: "80 g", product_id: null },
+        { name: "Parle-G", unit: "80 g", product_id: null },
+        { name: "Local Namkeen", unit: null, product_id: null },
+      ],
+    });
+    const { proposal } = await proposals.photoProposal(owner, upload.path, "shelf");
+    expect(proposal.kind).toBe("SHELF");
+    expect(proposal.changes).toEqual([
+      { op: "add_product", name: "Parle-G", unit: "80 g", category: "Biscuits", price_paise: 1000, aliases: ["parle g", "parle", "पारले"] },
+      { op: "add_product", name: "Local Namkeen", unit: null, category: null, price_paise: null },
+    ]);
+    // A shelf photo can't be sent as a bill: paths are checked per kind.
+    await expect(proposals.photoProposal(owner, upload.path, "bill")).rejects.toMatchObject({ code: "BAD_PATH" });
   });
 
   it("rejects a file that isn't a JPEG", async () => {
     const owner = await testOwner();
     const upload = await proposals.signedUpload(owner, "bill", randomUUID());
     await owner.db.storage.from("photos").uploadToSignedUrl(upload.path, upload.token, new Uint8Array([1, 2, 3, 4]), { contentType: "image/jpeg" });
-    await expect(proposals.billProposal(owner, upload.path)).rejects.toMatchObject({ code: "BAD_IMAGE" });
+    await expect(proposals.photoProposal(owner, upload.path, "bill")).rejects.toMatchObject({ code: "BAD_IMAGE" });
   });
 });
 

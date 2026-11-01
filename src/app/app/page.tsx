@@ -1,4 +1,4 @@
-import { ChevronRight, CircleAlert, Frown, Meh, MessageSquareText, Mic, Package, Smile, TrendingDown, TrendingUp } from "lucide-react";
+import { ChevronRight, CircleAlert, Frown, Meh, ListPlus, MessageSquareText, Package, Smile, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
@@ -52,11 +52,11 @@ async function Today() {
       {summary.productCount === 0 ? (
         <div className="px-4">
           <EmptyState
-            icon={<Mic />}
+            icon={<ListPlus />}
             title={t("today.setup.title")}
             body={t("today.setup.body")}
             action={
-              <ButtonLink href="/app/setup" size="lg" icon={<Mic aria-hidden className="size-5" />}>
+              <ButtonLink href="/app/setup" size="lg" icon={<ListPlus aria-hidden className="size-5" />}>
                 {t("today.setup.cta")}
               </ButtonLink>
             }

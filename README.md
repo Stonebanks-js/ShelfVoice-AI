@@ -10,7 +10,7 @@ A kirana owner runs the shop from the counter, often in Hindi, with no time to t
 
 Shelf Voice lets the owner do all three by speaking:
 
-- **Speak your shop online.** "Maggi 14 rupaye, Parle-G 10 rupaye" becomes a product list and a public shop page with hours, a call button and a QR code for the counter.
+- **Speak your shop online.** "Maggi 14 rupaye, Parle-G 10 rupaye" becomes a product list and a public shop page with hours, a call button and a QR code for the counter. A kirana stocks hundreds of items, so the owner can also tick them from a ready-made list with typical prices, photograph a shelf, scan barcodes, photograph a supplier's bill or upload an Excel or CSV file from a billing app.
 - **Know what to restock.** Sales are logged by voice ("do Maggi bike") or from a photo of the supplier's bill. The Orders tab says what to reorder and how much, and why.
 - **Hear every customer.** Customers scan the QR and leave a 15-second voice review. The owner sees what was said, whether they were happy, and which items they asked for. An item a customer wanted but couldn't get raises its restock forecast.
 
@@ -22,9 +22,9 @@ Every AI feature runs on Meta models through the Meta Model API. No other AI pro
 
 | Model | Used for |
 |---|---|
-| Muse Spark 1.3 | Reading a spoken shop description into a product list, turning commands into tool calls (sell, add stock, change price), reading supplier bills from photos, analysing customer reviews, wording restock reasons |
+| Muse Spark 1.3 | Reading a spoken shop description into a product list, turning commands into tool calls (sell, add stock, change price), reading supplier bills and shelves from photos, analysing customer reviews, wording restock reasons |
 | Muse Voice Transcribe 1.0 | Turning owner voice notes and customer reviews (Hindi, English or a mix) into text |
-| SAM 3.1 | Not used: product cut-outs from shelf photos (FR-10) were dropped before release |
+| SAM 3.1 | Not used: Muse Spark names the products in a shelf photo, and product cut-outs (FR-10) were dropped before release |
 
 Model output is always parsed and checked against a schema before it is used. Prices, stock counts and reorder quantities are computed in code, never by a model.
 
@@ -36,6 +36,7 @@ Phone browser ──► Next.js 16 on Vercel (Mumbai, bom1)
                     ├──► Supabase (Seoul): Postgres with row-level security, Storage, Auth (Google + anonymous demo)
                     ├──► Meta Model API: Muse Spark, Voice Transcribe
                     ├──► Cloudflare Turnstile (review page bot check)
+                    ├──► Open Food Facts (product names for scanned barcodes; only the number is sent)
                     └──► Axiom logs, Better Stack heartbeats, Discord alerts
 ```
 

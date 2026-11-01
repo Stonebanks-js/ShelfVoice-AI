@@ -46,12 +46,12 @@ test("reads in Hindi for a Hindi shop", async ({ page, context }) => {
   expect(await blockingViolations(page)).toEqual([]);
 });
 
-test("a new shop with no products is invited to set up by voice", async ({ page }) => {
+test("a new shop with no products is invited to add them", async ({ page }) => {
   await signInAsNewOwner(page);
   await page.goto("/app");
-  await expect(page.getByRole("heading", { name: "Set up your shop by voice" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Add your products" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Sales today" })).toBeHidden();
-  await page.getByRole("link", { name: "Start setup" }).click();
+  await page.getByRole("link", { name: "Add products" }).click();
   await expect(page).toHaveURL("/app/setup");
 });
 

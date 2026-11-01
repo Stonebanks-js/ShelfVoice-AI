@@ -40,7 +40,7 @@ export default defineConfig({
     // Journeys never spend Meta credit: an AI call they forget to mock fails
     // fast on a missing recording instead of reaching the live API.
     // One admin address per project, so the two never share a session.
-    env: { META_MODE: "recorded", ADMIN_EMAILS: "admin-phone-360@example.test,admin-desktop-1280@example.test" },
+    env: { META_MODE: "recorded", OPEN_FOOD_FACTS_URL: "off", ADMIN_EMAILS: "admin-phone-360@example.test,admin-desktop-1280@example.test" },
     url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

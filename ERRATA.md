@@ -56,6 +56,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-33](#e-33-content-security-policy-without-nonces) | Content Security Policy without nonces | Medium | No | Applied |
 | [E-34](#e-34-festival-calendar-dates-windows-and-factors) | Festival calendar dates, windows and factors | Low | No | Applied |
 | [E-35](#e-35-bag-logo-in-black-white-and-the-logos-red) | Bag logo in black, white and the logo's red | Medium | Yes | Applied |
+| [E-36](#e-36-client-feedback-bulk-product-adding-two-sign-up-paths-customer-orders-and-regional-languages) | Client feedback: bulk product adding, two sign-up paths, customer orders and regional languages | High | Yes | Decided |
 
 ---
 
@@ -741,3 +742,26 @@ The calendar ends in December 2027; a 2028 seed is needed before then.
 | 06 | 1 | U1 Visual direction | Accent `#0A66D8` → black `#101010` (light `#F2F2F2` in dark); voice red `#B80A16` (`#F2484F` in dark); turmeric removed (E-35) |
 | 06 | 1 | U3 Owner app navigation | "Bottom tabs + centre mic" → four tabs on a floating capsule with the Bolo button beside it (E-35) |
 | 06 | 5–7 | Tokens | Add the logo and the `voice` token; record, marigold and turmeric tokens removed (`src/app/globals.css`) |
+
+---
+
+### E-36 Client feedback: bulk product adding, two sign-up paths, customer orders and regional languages
+
+**Severity:** High · **Owner decision:** Yes · **Status:** Decided (Nov 1)
+
+**Gap.** The documents assume an owner speaks their catalog (FR-01), that customers only browse and message on WhatsApp (FR-07), that sign-in is Google or the demo shop (O-1), and that the interface is Hindi or English (E-21). After the owner, the team and 3–4 shop owners used the live app, they reported that a kirana holds too many products to speak, that quantities need + and − like Instamart, that the demo button confused people, that Today hid where to build and view the shop, and that there were no account settings or regional languages.
+
+**Decision (Nov 1, owner).** Build six phases before the freeze, in order, each released once its journeys pass; whatever isn't done by Nov 4, 12:00 IST waits until after judging (V-01 to V-06 in the action plan).
+
+1. **Bulk adding.** Ready-made lists for four shop types with typical MRPs marked "check price"; shelf photo read by Muse Spark (SAM stays unused, E-35's FR-10 drop stands for cut-outs); supplier bills add unknown products; barcodes looked up in Open Food Facts, a free public database with no account, and learned per shop when not found; Excel or CSV import. Voice stays for daily edits.
+2. **Navigation.** Tabs Home, My shop, Bolo, Orders, Reviews. Orders means customer orders; the supplier list becomes Restock inside My shop.
+3. **Sign-up.** Shop owner or Customer; Google or phone OTP (Twilio Verify, the owner's account); four setup steps. The demo shop is removed completely, so judges sign in with their own account.
+4. **Customers.** Nearby shops by distance without a map, a cart, pickup or delivery, in-app orders with WhatsApp as a backup, web push to the owner.
+5. **Settings.** For owners and customers, as in V-05. No wallet: holding customers' money needs an RBI prepaid payment instrument licence; customers pay the shop by UPI or cash, and refunds are tracked, not processed.
+6. **Languages.** Nine regional languages suggested from location, translated by Muse Spark and checked by a native speaker.
+
+| Doc | Page | Section | Change |
+|---|---|---|---|
+| 01 | — | FR-01, FR-07, FR-10 | Bulk adding methods; customer cart and in-app orders; shelf photo read without SAM (E-36) |
+| 06 | — | O-1, O-3, U3 | Two sign-up paths, setup steps, Home and My shop tabs (E-36) |
+| 07 | — | products | Add `barcode` (unique per shop) and an Open Food Facts lookup cache (E-36) |

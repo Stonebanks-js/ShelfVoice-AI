@@ -217,6 +217,21 @@ Every build task (W-xx) runs through the same loop. Each step comes from the doc
 
 ---
 
+## Client feedback build (Nov 1–4, E-36)
+
+**Why this section:** the owner, the team and 3–4 shop owners used the live app. They found that speaking a whole kirana's stock is too much, that quantities have no + and − like Instamart, that the demo button and a plain first screen confused people, that Today hid where to build and view the shop, and that there were no account settings or regional languages. The owner chose to build all of it before the freeze, in this order, releasing each phase once its Playwright journeys pass at 360 px and 1280 px; what isn't done by Nov 4, 12:00 IST waits until after judging.
+
+| ID | Task | Decisions (owner, Nov 1) | Needs from the owner | Status |
+|---|---|---|---|---|
+| V-01 | Add many products without speaking each one: an Add products screen with ready-made lists, shelf photo, supplier bill, barcode and Excel/CSV, voice kept for daily edits | Ready-made lists for kirana, departmental, dairy and bakery, pan shop, with typical MRPs marked "check price"; shelf photo read by Muse Spark (no SAM), owner sets quantity and price; bill adds unknown products; barcode looks up Open Food Facts (free, no key) and the shop learns names it doesn't know; Excel or CSV from billing software | — | Built Nov 1: Add products screen (first run, and Add many on Stock) with six ways; ready-made lists of 159 items for 4 shop types with typical MRPs to check and an ADD button per item; shelf photo read by Muse Spark into new products with the price filled in where the item is on the lists; bill photos price new items the same way; Check and confirm gets a price box and − / + stock on every new product; barcodes typed or scanned with the phone's camera (Chrome on Android), named from Open Food Facts (cached, only the number sent) or by the owner once, then found again to log a delivery; Excel (.xlsx) or CSV read in the browser, header row found, MRP preferred over rate, totals skipped. Review gate: unit tests (lists, matching, CSV and .xlsx reading), integration tests (bulk add skips duplicates, barcodes per shop, lookup cache and outages, shelf and bill proposals), 4 Playwright journeys at 360 and 1280 px with axe in light and dark; full suite 178 passed, 2 load flakes passed on rerun; Semgrep clean. Not covered: a live eval of the shelf reader (no shelf photo, C-09 skipped) |
+| V-02 | Home and My shop: tabs Home, My shop, mic, Orders, Reviews; Home shows the My shop card, today's sales, customer requests, running low and recent changes; Stock with + and − moves into My shop; the supplier list becomes Restock inside My shop | Orders becomes customer orders | — | Not started |
+| V-03 | First screen and sign-up: Shop owner or Customer, Google or phone OTP, then four setup steps (shop name, type, location, language); the demo shop removed completely | Labels "Shop owner" and "Customer"; customers browse without signing in | Twilio Verify account for phone OTP | Not started |
+| V-04 | Customer side: nearby shops listed by distance, cart with ADD and − 1 +, pickup or home delivery, in-app orders with WhatsApp as a backup, owner's Orders tab with accept or not available per item, phone notifications for new orders | List by distance, no map; web push | One VAPID secret in Vercel | Not started |
+| V-05 | Account and settings for both sides: owners get profile, shop, business hours, delivery, payment modes (cash, UPI ID), refunds per order, QR poster, language and alerts, help, privacy, sign out, delete; customers get profile, saved addresses, previously ordered with Order again, wishlist, payment preference, refunds, language and alerts, help, privacy, sign out, delete | No wallet: holding customers' money needs an RBI prepaid licence; customers pay the shop by UPI or cash | — | Not started |
+| V-06 | Regional languages: Kannada, Tamil, Telugu, Malayalam, Marathi, Gujarati, Bengali, Odia, Punjabi, suggested from the phone's location | Screens translated by Muse Spark in a one-time script, then checked by a native speaker | A native check per language | Not started |
+
+---
+
 ## Phase 5: Freeze, release and submit
 
 **Dates:** Nov 4 · **Workflow:** 08 release checklist and freeze rules; 04 release verification; 09 submission checklist
