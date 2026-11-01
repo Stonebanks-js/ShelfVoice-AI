@@ -11,6 +11,7 @@ import { log } from "@/server/log";
 import type { Owner, Shop } from "@/server/owner";
 import { adminClient } from "@/server/supabase";
 import type { Json } from "@/types/database";
+import { aiLanguage } from "@/i18n/dictionary";
 
 type Ctx = Owner & { shop: Shop; requestId: string };
 
@@ -104,7 +105,7 @@ export async function voiceProposal(ctx: Ctx, path: string, kind: "SETUP" | "COM
       const changes = await extractSetup(ai, aiCtx, transcript);
       return { proposal: await store(ctx, "SETUP", path, transcript, changes), question: null, rejected: [] as string[] };
     }
-    const result = await interpretCommand(ai, aiCtx, transcript, catalog, ctx.shop.language === "en" ? "en" : "hi");
+    const result = await interpretCommand(ai, aiCtx, transcript, catalog, aiLanguage(ctx.shop.language));
     return { proposal: await store(ctx, "COMMAND", path, transcript, result.changes), question: result.question, rejected: result.rejected };
   } catch (error) {
     if (error instanceof ApiError) throw error;

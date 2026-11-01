@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, ReactNode } from "react";
 
-import type { MessageKey } from "@/i18n/dictionary";
+import { isRegional, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
 
@@ -24,7 +24,7 @@ const TABS: Array<{ href: string; label: MessageKey; icon: Icon; also?: string[]
 // thumb zone. The selected tab is ink with a heavier icon, never colour
 // alone. `preview` renders it in place for the style guide.
 export function TabBar({ mic, preview = false, active }: { mic: ReactNode; preview?: boolean; active?: string }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const pathname = usePathname();
   const current = active ?? pathname;
   const isActive = (href: string, also: string[] = []) => (href === "/app" ? current === "/app" : [href, ...also].some((prefix) => current.startsWith(prefix)));
@@ -51,7 +51,9 @@ export function TabBar({ mic, preview = false, active }: { mic: ReactNode; previ
                 )}
               >
                 <TabIcon aria-hidden className="size-6" strokeWidth={on ? 2.4 : 1.75} />
-                <span className="max-w-full truncate px-0.5">{t(label)}</span>
+                {/* Regional scripts run wider (V-06): a phone tab bar's 12 px, and a
+                    second line between words ("ನನ್ನ ಅಂಗಡಿ") rather than cut off. */}
+                <span className={cn("line-clamp-2 max-w-full text-center", isRegional(lang) && "text-xs")}>{t(label)}</span>
               </Link>
             );
           })}

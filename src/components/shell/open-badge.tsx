@@ -20,8 +20,10 @@ export function OpenBadge({ hours, timeZone }: { hours: Hours; timeZone: string 
         : t("shop.opensOn", { day: dayName(status.opensDay, lang), time: formatTime(status.opensAt, lang) });
   return (
     // The minute can differ between the server's render and the browser's.
-    <span suppressHydrationWarning className="shrink-0">
-      <Badge tone={status.open ? "success" : "neutral"}>{label}</Badge>
+    <span suppressHydrationWarning className="max-w-full">
+      <Badge wrap tone={status.open ? "success" : "neutral"}>
+        {label}
+      </Badge>
     </span>
   );
 }

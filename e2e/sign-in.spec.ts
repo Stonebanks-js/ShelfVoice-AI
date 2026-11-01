@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
+import { blockingViolations, chooseLanguage, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
 // F-02 and V-03 review gate: the first screen (shop owner or customer), the
 // owner's Google sign-in and the four setup steps. The first block needs no
@@ -14,7 +14,7 @@ test.describe("first screen and sign-in", () => {
 
   test("asks shop owner or customer, axe clean in both languages", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("radio", { name: "English" }).click();
+    await chooseLanguage(page, "English");
     await expect(page.getByRole("heading", { level: 1, name: "Shelf Voice" })).toBeVisible();
     const choices = page.getByRole("navigation", { name: "Who are you?" });
     await expect(choices.getByRole("link", { name: /^Shop owner/ })).toHaveAttribute("href", "/owner");
@@ -23,7 +23,7 @@ test.describe("first screen and sign-in", () => {
     await expect(page.getByText(/demo/i)).toHaveCount(0);
     expect(await blockingViolations(page)).toEqual([]);
 
-    await page.getByRole("radio", { name: "हिन्दी" }).click();
+    await chooseLanguage(page, "हिन्दी");
     await expect(page.getByRole("heading", { level: 1, name: "शेल्फ़ वॉइस" })).toBeVisible();
     await expect(page.getByRole("link", { name: /^दुकानदार/ })).toBeVisible();
     expect(await blockingViolations(page)).toEqual([]);
@@ -31,7 +31,7 @@ test.describe("first screen and sign-in", () => {
 
   test("shop owners continue with Google", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("radio", { name: "English" }).click();
+    await chooseLanguage(page, "English");
     await page.getByRole("link", { name: /^Shop owner/ }).click();
     await expect(page).toHaveURL("/owner");
     await expect(page.getByRole("heading", { level: 1, name: "Your shop, online in minutes" })).toBeVisible();
@@ -44,7 +44,7 @@ test.describe("first screen and sign-in", () => {
 
   test("remembers the language choice", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("radio", { name: "हिन्दी" }).click();
+    await chooseLanguage(page, "हिन्दी");
     await page.reload();
     await expect(page.getByRole("link", { name: /^ग्राहक/ })).toBeVisible();
   });
@@ -59,7 +59,7 @@ test.describe("first screen and sign-in", () => {
 
   test("says when Google sign-in didn't finish", async ({ page }) => {
     await page.goto("/owner?signin=failed");
-    await page.getByRole("radio", { name: "English" }).click();
+    await chooseLanguage(page, "English");
     await expect(page.getByRole("main").getByRole("alert")).toHaveText("Sign-in didn't finish. Please try again.");
   });
 
@@ -96,7 +96,7 @@ test.describe("signed-in entry", () => {
       await page.goto("/app");
       await expect(page).toHaveURL("/app/welcome");
       await expect(page.getByRole("progressbar", { name: "Step 1 of 4" })).toBeVisible();
-      await page.getByRole("radio", { name: /English/ }).click();
+      await page.getByRole("radio", { name: "English" }).click();
       await expect(page.getByRole("heading", { level: 1, name: "Choose your language" })).toBeVisible();
       expect(await blockingViolations(page)).toEqual([]);
       await page.getByRole("button", { name: "Next" }).click();

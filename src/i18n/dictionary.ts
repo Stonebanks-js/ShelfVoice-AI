@@ -1,8 +1,53 @@
-// Interface text in English and Hindi (doc 06 U2, errata E-21: the interface
-// is Hindi or English; AI replies may be Hinglish). Plain everyday words,
-// never system terms like "proposal" or "SKU".
-export type Lang = "en" | "hi";
-export const LANGS: Lang[] = ["en", "hi"];
+// Interface text (doc 06 U2). English and Hindi are written here and ship
+// with every page; the nine regional languages (V-06, E-36) live in
+// ./locales, translated by Muse Spark and checked by native speakers, and
+// load only for people who choose them. Plain everyday words, never system
+// terms like "proposal" or "SKU".
+export const REGIONAL = ["kn", "ta", "te", "ml", "mr", "gu", "bn", "or", "pa"] as const;
+export type RegionalLang = (typeof REGIONAL)[number];
+export type Lang = "en" | "hi" | RegionalLang;
+export const LANGS: Lang[] = ["en", "hi", ...REGIONAL];
+
+// Each language in its own script, as the picker shows it.
+export const LANG_NAMES: Record<Lang, string> = {
+  en: "English",
+  hi: "हिन्दी",
+  kn: "ಕನ್ನಡ",
+  ta: "தமிழ்",
+  te: "తెలుగు",
+  ml: "മലയാളം",
+  mr: "मराठी",
+  gu: "ગુજરાતી",
+  bn: "বাংলা",
+  or: "ଓଡ଼ିଆ",
+  pa: "ਪੰਜਾਬੀ",
+};
+
+// And in English, for people who can't read that script.
+export const LANG_ENGLISH: Record<Lang, string> = {
+  en: "English",
+  hi: "Hindi",
+  kn: "Kannada",
+  ta: "Tamil",
+  te: "Telugu",
+  ml: "Malayalam",
+  mr: "Marathi",
+  gu: "Gujarati",
+  bn: "Bengali",
+  or: "Odia",
+  pa: "Punjabi",
+};
+
+export const isLang = (value: unknown): value is Lang => typeof value === "string" && (LANGS as string[]).includes(value);
+export const isRegional = (lang: Lang): lang is RegionalLang => (REGIONAL as readonly string[]).includes(lang);
+
+// For Intl dates, numbers and relative times: the language as used in India.
+export const localeFor = (lang: Lang) => `${lang}-IN`;
+
+// What AI-written text (restock reasons, questions) is in: Hindi for Hindi
+// shops, English for everyone else, until those prompts are checked in
+// each regional language.
+export const aiLanguage = (lang: string): "en" | "hi" => (lang === "hi" ? "hi" : "en");
 
 const en = {
   "app.name": "Shelf Voice",
@@ -190,6 +235,9 @@ const en = {
   "setup.example": "“Sharma Kirana, near the bus stand. Open 7 in the morning to 10 at night. Maggi 14 rupees, Parle-G 10, Amul butter 58.”",
   "setup.skip": "Skip for now",
   "tab.shop": "My shop",
+  "lang.suggest": "You seem to be in {state}. Which language do you want?",
+  "lang.change": "Change language",
+  "lang.title": "Language",
   "acct.title": "Account",
   "acct.signin.title": "Sign in to save your details",
   "acct.signin.body": "Your addresses, past orders and wishlist stay with you, on any phone.",
@@ -635,6 +683,10 @@ const en = {
 };
 
 export type MessageKey = keyof typeof en;
+export type Messages = Partial<Record<MessageKey, string>>;
+
+// The source text, for the translation script and tests.
+export const english: Record<MessageKey, string> = en;
 
 const hi: Record<MessageKey, string> = {
   "app.name": "शेल्फ़ वॉइस",
@@ -822,6 +874,9 @@ const hi: Record<MessageKey, string> = {
   "setup.example": "“शर्मा किराना, बस स्टैंड के पास। सुबह 7 से रात 10 बजे तक। मैगी 14 रुपये, पारले-जी 10, अमूल बटर 58।”",
   "setup.skip": "अभी छोड़ें",
   "tab.shop": "मेरी दुकान",
+  "lang.suggest": "लगता है आप {state} में हैं। आप कौन सी भाषा चाहते हैं?",
+  "lang.change": "भाषा बदलें",
+  "lang.title": "भाषा",
   "acct.title": "खाता",
   "acct.signin.title": "अपनी जानकारी सेव करने के लिए साइन इन करें",
   "acct.signin.body": "आपके पते, पुराने ऑर्डर और पसंदीदा सामान किसी भी फ़ोन पर आपके साथ रहेंगे।",
@@ -1266,17 +1321,62 @@ const hi: Record<MessageKey, string> = {
 
 };
 
-const dictionaries: Record<Lang, Record<MessageKey, string>> = { en, hi };
+const dictionaries: Partial<Record<Lang, Messages>> = { en, hi };
+
+// A regional language's text, once loaded (server: all at start; browser:
+// the one in use).
+export function registerMessages(lang: Lang, messages: Messages) {
+  dictionaries[lang] = messages;
+}
+export const hasMessages = (lang: Lang) => Boolean(dictionaries[lang]);
 
 // Looks up a message and fills {name} placeholders.
 export function translate(lang: Lang, key: MessageKey, vars?: Record<string, string | number>): string {
   // Never crash a screen over a missing string: English, then the key itself.
-  const text = dictionaries[lang][key] ?? dictionaries.en[key] ?? key;
+  const text = dictionaries[lang]?.[key] ?? en[key] ?? key;
   return vars ? text.replace(/\{(\w+)\}/g, (match, name: string) => String(vars[name] ?? match)) : text;
 }
 
-// Doc 06 U2: follow the phone's language; Hindi when it prefers Hindi.
+// Doc 06 U2: follow the phone's first language when the app has it.
 export function langFromAcceptLanguage(header: string | null | undefined): Lang {
-  const first = header?.split(",")[0]?.trim().toLowerCase() ?? "";
-  return first.startsWith("hi") ? "hi" : "en";
+  const first = header?.split(",")[0]?.trim().toLowerCase().split("-")[0] ?? "";
+  return isLang(first) ? first : "en";
+}
+
+// The state a visitor seems to be in (Vercel's IP region: ISO 3166-2 codes)
+// and its language, for "You seem to be in Karnataka" (V-06). Hindi-speaking
+// states suggest Hindi.
+const REGION_LANG: Record<string, [state: string, lang: Lang]> = {
+  KA: ["Karnataka", "kn"],
+  TN: ["Tamil Nadu", "ta"],
+  PY: ["Puducherry", "ta"],
+  AP: ["Andhra Pradesh", "te"],
+  TG: ["Telangana", "te"],
+  TS: ["Telangana", "te"],
+  KL: ["Kerala", "ml"],
+  MH: ["Maharashtra", "mr"],
+  GJ: ["Gujarat", "gu"],
+  WB: ["West Bengal", "bn"],
+  OD: ["Odisha", "or"],
+  OR: ["Odisha", "or"],
+  PB: ["Punjab", "pa"],
+  UP: ["Uttar Pradesh", "hi"],
+  MP: ["Madhya Pradesh", "hi"],
+  BR: ["Bihar", "hi"],
+  RJ: ["Rajasthan", "hi"],
+  HR: ["Haryana", "hi"],
+  DL: ["Delhi", "hi"],
+  UK: ["Uttarakhand", "hi"],
+  UT: ["Uttarakhand", "hi"],
+  JH: ["Jharkhand", "hi"],
+  CT: ["Chhattisgarh", "hi"],
+  CG: ["Chhattisgarh", "hi"],
+  HP: ["Himachal Pradesh", "hi"],
+  CH: ["Chandigarh", "hi"],
+};
+
+export function langFromRegion(country: string | null | undefined, region: string | null | undefined): { state: string; lang: Lang } | null {
+  if (country !== "IN" || !region) return null;
+  const found = REGION_LANG[region.toUpperCase()];
+  return found ? { state: found[0], lang: found[1] } : null;
 }

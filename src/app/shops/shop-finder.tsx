@@ -8,7 +8,7 @@ import { OpenBadge } from "@/components/shell/open-badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/feedback";
 import { TextField } from "@/components/ui/field";
-import type { MessageKey } from "@/i18n/dictionary";
+import { localeFor, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { errorKey } from "@/lib/errors";
@@ -65,7 +65,7 @@ export function ShopFinder() {
   }
 
   const pincodeOk = /^[1-9][0-9]{5}$/.test(pincode);
-  const km = new Intl.NumberFormat(lang === "hi" ? "hi-IN" : "en-IN", { maximumFractionDigits: 1 });
+  const km = new Intl.NumberFormat(localeFor(lang), { maximumFractionDigits: 1 });
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">

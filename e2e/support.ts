@@ -52,6 +52,14 @@ export async function ownTestAddress(page: Page) {
   await page.setExtraHTTPHeaders({ "x-forwarded-for": `10.${octet()}.${octet()}.${octet()}` });
 }
 
+// Switches the screen's language through the picker (V-06). `name` is how
+// the language is written in its own script, e.g. "English" or "हिन्दी".
+export async function chooseLanguage(page: Page, name: string) {
+  await page.getByTestId("language-picker").click();
+  await page.getByRole("dialog").getByRole("radio", { name }).click();
+  await page.getByRole("dialog").waitFor({ state: "hidden" });
+}
+
 // A new owner with the seeded sample shop (15 products, 90 days of sales,
 // two reviews), opened on Home. Replaces the demo sign-in removed by E-36.
 export async function signInToSampleShop(page: Page, language: "en" | "hi" = "en") {

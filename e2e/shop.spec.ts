@@ -68,7 +68,8 @@ test("details and hours save", async ({ page }) => {
 
 test("switching to Hindi saves the shop's language", async ({ page }) => {
   const { shopId } = await openShop(page);
-  await page.getByRole("radio", { name: "हिन्दी" }).click();
+  await page.getByRole("button", { name: /^Language/ }).click();
+  await page.getByRole("dialog", { name: "Language" }).getByRole("radio", { name: "हिन्दी" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "मेरी दुकान" })).toBeVisible();
   await expect.poll(async () => (await shopRow(shopId)).data?.language).toBe("hi");
 });

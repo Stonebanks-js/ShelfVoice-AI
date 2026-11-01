@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner } from "./support";
+import { blockingViolations, chooseLanguage, darkMode, localAdmin, localSupabase, signInAsNewOwner } from "./support";
 
 // V-03 review gate: customers find shops near them without an account, by
 // pincode or by the phone's location, nearest first, and open a shop's page.
@@ -45,7 +45,7 @@ async function area(page: import("@playwright/test").Page) {
 test("a customer finds shops by pincode and by location, nearest first", async ({ page, context }) => {
   const shops = await area(page);
   await page.goto("/");
-  await page.getByRole("radio", { name: "English" }).click();
+  await chooseLanguage(page, "English");
   await page.getByRole("link", { name: /^Customer/ }).click();
   await expect(page).toHaveURL("/shops");
   await expect(page.getByRole("heading", { level: 1, name: "Shops near you" })).toBeVisible();

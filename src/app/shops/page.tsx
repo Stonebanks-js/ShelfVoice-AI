@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { requestLang } from "@/server/session";
 
 import { ShopFinder } from "./shop-finder";
@@ -19,8 +19,8 @@ export default function ShopsPage() {
 
 async function Shops() {
   return (
-    <LangProvider initial={await requestLang()}>
+    <LangRoot initial={await requestLang()}>
       <ShopFinder />
-    </LangProvider>
+    </LangRoot>
   );
 }

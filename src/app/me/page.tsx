@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { ToastProvider } from "@/components/ui/toast";
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { getAccount } from "@/server/customer";
 import { safeNext } from "@/server/next-path";
 import { currentUser } from "@/server/owner";
@@ -27,8 +27,8 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
   const [user, query, lang] = await Promise.all([currentUser(), searchParams, requestLang()]);
   const next = typeof query.next === "string" ? safeNext(query.next) : "/me";
   return (
-    <LangProvider initial={lang}>
+    <LangRoot initial={lang}>
       <ToastProvider>{user ? <AccountScreen account={await getAccount(user)} /> : <SignInToAccount next={next === "/app" ? "/me" : next} />}</ToastProvider>
-    </LangProvider>
+    </LangRoot>
   );
 }

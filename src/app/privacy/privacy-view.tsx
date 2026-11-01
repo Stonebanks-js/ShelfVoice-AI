@@ -3,8 +3,7 @@
 import { Clock, ExternalLink, TriangleAlert } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { Segmented } from "@/components/ui/controls";
-import type { Lang } from "@/i18n/dictionary";
+import { LanguagePicker } from "@/components/shell/language-picker";
 import { useLang } from "@/i18n/lang";
 
 import { ISSUES_URL, PRIVACY, UPDATED, type Kept } from "./content";
@@ -12,22 +11,15 @@ import { ISSUES_URL, PRIVACY, UPDATED, type Kept } from "./content";
 // Plain sections in the app's grouped-list style; the "how long" for each
 // kind of data sits on its own line so long Hindi text never gets cut off.
 export function PrivacyView() {
-  const { lang, setLang, t } = useLang();
-  const c = PRIVACY[lang];
+  const { lang } = useLang();
+  const c = PRIVACY[lang] ?? PRIVACY.en;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <main lang={PRIVACY[lang] ? lang : "en"} className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
       <header className="flex flex-col gap-4 px-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
-        <Segmented<Lang>
-          label={t("lang.label")}
-          value={lang}
-          onValueChange={setLang}
-          className="w-44 self-end"
-          options={[
-            { value: "en", label: "English" },
-            { value: "hi", label: <span lang="hi">हिन्दी</span> },
-          ]}
-        />
+        <div className="self-end">
+          <LanguagePicker />
+        </div>
         <div>
           <h1 className="font-display text-large-title font-bold tracking-tight">{c.title}</h1>
           <p className="mt-1 text-footnote text-ink-2">

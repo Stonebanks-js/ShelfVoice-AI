@@ -1,6 +1,6 @@
 "use client";
 
-import { Banknote, Check, Clock, Download, ExternalLink, IndianRupee, Languages, LifeBuoy, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Settings2, Share, ShieldCheck, ShoppingBag, Store, Tag, Trash2, Truck, Wallet } from "lucide-react";
+import { Banknote, Check, Clock, Download, ExternalLink, IndianRupee, LifeBuoy, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Settings2, Share, ShieldCheck, ShoppingBag, Store, Tag, Trash2, Truck, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
@@ -9,13 +9,14 @@ import { drawLogo, LOGO } from "@/components/brand/logo";
 import { OrderAlerts } from "@/components/shell/order-alerts";
 import { Button, buttonClass } from "@/components/ui/button";
 import { OpenBadge } from "@/components/shell/open-badge";
-import { Segmented, Switch } from "@/components/ui/controls";
+import { Switch } from "@/components/ui/controls";
 import { PageHeader } from "@/components/ui/feedback";
 import { TextField } from "@/components/ui/field";
 import { ListGroup, ListRow } from "@/components/ui/list";
 import { AlertDialog, Sheet } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
 import type { Lang, MessageKey } from "@/i18n/dictionary";
+import { LanguagePicker } from "@/components/shell/language-picker";
 import { useLang } from "@/i18n/lang";
 import { UPI_ID } from "@/lib/delivery";
 import { api } from "@/lib/api";
@@ -61,7 +62,7 @@ export function ShopScreen({
   email: string | null;
   vapidKey: string | null;
 }) {
-  const { lang, setLang, t } = useLang();
+  const { lang, t } = useLang();
   const router = useRouter();
   const toast = useToast();
   const [published, setPublished] = useState(shop.is_published);
@@ -137,8 +138,8 @@ export function ShopScreen({
     }
   }
 
-  async function changeLanguage(next: Lang) {
-    setLang(next);
+  // The picker has already switched the screens; this saves it for the shop.
+  async function saveLanguage(next: Lang) {
     try {
       await api("/api/v1/shops/me", { method: "PATCH", json: { language: next } });
       router.refresh();
@@ -173,7 +174,8 @@ export function ShopScreen({
 
       {/* Doc 06: a live preview of what customers see. */}
       <section aria-label={t("shop.page")} className="mx-4 flex flex-col gap-3 rounded-lg bg-surface p-4 shadow-card">
-        <div className="flex items-start justify-between gap-3">
+        {/* The badge drops below a long name or a long regional label (V-06). */}
+        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <div className="min-w-0">
             <h2 className="font-display text-title font-bold tracking-tight">{shop.name}</h2>
             {shop.category && <p className="text-footnote text-ink-2">{shop.category}</p>}
@@ -277,18 +279,8 @@ export function ShopScreen({
         </ListGroup>
 
         <ListGroup header={t("lang.label")}>
-          <li className="flex items-center gap-3 px-4 py-2.5">
-            <Languages aria-hidden className="size-5 shrink-0 text-ink-2" />
-            <Segmented<Lang>
-              label={t("lang.label")}
-              value={lang}
-              onValueChange={changeLanguage}
-              className="flex-1"
-              options={[
-                { value: "hi", label: <span lang="hi">हिन्दी</span> },
-                { value: "en", label: "English" },
-              ]}
-            />
+          <li>
+            <LanguagePicker variant="row" onChange={saveLanguage} />
           </li>
         </ListGroup>
 

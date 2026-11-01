@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { getStorefront } from "@/server/storefront";
 
 import { ReviewFlow } from "./review-flow";
@@ -19,9 +19,9 @@ export default async function ReviewPage({ params }: PageProps<"/r/[slug]">) {
   const shop = await getStorefront((await params).slug);
   if (!shop) notFound();
   return (
-    <LangProvider initial={shop.language}>
+    <LangRoot initial={shop.language}>
       <ReviewFlow slug={shop.slug} shopName={shop.name} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} />
-    </LangProvider>
+    </LangRoot>
   );
 }
 

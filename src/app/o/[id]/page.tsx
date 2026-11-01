@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { orderForCustomer } from "@/server/orders";
 import { currentUser } from "@/server/owner";
 import { requestLang } from "@/server/session";
 
 import { OrderStatusView } from "./order-status";
+import { isLang } from "@/i18n/dictionary";
 
 export const metadata: Metadata = { title: "Your order · Shelf Voice", robots: { index: false, follow: false }, referrer: "no-referrer" };
 
@@ -24,10 +25,10 @@ async function Order({ params, searchParams }: Pick<PageProps<"/o/[id]">, "param
   const token = typeof query.t === "string" ? query.t : "";
   const user = await currentUser();
   const order = await orderForCustomer(id, token, user?.user.id ?? null);
-  const lang = order ? (order.shop.language === "en" ? "en" : "hi") : await requestLang();
+  const lang = order && isLang(order.shop.language) ? order.shop.language : await requestLang();
   return (
-    <LangProvider initial={lang}>
+    <LangRoot initial={lang}>
       <OrderStatusView initial={order} token={token} />
-    </LangProvider>
+    </LangRoot>
   );
 }

@@ -54,7 +54,7 @@ interface ListRowProps {
   href?: string;
   onClick?: () => void;
   titleId?: string;
-  wrap?: boolean; // up to two lines of title and subtitle, for names that matter
+  wrap?: boolean; // up to two lines of subtitle too, for names that matter
 }
 
 // One row. A link or button when it navigates or acts (with a chevron for
@@ -66,7 +66,8 @@ export function ListRow({ title, subtitle, icon, iconTone, value, accessory, hre
       {icon && <IconTile icon={icon} tone={iconTone} />}
       <span className="flex min-h-12 min-w-0 flex-1 items-center gap-3 border-separator py-2.5 pr-4 [li+li_&]:border-t">
         <span className="flex min-w-0 flex-1 flex-col">
-          <span id={titleId} className={cn("text-body text-ink", wrap ? "line-clamp-2" : "truncate")}>
+          {/* Titles wrap rather than cut off: regional labels run longer (V-06). */}
+          <span id={titleId} className="line-clamp-2 text-body text-ink [overflow-wrap:anywhere]">
             {title}
           </span>
           {subtitle && <span className={cn("text-footnote text-ink-2", wrap ? "line-clamp-2" : "truncate")}>{subtitle}</span>}

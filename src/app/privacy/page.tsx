@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { Skeleton, SkeletonList } from "@/components/ui/feedback";
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { requestLang } from "@/server/session";
 
 import { PrivacyView } from "./privacy-view";
+import { isLang } from "@/i18n/dictionary";
 
 export const metadata: Metadata = {
   title: "Privacy · Shelf Voice",
@@ -25,11 +26,11 @@ export default function PrivacyPage({ searchParams }: PageProps<"/privacy">) {
 
 async function Privacy({ searchParams }: Pick<PageProps<"/privacy">, "searchParams">) {
   const { lang: asked } = await searchParams;
-  const lang = asked === "hi" || asked === "en" ? asked : await requestLang();
+  const lang = isLang(asked) ? asked : await requestLang();
   return (
-    <LangProvider initial={lang}>
+    <LangRoot initial={lang}>
       <PrivacyView />
-    </LangProvider>
+    </LangRoot>
   );
 }
 

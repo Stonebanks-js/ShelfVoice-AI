@@ -1,4 +1,4 @@
-import type { Lang } from "@/i18n/dictionary";
+import { type Lang, localeFor } from "@/i18n/dictionary";
 
 // Opening hours as stored on the shop (voice setup and My shop write them):
 // per day, up to two [open, close] pairs in 24-hour "HH:MM"; empty = closed.
@@ -58,13 +58,13 @@ export function openStatus(hours: Hours, now: Date, timeZone = "Asia/Kolkata"): 
 
 export function formatTime(hhmm: string, lang: Lang): string {
   const date = new Date(Date.UTC(2026, 0, 1, Number(hhmm.slice(0, 2)), Number(hhmm.slice(3, 5))));
-  return new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(date);
+  return new Intl.DateTimeFormat(localeFor(lang), { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(date);
 }
 
 export function dayName(day: Day, lang: Lang, width: "short" | "long" = "short"): string {
   // 2026-01-05 was a Monday.
   const date = new Date(Date.UTC(2026, 0, 5 + DAYS.indexOf(day)));
-  return new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { weekday: width, timeZone: "UTC" }).format(date);
+  return new Intl.DateTimeFormat(localeFor(lang), { weekday: width, timeZone: "UTC" }).format(date);
 }
 
 // Runs of days with the same hours, for one compact line each:
