@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, MessageSquareText, Package, ReceiptText } from "lucide-react";
+import { House, MessageSquareText, ReceiptText, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, ReactNode } from "react";
@@ -11,9 +11,10 @@ import { cn } from "@/lib/cn";
 
 type Icon = ComponentType<{ className?: string; strokeWidth?: number; "aria-hidden"?: boolean }>;
 
-const TABS: Array<{ href: string; label: MessageKey; icon: Icon }> = [
-  { href: "/app", label: "tab.today", icon: CalendarDays },
-  { href: "/app/stock", label: "tab.stock", icon: Package },
+// My shop holds the products and their stock, and adding more (V-02, E-36).
+const TABS: Array<{ href: string; label: MessageKey; icon: Icon; also?: string[] }> = [
+  { href: "/app", label: "tab.home", icon: House },
+  { href: "/app/shop", label: "tab.shop", icon: Store, also: ["/app/stock", "/app/add"] },
   { href: "/app/orders", label: "tab.orders", icon: ReceiptText },
   { href: "/app/reviews", label: "tab.reviews", icon: MessageSquareText },
 ];
@@ -26,7 +27,7 @@ export function TabBar({ mic, preview = false, active }: { mic: ReactNode; previ
   const { t } = useLang();
   const pathname = usePathname();
   const current = active ?? pathname;
-  const isActive = (href: string) => (href === "/app" ? current === "/app" : current.startsWith(href));
+  const isActive = (href: string, also: string[] = []) => (href === "/app" ? current === "/app" : [href, ...also].some((prefix) => current.startsWith(prefix)));
   return (
     <nav
       aria-label={t("tab.label")}
@@ -37,8 +38,8 @@ export function TabBar({ mic, preview = false, active }: { mic: ReactNode; previ
     >
       <div className="pointer-events-auto mx-auto flex max-w-lg items-center gap-3">
         <div className="flex min-w-0 flex-1 rounded-full border border-separator bg-chrome p-1 shadow-float backdrop-blur-xl backdrop-saturate-150">
-          {TABS.map(({ href, label, icon: TabIcon }) => {
-            const on = isActive(href);
+          {TABS.map(({ href, label, icon: TabIcon, also }) => {
+            const on = isActive(href, also);
             return (
               <Link
                 key={href}

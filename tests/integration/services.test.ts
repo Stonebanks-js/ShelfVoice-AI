@@ -185,6 +185,7 @@ describe("Today summary (doc 06 O-5)", () => {
       lowCount: 0,
       reviews: [],
       newReviews: 0,
+      recent: [],
     });
   });
 

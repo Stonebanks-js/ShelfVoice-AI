@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Download, ExternalLink, Info, Languages, LogOut, MapPin, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2 } from "lucide-react";
+import { Clock, Download, ExternalLink, Info, Languages, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
@@ -36,7 +36,7 @@ export interface OwnerShop {
   is_demo: boolean;
 }
 
-export function ShopScreen({ shop, origin }: { shop: OwnerShop; origin: string }) {
+export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; origin: string; productCount: number }) {
   const { lang, setLang, t } = useLang();
   const router = useRouter();
   const toast = useToast();
@@ -144,6 +144,12 @@ export function ShopScreen({ shop, origin }: { shop: OwnerShop; origin: string }
       </section>
 
       <div className="flex flex-col gap-6 px-4">
+        {/* V-02: products and their stock live under My shop. */}
+        <ListGroup header={t("shop.products")}>
+          <ListRow icon={<Package />} title={t("shop.allProducts")} value={<span className="tabular-nums">{productCount}</span>} href="/app/stock" />
+          <ListRow icon={<ListPlus />} title={t("add.title")} href="/app/add" />
+        </ListGroup>
+
         <ListGroup header={t("shop.page")} footer={t("shop.publishedNote")}>
           <ListRow
             icon={<Store />}

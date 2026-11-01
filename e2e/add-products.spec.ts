@@ -21,7 +21,7 @@ const products = async (shopId: string) =>
 test("a ready-made list adds ticked products, with prices the owner fixed", async ({ page }) => {
   const shopId = await newShop(page);
   await page.goto("/app");
-  await page.getByRole("link", { name: "Add products" }).click();
+  await page.getByRole("link", { name: "Build your shop" }).click();
   await expect(page).toHaveURL("/app/setup");
   await expect(page.getByRole("heading", { level: 1, name: "Add your products" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Main sections" })).toBeHidden();

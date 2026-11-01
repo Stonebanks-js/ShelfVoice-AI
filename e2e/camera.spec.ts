@@ -71,8 +71,8 @@ test("a bill photo is resized, loses its EXIF and comes back as changes to check
     await route.fulfill({ status: 201, json: { proposal: { id: proposal!.id } } });
   });
 
-  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Stock" }).click();
-  await page.getByRole("link", { name: "Add many" }).click();
+  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "My shop" }).click();
+  await page.getByRole("link", { name: "Add products" }).click();
   await page.getByRole("link", { name: /^Supplier's bill/ }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Photo of a supplier's bill" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Main sections" })).toBeHidden();
