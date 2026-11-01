@@ -4,11 +4,12 @@ import { ApiError, fromPostgres, readJson, route } from "@/server/http";
 import { bothOrNeither, ShopLocation } from "@/server/location";
 import { requireOwner } from "@/server/owner";
 import { slugFor } from "@/server/shops";
+import { type Lang, LANGS } from "@/i18n/dictionary";
 
 const Body = z
   .object({
     name: z.string().trim().min(1).max(80).default("My shop"),
-    language: z.enum(["hi", "en"]).optional(),
+    language: z.enum(LANGS as [Lang, ...Lang[]]).optional(),
     // The setup steps (V-03): shop type, and where the shop is.
     category: z.string().trim().max(80).nullable().optional(),
     ...ShopLocation,

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { ClipQueueProvider } from "@/components/shell/clip-queue";
 import { ToastProvider } from "@/components/ui/toast";
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { ownerState, requestLang } from "@/server/session";
 
 import Loading from "./loading";
@@ -24,13 +24,13 @@ async function AppFrame({ children }: { children: React.ReactNode }) {
   if (!state) redirect("/");
   const lang = await requestLang(state);
   return (
-    <LangProvider initial={lang}>
+    <LangRoot initial={lang}>
       <ToastProvider>
         <ClipQueueProvider ownerId={state.user.id}>
           <div className="flex min-h-dvh flex-col pb-[calc(env(safe-area-inset-bottom)+6rem)]">{children}</div>
           {state.shop && <OwnerTabBar />}
         </ClipQueueProvider>
       </ToastProvider>
-    </LangProvider>
+    </LangRoot>
   );
 }

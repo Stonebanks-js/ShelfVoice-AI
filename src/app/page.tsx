@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { Skeleton } from "@/components/ui/feedback";
-import { LangProvider } from "@/i18n/lang";
-import { ownerState, requestLang } from "@/server/session";
+import { LangRoot } from "@/i18n/lang-root";
+import { languageSuggestion, ownerState, requestLang } from "@/server/session";
 
 import { Start } from "./start";
 
@@ -22,10 +22,11 @@ async function Landing() {
   const state = await ownerState();
   if (state?.shop) redirect("/app");
   const lang = await requestLang(state);
+  const suggestion = await languageSuggestion(lang);
   return (
-    <LangProvider initial={lang}>
-      <Start />
-    </LangProvider>
+    <LangRoot initial={lang}>
+      <Start suggestion={suggestion} />
+    </LangRoot>
   );
 }
 

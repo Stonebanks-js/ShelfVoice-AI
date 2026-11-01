@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { Skeleton } from "@/components/ui/feedback";
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { requestLang } from "@/server/session";
 
 import { OwnerSignIn } from "./owner-sign-in";
@@ -19,9 +19,9 @@ export default function OwnerPage({ searchParams }: PageProps<"/owner">) {
 async function Owner({ searchParams }: Pick<PageProps<"/owner">, "searchParams">) {
   const [lang, params] = await Promise.all([requestLang(), searchParams]);
   return (
-    <LangProvider initial={lang}>
+    <LangRoot initial={lang}>
       <OwnerSignIn failed={params.signin === "failed"} />
-    </LangProvider>
+    </LangRoot>
   );
 }
 

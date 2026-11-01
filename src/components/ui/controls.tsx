@@ -140,12 +140,15 @@ const BADGE: Record<BadgeTone, string> = {
   low: "bg-fill-strong text-ink",
 };
 
-// Status badge: icon plus word, never colour alone (doc 06).
-export function Badge({ tone = "neutral", icon, children }: { tone?: BadgeTone; icon?: ReactNode; children: ReactNode }) {
+// Status badge: icon plus word, never colour alone (doc 06). `wrap` lets a
+// long label (a sentence, or a regional language) take a second line instead
+// of running past the screen edge (V-06).
+export function Badge({ tone = "neutral", icon, wrap = false, children }: { tone?: BadgeTone; icon?: ReactNode; wrap?: boolean; children: ReactNode }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-footnote font-semibold whitespace-nowrap [&>svg]:size-3.5",
+        "inline-flex items-center gap-1 px-2.5 py-0.5 text-footnote font-semibold [&>svg]:size-3.5 [&>svg]:shrink-0",
+        wrap ? "max-w-full rounded-xl" : "rounded-full whitespace-nowrap",
         BADGE[tone],
       )}
     >

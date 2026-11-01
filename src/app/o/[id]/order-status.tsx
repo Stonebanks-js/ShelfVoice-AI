@@ -8,7 +8,7 @@ import { buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/controls";
 import { EmptyState } from "@/components/ui/feedback";
 import { QrCode } from "@/components/ui/qr-code";
-import type { MessageKey } from "@/i18n/dictionary";
+import { localeFor, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { formatRupees } from "@/lib/changes-view";
@@ -73,7 +73,7 @@ export function OrderStatusView({ initial, token }: { initial: OrderView | null;
   const canPay = Boolean(order.shop.upiId) && due > 0 && order.status !== "NEW" && order.status !== "CANCELLED";
   const upi = canPay ? upiLink({ upiId: order.shop.upiId!, shopName: order.shop.name, amountPaise: due, note: `Order ${order.code}` }) : null;
   const modes = [order.shop.acceptsCash && t("pay.CASH"), order.shop.upiId && t("pay.UPI"), order.shop.payOnDelivery && order.fulfilment === "DELIVERY" && t("pay.cod")].filter(Boolean).join(" · ");
-  const time = new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(checked);
+  const time = new Intl.DateTimeFormat(localeFor(lang), { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(checked);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">

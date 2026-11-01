@@ -8,7 +8,7 @@ import { Badge, Chip } from "@/components/ui/controls";
 import { EmptyState, PageHeader } from "@/components/ui/feedback";
 import { IconTile, type IconTone } from "@/components/ui/list";
 import { useToast } from "@/components/ui/toast";
-import type { Lang, MessageKey } from "@/i18n/dictionary";
+import { type Lang, localeFor, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
@@ -132,7 +132,7 @@ export function ReviewsScreen({
 }
 
 function ago(iso: string, lang: Lang): string {
-  const when = new Intl.RelativeTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { numeric: "auto" });
+  const when = new Intl.RelativeTimeFormat(localeFor(lang), { numeric: "auto" });
   const minutes = Math.round((new Date(iso).getTime() - Date.now()) / 60_000);
   if (Math.abs(minutes) < 60) return when.format(minutes, "minute");
   const hours = Math.round(minutes / 60);
@@ -187,7 +187,7 @@ function ReviewCard({
           {items.map((id) =>
             stockouts.has(id) ? (
               <li key={id}>
-                <Badge tone="danger" icon={<CircleAlert aria-hidden />}>
+                <Badge wrap tone="danger" icon={<CircleAlert aria-hidden />}>
                   {t("reviews.wantedOut", { name: productNames[id] })}
                 </Badge>
               </li>

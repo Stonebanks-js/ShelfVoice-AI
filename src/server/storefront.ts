@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 
 import { env } from "@/env/server";
-import type { Lang } from "@/i18n/dictionary";
+import { isLang, type Lang } from "@/i18n/dictionary";
 import { asHours, type Hours } from "@/lib/hours";
 import type { Database } from "@/types/database";
 
@@ -63,7 +63,7 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
     address: shop.address,
     timezone: shop.timezone ?? "Asia/Kolkata",
     hours: asHours(shop.hours),
-    language: shop.language === "en" ? "en" : "hi",
+    language: isLang(shop.language) ? shop.language : "hi",
     delivers: shop.delivers ?? false,
     upiId: shop.upi_id,
     acceptsCash: shop.accepts_cash ?? true,

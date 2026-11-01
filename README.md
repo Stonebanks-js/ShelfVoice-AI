@@ -40,7 +40,7 @@ Phone browser ──► Next.js 16 on Vercel (Mumbai, bom1)
                     └──► Axiom logs, Better Stack heartbeats, Discord alerts
 ```
 
-- **App:** Next.js 16 (App Router, cache components, partial prerendering), React 19, Tailwind 4. Hindi and English throughout; light and dark follow the phone.
+- **App:** Next.js 16 (App Router, cache components, partial prerendering), React 19, Tailwind 4. Eleven languages: Hindi and English, plus Kannada, Tamil, Telugu, Malayalam, Marathi, Gujarati, Bengali, Odia and Punjabi, offered from the state the phone seems to be in (the internet address's region, no permission asked). The regional screens were translated once by Muse Spark (`scripts/translate-locales.mjs`) and are waiting on a native speaker's check, one sheet per language in `i18n-review/`; anything not yet translated shows in English. Voice notes are still heard as Hindi or English, AI-written text for a regional shop is in English, and the privacy policy is in Hindi and English. Light and dark follow the phone.
 - **Audio:** the browser records 16 kHz mono WAV with an AudioWorklet and uploads it straight to Storage with a signed URL. Photos are resized and re-encoded on the phone, which removes location data.
 - **Data:** every table has row-level security; owners only ever see their own shop. Confirming a proposal runs in one database transaction, and repeating the same request changes nothing.
 - **AI client** (`src/server/ai`): spending caps ($100 total, $15 a day, $2 per shop a day), a circuit breaker with a manual pause switch on the admin page, timeouts and one retry, and a ledger of every call's cost and latency.

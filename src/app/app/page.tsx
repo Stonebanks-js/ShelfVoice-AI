@@ -5,7 +5,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/controls";
 import { ListGroup, ListRow } from "@/components/ui/list";
-import { translate, type Lang, type MessageKey } from "@/i18n/dictionary";
+import { type Lang, localeFor, type MessageKey, translate } from "@/i18n/dictionary";
 import { formatRupees } from "@/lib/changes-view";
 import { ownerState, requestLang } from "@/server/session";
 import { ownerClient } from "@/server/supabase";
@@ -33,7 +33,7 @@ async function Today() {
   const now = new Date(); // one clock for the whole screen
   const summary = await todaySummary(await ownerClient(), state.shop.id, now);
   const t = (key: MessageKey, vars?: Record<string, string | number>) => translate(lang, key, vars);
-  const weekday = new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { weekday: "long", timeZone: "Asia/Kolkata" }).format(now);
+  const weekday = new Intl.DateTimeFormat(localeFor(lang), { weekday: "long", timeZone: "Asia/Kolkata" }).format(now);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6">
@@ -158,7 +158,7 @@ const SENTIMENT: Record<string, { icon: ReactNode; tone: "success" | "accent" | 
 };
 
 function ReviewList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
-  const when = new Intl.RelativeTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { numeric: "auto" });
+  const when = new Intl.RelativeTimeFormat(localeFor(lang), { numeric: "auto" });
   const ago = (iso: string) => {
     const hours = Math.round((new Date(iso).getTime() - now.getTime()) / 3_600_000);
     return Math.abs(hours) < 24 ? when.format(hours, "hour") : when.format(Math.round(hours / 24), "day");
@@ -209,7 +209,7 @@ const KIND_ICON: Record<TodaySummary["recent"][number]["kind"], ReactNode> = {
 // The last few confirmed voice and photo changes, so the owner can see what
 // the app just did (V-02).
 function RecentList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
-  const when = new Intl.RelativeTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { numeric: "auto" });
+  const when = new Intl.RelativeTimeFormat(localeFor(lang), { numeric: "auto" });
   const ago = (iso: string) => {
     const minutes = Math.round((new Date(iso).getTime() - now.getTime()) / 60_000);
     if (Math.abs(minutes) < 60) return when.format(minutes, "minute");
@@ -238,7 +238,7 @@ function RecentList({ summary, lang, now, t }: { summary: TodaySummary; lang: La
 
 // New customer orders, first on Home so none waits (V-04).
 function OrdersList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
-  const when = new Intl.RelativeTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { numeric: "auto" });
+  const when = new Intl.RelativeTimeFormat(localeFor(lang), { numeric: "auto" });
   const ago = (iso: string) => {
     const minutes = Math.round((new Date(iso).getTime() - now.getTime()) / 60_000);
     return Math.abs(minutes) < 60 ? when.format(minutes, "minute") : when.format(Math.round(minutes / 60), "hour");

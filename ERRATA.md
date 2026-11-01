@@ -758,10 +758,11 @@ The calendar ends in December 2027; a 2028 seed is needed before then.
 3. **Sign-up.** Shop owner or Customer; four setup steps (language, name, type, location). The demo shop is removed completely, so judges sign in with their own Google account; the tests keep its seeded data as a sample shop behind a route that only runs locally. Phone OTP was dropped for now on Nov 1: the owner wants sign-up free, and every SMS route costs per message (Firebase phone sign-in needs the paid Blaze plan, Twilio needs India DLT registration), so owners sign in with Google until after judging.
 4. **Customers.** Nearby shops by distance without a map, a cart, pickup or delivery, in-app orders with WhatsApp as a backup, web push to the owner.
 5. **Settings.** For owners and customers, as in V-05. No wallet: holding customers' money needs an RBI prepaid payment instrument licence; customers pay the shop by UPI or cash, and refunds are tracked, not processed.
-6. **Languages.** Nine regional languages suggested from location, translated by Muse Spark and checked by a native speaker.
+6. **Languages.** Nine regional languages suggested from location, translated by Muse Spark and checked by a native speaker. Built Nov 1: what still waits on that check, and what stays in Hindi or English for now (voice notes, AI-written text, the privacy policy), is in V-06.
 
 | Doc | Page | Section | Change |
 |---|---|---|---|
 | 01 | — | FR-01, FR-07, FR-10 | Bulk adding methods; customer cart and in-app orders; shelf photo read without SAM (E-36) |
 | 06 | — | O-1, O-3, U3 | Two sign-up paths, setup steps, Home and My shop tabs (E-36) |
 | 07 | — | products | Add `barcode` (unique per shop) and an Open Food Facts lookup cache (E-36) |
+| 07 | — | shops | `language` allows the nine regional codes as well as `hi` and `en` (E-36) |

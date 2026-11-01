@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { LangProvider } from "@/i18n/lang";
+import { LangRoot } from "@/i18n/lang-root";
 import { getStorefront } from "@/server/storefront";
 
 import { StorefrontView } from "./storefront-view";
@@ -19,9 +19,9 @@ export default async function StorefrontPage({ params }: PageProps<"/s/[slug]">)
   const shop = await getStorefront((await params).slug);
   if (!shop) notFound();
   return (
-    <LangProvider initial={shop.language}>
+    <LangRoot initial={shop.language}>
       <StorefrontView shop={shop} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} />
-    </LangProvider>
+    </LangRoot>
   );
 }
 

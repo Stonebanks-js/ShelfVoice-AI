@@ -168,4 +168,6 @@ const hi: PrivacyContent = {
   },
 };
 
-export const PRIVACY: Record<Lang, PrivacyContent> = { en, hi };
+// English and Hindi, as written and reviewed; other languages show English
+// until a translation is checked (V-06): a policy must not be guessed at.
+export const PRIVACY: Partial<Record<Lang, PrivacyContent>> & { en: PrivacyContent } = { en, hi };

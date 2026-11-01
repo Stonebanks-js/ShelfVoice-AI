@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronLeft, CircleAlert, Heart, Home, Languages, LogOut, MapPin, Pencil, Plus, RotateCcw, ShieldCheck, Store, Trash2, UserRound } from "lucide-react";
+import { Check, ChevronLeft, CircleAlert, Heart, Home, LogOut, MapPin, Pencil, Plus, RotateCcw, ShieldCheck, Store, Trash2, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
@@ -12,7 +12,8 @@ import { TextField } from "@/components/ui/field";
 import { ListGroup, ListRow } from "@/components/ui/list";
 import { AlertDialog, Sheet } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import type { Lang, MessageKey } from "@/i18n/dictionary";
+import { localeFor, type MessageKey } from "@/i18n/dictionary";
+import { LanguagePicker } from "@/components/shell/language-picker";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { setCart } from "@/lib/cart";
@@ -59,7 +60,7 @@ export function SignInToAccount({ next }: { next: string }) {
 type Address = Account["addresses"][number];
 
 export function AccountScreen({ account }: { account: Account }) {
-  const { lang, setLang, t } = useLang();
+  const { lang, t } = useLang();
   const router = useRouter();
   const toast = useToast();
   const [sheet, setSheet] = useState<"profile" | Address | "new" | null>(null);
@@ -67,7 +68,7 @@ export function AccountScreen({ account }: { account: Account }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const refunds = account.orders.flatMap((o) => o.refunds.map((r) => ({ ...r, code: o.code, shop: o.shop })));
-  const date = (iso: string) => new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" }).format(new Date(iso));
+  const date = (iso: string) => new Intl.DateTimeFormat(localeFor(lang), { day: "numeric", month: "short", timeZone: "Asia/Kolkata" }).format(new Date(iso));
 
   async function savePayWith(value: "CASH" | "UPI") {
     setPayWith(value);
@@ -223,18 +224,8 @@ export function AccountScreen({ account }: { account: Account }) {
       </Section>
 
       <ListGroup header={t("lang.label")}>
-        <li className="flex items-center gap-3 px-4 py-2.5">
-          <Languages aria-hidden className="size-5 shrink-0 text-ink-2" />
-          <Segmented<Lang>
-            label={t("lang.label")}
-            value={lang}
-            onValueChange={setLang}
-            className="flex-1"
-            options={[
-              { value: "hi", label: <span lang="hi">हिन्दी</span> },
-              { value: "en", label: "English" },
-            ]}
-          />
+        <li>
+          <LanguagePicker variant="row" />
         </li>
       </ListGroup>
 

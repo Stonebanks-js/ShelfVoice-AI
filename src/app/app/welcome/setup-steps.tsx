@@ -4,6 +4,7 @@ import { Candy, Check, ChevronLeft, CircleAlert, Croissant, MapPin, Shapes, Shop
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
+import { LanguageList, type LanguageSuggestion } from "@/components/shell/language-picker";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import type { Lang, MessageKey } from "@/i18n/dictionary";
@@ -11,11 +12,6 @@ import { useLang } from "@/i18n/lang";
 import { api, ApiFailure } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
-
-const LANGS: Array<{ value: Lang; name: string; sample: string }> = [
-  { value: "hi", name: "हिन्दी", sample: "नमस्ते! आज क्या बिका?" },
-  { value: "en", name: "English", sample: "Hello! What sold today?" },
-];
 
 // Saved as the shop's category, which the storefront shows and the
 // ready-made lists read (typeForCategory).
@@ -35,7 +31,7 @@ type Where = { lat: number; lng: number } | null;
 // like the sign-up of a calorie-tracking app: language first so the rest
 // reads in it, then the shop's name, its kind and where it is. Then the
 // owner adds products.
-export function SetupSteps({ initial }: { initial: Lang }) {
+export function SetupSteps({ initial, suggestion }: { initial: Lang; suggestion: LanguageSuggestion | null }) {
   const { setLang, t } = useLang();
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -144,21 +140,21 @@ export function SetupSteps({ initial }: { initial: Lang }) {
         {step === 0 && (
           <>
             <Heading title={t("welcome.title")} body={t("welcome.body")} />
-            <div role="radiogroup" aria-label={t("lang.label")} className="flex flex-col gap-3">
-              {LANGS.map((c) => (
-                <Option
-                  key={c.value}
-                  selected={c.value === lang}
-                  lang={c.value}
-                  onClick={() => {
-                    setChoice(c.value);
-                    setLang(c.value); // the screens switch as soon as it's tapped
-                  }}
-                  title={c.name}
-                  body={c.sample}
-                />
-              ))}
-            </div>
+            {/* V-06: the state's language first, from where the phone seems to be. */}
+            {suggestion && (
+              <p className="flex items-start gap-2 rounded-md bg-fill px-4 py-3 text-footnote text-ink">
+                <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
+                {t("lang.suggest", { state: suggestion.state })}
+              </p>
+            )}
+            <LanguageList
+              label={t("lang.label")}
+              value={lang}
+              onChoose={(next) => {
+                setChoice(next);
+                setLang(next); // the screens switch as soon as it's tapped
+              }}
+            />
           </>
         )}
 
@@ -259,29 +255,3 @@ function Heading({ title, body }: { title: string; body: string }) {
   );
 }
 
-function Option({ selected, lang, onClick, title, body }: { selected: boolean; lang: Lang; onClick: () => void; title: string; body: string }) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      lang={lang}
-      onClick={onClick}
-      className={cn(
-        "flex min-h-20 items-center gap-4 rounded-lg bg-surface px-5 text-left shadow-card transition-[box-shadow,transform] active:scale-[0.99]",
-        selected && "ring-3 ring-accent",
-      )}
-    >
-      <span className="flex-1">
-        <span className="block text-title font-semibold">{title}</span>
-        <span className="block text-footnote text-ink-2">{body}</span>
-      </span>
-      <span
-        aria-hidden
-        className={cn("grid size-7 place-items-center rounded-full border-2", selected ? "border-accent-fill bg-accent-fill text-on-accent" : "border-separator")}
-      >
-        {selected && <Check className="size-4" strokeWidth={3} />}
-      </span>
-    </button>
-  );
-}

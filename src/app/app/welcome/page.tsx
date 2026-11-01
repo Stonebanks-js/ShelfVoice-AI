@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { ownerState, requestLang } from "@/server/session";
+import { languageSuggestion, ownerState, requestLang } from "@/server/session";
 
 import Loading from "../loading";
 import { SetupSteps } from "./setup-steps";
@@ -20,5 +20,7 @@ async function Welcome() {
   const state = await ownerState();
   if (!state) redirect("/");
   if (state.shop) redirect("/app");
-  return <SetupSteps initial={await requestLang(state)} />;
+  // The state's language is suggested above the list (V-06); the owner picks.
+  const lang = await requestLang(state);
+  return <SetupSteps initial={lang} suggestion={await languageSuggestion(lang)} />;
 }

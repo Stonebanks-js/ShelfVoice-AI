@@ -4,29 +4,19 @@ import { ChevronRight, MapPin, Store } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { LanguagePicker, SuggestLanguage, type LanguageSuggestion } from "@/components/shell/language-picker";
 import { LogoMark, Wordmark } from "@/components/brand/logo";
-import { Segmented } from "@/components/ui/controls";
-import type { Lang } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 
 // The first screen (E-36): two plain choices, so nobody has to guess which
 // button is theirs. Shop owners go on to sign in; customers find shops
 // near them without an account.
-export function Start() {
-  const { lang, setLang, t } = useLang();
+export function Start({ suggestion }: { suggestion: LanguageSuggestion | null }) {
+  const { lang, t } = useLang();
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div className="flex justify-end">
-        <Segmented<Lang>
-          label={t("lang.label")}
-          value={lang}
-          onValueChange={setLang}
-          className="w-44"
-          options={[
-            { value: "en", label: "English" },
-            { value: "hi", label: <span lang="hi">हिन्दी</span> },
-          ]}
-        />
+        <LanguagePicker />
       </div>
 
       <div className="flex flex-1 flex-col justify-center gap-4 py-8">
@@ -39,6 +29,11 @@ export function Start() {
         </div>
       </div>
 
+      {suggestion && (
+        <div className="pb-4">
+          <SuggestLanguage suggestion={suggestion} />
+        </div>
+      )}
       <nav aria-labelledby="start-question" className="flex flex-col gap-3">
         <h2 id="start-question" className="px-1 text-headline font-semibold">
           {t("start.question")}

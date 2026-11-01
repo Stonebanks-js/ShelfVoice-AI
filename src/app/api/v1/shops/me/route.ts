@@ -5,6 +5,7 @@ import { fromPostgres, readJson, route } from "@/server/http";
 import { bothOrNeither, ShopLocation } from "@/server/location";
 import { requireOwner, requireShop } from "@/server/owner";
 import { refreshStorefront } from "@/server/storefront";
+import { type Lang, LANGS } from "@/i18n/dictionary";
 
 // The signed-in owner and their shop (null until created).
 export const GET = route(async () => {
@@ -27,7 +28,7 @@ const Patch = z
     phone: z.string().regex(/^\+[1-9][0-9]{6,14}$/).nullable().optional(),
     description: z.string().trim().max(500).nullable().optional(),
     hours: Hours.nullable().optional(),
-    language: z.enum(["hi", "en"]).optional(),
+    language: z.enum(LANGS as [Lang, ...Lang[]]).optional(),
     delivers: z.boolean().optional(),
     // Payments and delivery (V-05).
     upi_id: z.string().trim().regex(/^[A-Za-z0-9._-]{2,64}@[A-Za-z]{2,64}$/).nullable().optional(),

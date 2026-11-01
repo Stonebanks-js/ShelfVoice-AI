@@ -7,6 +7,7 @@ import { fromPostgres } from "./http";
 import { background, log } from "./log";
 import type { Owner, Shop } from "./owner";
 import { adminClient } from "./supabase";
+import { aiLanguage } from "@/i18n/dictionary";
 
 const today = () => new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10);
 
@@ -39,7 +40,7 @@ export async function restockList({ db, shop, requestId }: Owner & { shop: Shop;
   if (error) throw fromPostgres(error);
 
 
-  const language = shop.language === "en" ? "en" : "hi";
+  const language = aiLanguage(shop.language);
   // Items whose explanation still needs wording, by product ID.
   const toExplain = new Map<string, ExplainInput>();
   const items = data

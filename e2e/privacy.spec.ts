@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localSupabase, signInToSampleShop } from "./support";
+import { blockingViolations, chooseLanguage, darkMode, localSupabase, signInToSampleShop } from "./support";
 
 // F-14 review gate: the privacy page says where data lives (Seoul, errata
 // E-28) and how long each kind is kept, in Hindi and English, and is linked
@@ -36,13 +36,13 @@ test("the privacy page reads in Hindi, from the link or the switch", async ({ pa
   await expect(page.locator("main").locator("xpath=ancestor-or-self::*[@lang][1]")).toHaveAttribute("lang", "hi");
   expect(await blockingViolations(page)).toEqual([]);
 
-  await page.getByRole("radio", { name: "English" }).click();
+  await chooseLanguage(page, "English");
   await expectEnglish(page);
 });
 
 test("sign-in links to the privacy page", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("radio", { name: "English" }).click();
+  await chooseLanguage(page, "English");
   await page.getByRole("link", { name: "Privacy" }).click();
   await page.waitForURL("/privacy?lang=en");
   await expectEnglish(page);

@@ -3,11 +3,10 @@
 import { ChevronLeft, CircleAlert } from "lucide-react";
 import Link from "next/link";
 
+import { LanguagePicker } from "@/components/shell/language-picker";
 import { GoogleMark } from "@/components/brand/google-mark";
 import { VoiceBars } from "@/components/shell/mic-button";
 import { buttonClass } from "@/components/ui/button";
-import { Segmented } from "@/components/ui/controls";
-import type { Lang } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 
 // What the app does, shown rather than listed: a spoken line becomes two
@@ -41,7 +40,7 @@ function Example() {
 }
 
 export function OwnerSignIn({ failed }: { failed: boolean }) {
-  const { lang, setLang, t } = useLang();
+  const { lang, t } = useLang();
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
@@ -50,16 +49,7 @@ export function OwnerSignIn({ failed }: { failed: boolean }) {
           <ChevronLeft aria-hidden className="size-5" />
           {t("action.back")}
         </Link>
-        <Segmented<Lang>
-          label={t("lang.label")}
-          value={lang}
-          onValueChange={setLang}
-          className="w-44"
-          options={[
-            { value: "en", label: "English" },
-            { value: "hi", label: <span lang="hi">हिन्दी</span> },
-          ]}
-        />
+        <LanguagePicker />
       </div>
 
       <div className="flex flex-1 flex-col justify-center gap-8 py-10">

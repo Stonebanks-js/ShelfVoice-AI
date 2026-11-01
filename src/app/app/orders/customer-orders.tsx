@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/controls";
 import { EmptyState, PageHeader } from "@/components/ui/feedback";
 import { AlertDialog, Sheet } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import type { MessageKey } from "@/i18n/dictionary";
+import { localeFor, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { formatPhone, formatRupees } from "@/lib/changes-view";
@@ -96,7 +96,7 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
   const have = items.filter((i) => i.status !== "UNAVAILABLE");
   const total = have.reduce((sum, i) => sum + (i.price_paise ?? 0) * i.qty, 0) + order.delivery_fee_paise;
   const refunded = order.order_refunds.reduce((sum, r) => sum + r.amount_paise, 0);
-  const time = new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(new Date(order.created_at));
+  const time = new Intl.DateTimeFormat(localeFor(lang), { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(new Date(order.created_at));
 
   // The message the customer most needs right now, ready to send.
   const waKey: MessageKey | null =
