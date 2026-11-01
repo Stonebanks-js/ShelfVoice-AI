@@ -27,6 +27,7 @@ export interface Storefront {
   timezone: string;
   hours: Hours;
   language: Lang;
+  delivers: boolean;
   products: StorefrontProduct[];
 }
 
@@ -58,6 +59,7 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
     timezone: shop.timezone,
     hours: asHours(shop.hours),
     language: shop.language === "en" ? "en" : "hi",
+    delivers: shop.delivers ?? false,
     products: data
       .filter((row) => row.product_id && row.product_name)
       .map((row) => ({

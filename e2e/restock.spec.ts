@@ -2,22 +2,24 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-07 review gate: the order list (O-7) against the local database. AI
+// F-07 review gate: the restock list (O-7, under My shop since V-04) against
+// the local database. AI
 // wording runs in recorded mode here, so every reason is the template
 // sentence, which quotes the same numbers.
 
 test.skip(!localSupabase, "needs the local Supabase stack");
 
-async function openOrders(page: Page) {
+async function openRestock(page: Page) {
   await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
-  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Orders" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Orders" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "My shop" }).click();
+  await page.getByRole("link", { name: "Restock list" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Restock" })).toBeVisible({ timeout: 15_000 });
   return shop.id;
 }
 
 test("the customer-flagged atta leads, with a quantity and a reason", async ({ page }) => {
-  await openOrders(page);
+  await openRestock(page);
   const first = page.getByRole("listitem").first();
   await expect(first.getByRole("heading", { level: 2 })).toContainText("Aashirvaad Atta");
   await expect(first).toContainText("Customers asked");
@@ -36,7 +38,7 @@ test("Share sends the list as a message", async ({ page }) => {
       (window as unknown as { shared: string[] }).shared.push(data?.text ?? "");
     };
   });
-  await openOrders(page);
+  await openRestock(page);
   await page.getByRole("button", { name: "Share" }).click();
   const text = await page.evaluate(() => (window as unknown as { shared: string[] }).shared[0]);
   expect(text).toContain("Order for Sharma Kirana Store");
@@ -44,7 +46,7 @@ test("Share sends the list as a message", async ({ page }) => {
 });
 
 test("Delivery arrived adds stock and takes the item off the list", async ({ page }) => {
-  const shopId = await openOrders(page);
+  const shopId = await openRestock(page);
   const atta = page.getByRole("listitem").filter({ hasText: "Aashirvaad Atta" });
   await atta.getByRole("button", { name: "Delivery arrived" }).click();
   const sheet = page.getByRole("dialog", { name: "Delivery arrived" });
@@ -66,7 +68,7 @@ test("Delivery arrived adds stock and takes the item off the list", async ({ pag
 
 test("a new shop has nothing to order, then warns at its own level", async ({ page }) => {
   await signInAsNewOwner(page);
-  await page.goto("/app/orders");
+  await page.goto("/app/restock");
   await expect(page.getByRole("heading", { name: "Nothing to order right now" })).toBeVisible();
 
   // Added by tap with 1 left and a warning level of 2: cold start, no

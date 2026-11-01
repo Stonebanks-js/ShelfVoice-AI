@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clock, Download, ExternalLink, Languages, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2 } from "lucide-react";
+import { Check, Clock, Download, ExternalLink, Languages, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2, Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
@@ -36,6 +36,7 @@ export interface OwnerShop {
   pincode: string | null;
   lat: number | null;
   lng: number | null;
+  delivers: boolean;
 }
 
 export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; origin: string; productCount: number }) {
@@ -56,6 +57,19 @@ export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; or
       toast.show({ message: t(on ? "shop.publishedOn" : "shop.publishedOff") });
     } catch (failure) {
       setPublished(!on);
+      toast.show({ message: t(errorKey(failure)) });
+    }
+  }
+
+  // V-04: customers can choose home delivery only when the shop delivers.
+  const [delivers, setDelivers] = useState(shop.delivers);
+  async function toggleDelivers(on: boolean) {
+    setDelivers(on);
+    try {
+      await api("/api/v1/shops/me", { method: "PATCH", json: { delivers: on } });
+      router.refresh();
+    } catch (failure) {
+      setDelivers(!on);
       toast.show({ message: t(errorKey(failure)) });
     }
   }
@@ -144,6 +158,7 @@ export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; or
         <ListGroup header={t("shop.products")}>
           <ListRow icon={<Package />} title={t("shop.allProducts")} value={<span className="tabular-nums">{productCount}</span>} href="/app/stock" />
           <ListRow icon={<ListPlus />} title={t("add.title")} href="/app/add" />
+          <ListRow icon={<Truck />} title={t("shop.restock")} href="/app/restock" />
         </ListGroup>
 
         <ListGroup header={t("shop.page")} footer={t("shop.publishedNote")}>
@@ -154,6 +169,12 @@ export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; or
             accessory={<Switch checked={published} onCheckedChange={togglePublished} labelledBy="published-title" />}
           />
           <ListRow icon={<QrCode />} title={t("shop.qr")} onClick={() => setSheet("qr")} />
+          <ListRow
+            icon={<Truck />}
+            title={t("shop.delivers")}
+            titleId="delivers-title"
+            accessory={<Switch checked={delivers} onCheckedChange={toggleDelivers} labelledBy="delivers-title" />}
+          />
         </ListGroup>
 
         <ListGroup header={t("shop.details")}>

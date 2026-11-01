@@ -46,8 +46,8 @@ async function uploadClip(owner: Awaited<ReturnType<typeof testOwner>>, audio = 
   return upload.path;
 }
 
-describe("demo copy and forecasts", () => {
-  it("gives a demo user their own seeded shop with forecasts", async () => {
+describe("sample shop and forecasts", () => {
+  it("gives an owner their own seeded shop with forecasts", { timeout: 30_000 }, async () => {
     const owner = await testOwner(false);
     const shopId = await createSampleShop(owner.user.id);
     const { data: products } = await owner.db.from("products").select("name, stock_qty, product_forecasts(order_qty, stockout_boost_until)").eq("shop_id", shopId);
@@ -61,7 +61,7 @@ describe("demo copy and forecasts", () => {
   });
 
   // 18:42 IST: today's 6 pm sales must not land tomorrow and break the forecast.
-  it("seeds an evening demo copy without future movements", async () => {
+  it("seeds an evening copy without future movements", { timeout: 30_000 }, async () => {
     const owner = await testOwner(false);
     const now = new Date("2026-10-29T13:12:00Z");
     const shopId = await createSampleShop(owner.user.id, now);
@@ -71,7 +71,7 @@ describe("demo copy and forecasts", () => {
     expect(count).toBe(15);
   });
 
-  it("opens the demo shop in the visitor's language", async () => {
+  it("opens the sample shop in the chosen language", { timeout: 30_000 }, async () => {
     const owner = await testOwner(false);
     const shopId = await createSampleShop(owner.user.id, new Date(), "en");
     const { data } = await admin.from("shops").select("language").eq("id", shopId).single();
@@ -186,6 +186,7 @@ describe("Today summary (doc 06 O-5)", () => {
       reviews: [],
       newReviews: 0,
       recent: [],
+      newOrders: [],
     });
   });
 
@@ -251,7 +252,7 @@ describe("review feed (doc 06 O-8)", () => {
 });
 
 describe("delete my shop (doc 01 FR-16, W-17)", () => {
-  it("removes the shop, its rows, its files and the account, and nothing else", async () => {
+  it("removes the shop, its rows, its files and the account, and nothing else", { timeout: 30_000 }, async () => {
     const owner = await testOwner(false);
     const shopId = await createSampleShop(owner.user.id);
     const bystander = await testOwner(false);

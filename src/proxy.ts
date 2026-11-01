@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   // round trip (doc 06: the storefront and review page load in 15 seconds or
   // less on a phone).
   const path = request.nextUrl.pathname;
-  if (path.startsWith("/s/") || path.startsWith("/r/") || path === "/privacy" || path === "/shops") {
+  if (path.startsWith("/s/") || path.startsWith("/r/") || path === "/privacy" || path === "/shops" || path.startsWith("/o/")) {
     const response = NextResponse.next({ request: { headers } });
     response.headers.set("x-request-id", requestId);
     return response;

@@ -34,7 +34,7 @@ test("shows today's sales, what's running low and new reviews", async ({ page })
   expect(await blockingViolations(page)).toEqual([]);
 
   await firstLow.click();
-  await expect(page).toHaveURL("/app/orders");
+  await expect(page).toHaveURL("/app/restock");
   await page.goBack();
   await page.getByRole("link", { name: "Sharma Kirana Store" }).click();
   await expect(page).toHaveURL("/app/shop");

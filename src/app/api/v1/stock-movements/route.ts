@@ -24,6 +24,28 @@ const Body = z
 export const POST = route(async (request, _ctx, { requestId }) => {
   const { db, shop } = await requireShop();
   const body = await readJson(request, Body);
+
+  // A count on an item not counted before starts tracking it: the stock
+  // trigger ignores movements on uncounted items, so the first count is set
+  // directly, as confirm_proposal does for set_stock_count.
+  if (body.kind === "CORRECTION") {
+    const { data: product } = await db.from("products").select("stock_qty").eq("id", body.product_id).eq("shop_id", shop.id).maybeSingle();
+    if (product && product.stock_qty === null) {
+      const count = Math.max(body.qty, 0);
+      const { error: startError } = await db.from("products").update({ stock_qty: count, is_in_stock: count > 0 }).eq("id", body.product_id).is("stock_qty", null);
+      if (startError) throw fromPostgres(startError);
+      after(async () => {
+        refreshStorefront(shop.slug);
+        try {
+          await refreshForecasts(shop.id, [body.product_id]);
+        } catch (error) {
+          log("error", "forecast.refresh_failed", { requestId, shopId: shop.id, error });
+        }
+      });
+      return Response.json({ movement: null, startedCount: count }, { status: 201 });
+    }
+  }
+
   const { data, error } = await db
     .from("stock_movements")
     .insert({ ...body, shop_id: shop.id, source: "TAP" })

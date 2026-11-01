@@ -95,7 +95,7 @@ test.describe("with the local stack", () => {
     const violations = watchCsp(page);
     await signInToSampleShop(page);
     const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { slug: string } }>));
-    for (const path of ["/app", "/app/stock", "/app/orders", "/app/reviews", "/app/shop", "/app/camera"]) {
+    for (const path of ["/app", "/app/stock", "/app/orders", "/app/restock", "/app/reviews", "/app/shop", "/app/camera"]) {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
     }

@@ -55,10 +55,18 @@ export const serverSchema = clientSchema
 
     RELEASE: z.string().default("dev"),
 
+    // Web push for new-order notifications (V-04): a VAPID key pair made
+    // for this app. Without it, order alerts are simply not offered.
+    VAPID_PUBLIC_KEY: z.preprocess(emptyAsUndefined, z.string().regex(/^[A-Za-z0-9_-]{80,100}$/).optional()),
+    VAPID_PRIVATE_KEY: z.preprocess(emptyAsUndefined, z.string().regex(/^[A-Za-z0-9_-]{40,50}$/).optional()),
+
     // The Playwright journeys' sample-shop route (E-36). Never on a deploy.
     E2E_TEST_ROUTES: z.enum(["1"]).optional(),
   })
   .superRefine((env, ctx) => {
+    if (Boolean(env.VAPID_PUBLIC_KEY) !== Boolean(env.VAPID_PRIVATE_KEY)) {
+      ctx.addIssue({ code: "custom", path: ["VAPID_PRIVATE_KEY"], message: "set both VAPID keys, or neither" });
+    }
     if (deployed && env.E2E_TEST_ROUTES) {
       ctx.addIssue({ code: "custom", path: ["E2E_TEST_ROUTES"], message: "test routes are never allowed on a deploy" });
     }

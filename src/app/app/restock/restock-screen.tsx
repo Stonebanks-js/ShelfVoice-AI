@@ -16,7 +16,7 @@ import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
 import type { RestockItem } from "@/server/restock";
 
-export function OrdersScreen({ items, shopName }: { items: RestockItem[]; shopName: string }) {
+export function RestockScreen({ items, shopName }: { items: RestockItem[]; shopName: string }) {
   const { t } = useLang();
   const toast = useToast();
   const [delivering, setDelivering] = useState<RestockItem | null>(null);
@@ -46,7 +46,7 @@ export function OrdersScreen({ items, shopName }: { items: RestockItem[]; shopNa
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-4">
       <PageHeader
-        title={t("tab.orders")}
+        title={t("orders.restock")}
         subtitle={items.length ? t("orders.count", { n: items.length }) : undefined}
         trailing={
           <div className="flex gap-2">

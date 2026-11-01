@@ -11,7 +11,7 @@ async function expectEnglish(page: Page) {
   await expect(page.getByText("Everything we keep is stored with Supabase in Seoul, South Korea. It is not stored in India.")).toBeVisible();
   const owners = page.getByRole("region", { name: "If you run a shop" });
   await expect(owners.getByRole("listitem").filter({ hasText: "Voice notes" })).toContainText("Audio 7 days, words 90 days");
-  const customers = page.getByRole("region", { name: "If you visit a shop or leave a review" });
+  const customers = page.getByRole("region", { name: "If you visit a shop, order or leave a review" });
   await expect(customers.getByRole("listitem").filter({ hasText: "Voice reviews" })).toContainText("Audio 30 days");
   await expect(customers.getByRole("listitem").filter({ hasText: "Your internet address" })).toContainText("7 days");
 }

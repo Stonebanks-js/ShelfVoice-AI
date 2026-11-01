@@ -103,6 +103,58 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"order_items": {
+                  Row: {
+                    "id": string,"name": string,"order_id": string,"position": number,"price_paise": number | null,"product_id": string | null,"qty": number,"shop_id": string,"status": Database["public"]['Enums']["order_item_status"],"unit": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: string,"name": string,"order_id": string,"position": number,"price_paise"?: number | null,"product_id"?: string | null,"qty": number,"shop_id": string,"status"?: Database["public"]['Enums']["order_item_status"],"unit"?: string | null
+                  }
+                  Update: {
+                    "id"?: string,"name"?: string,"order_id"?: string,"position"?: number,"price_paise"?: number | null,"product_id"?: string | null,"qty"?: number,"shop_id"?: string,"status"?: Database["public"]['Enums']["order_item_status"],"unit"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "order_items_order_id_shop_id_fkey"
+      columns: ["order_id","shop_id"]
+isOneToOne: false
+      referencedRelation: "orders"
+      referencedColumns: ["id","shop_id"]
+    },{
+      foreignKeyName: "order_items_product_id_shop_id_fkey"
+      columns: ["product_id","shop_id"]
+isOneToOne: false
+      referencedRelation: "products"
+      referencedColumns: ["id","shop_id"]
+    }
+                  ]
+                },"orders": {
+                  Row: {
+                    "address": string | null,"code": string,"created_at": string,"customer_name": string,"customer_phone": string,"fulfilment": Database["public"]['Enums']["fulfilment"],"id": string,"ip_hash": string | null,"note": string | null,"shop_id": string,"status": Database["public"]['Enums']["order_status"],"token_hash": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "address"?: string | null,"code": string,"created_at"?: string,"customer_name": string,"customer_phone": string,"fulfilment": Database["public"]['Enums']["fulfilment"],"id"?: string,"ip_hash"?: string | null,"note"?: string | null,"shop_id": string,"status"?: Database["public"]['Enums']["order_status"],"token_hash": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "address"?: string | null,"code"?: string,"created_at"?: string,"customer_name"?: string,"customer_phone"?: string,"fulfilment"?: Database["public"]['Enums']["fulfilment"],"id"?: string,"ip_hash"?: string | null,"note"?: string | null,"shop_id"?: string,"status"?: Database["public"]['Enums']["order_status"],"token_hash"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "orders_shop_id_fkey"
+      columns: ["shop_id"]
+isOneToOne: false
+      referencedRelation: "public_storefront"
+      referencedColumns: ["shop_id"]
+    },{
+      foreignKeyName: "orders_shop_id_fkey"
+      columns: ["shop_id"]
+isOneToOne: false
+      referencedRelation: "shops"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"product_forecasts": {
                   Row: {
                     "computed_at": string,"days_left": number | null,"explanation": string | null,"explanation_lang": string | null,"explanation_on": string | null,"festival": string | null,"level": number,"order_qty": number | null,"product_id": string,"reorder_point": number | null,"shop_id": string,"sigma": number,"stockout_boost_until": string | null
@@ -187,6 +239,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"push_subscriptions": {
+                  Row: {
+                    "auth": string,"created_at": string,"endpoint": string,"id": string,"p256dh": string,"shop_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auth": string,"created_at"?: string,"endpoint": string,"id"?: string,"p256dh": string,"shop_id": string
+                  }
+                  Update: {
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"id"?: string,"p256dh"?: string,"shop_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "push_subscriptions_shop_id_fkey"
+      columns: ["shop_id"]
+isOneToOne: false
+      referencedRelation: "public_storefront"
+      referencedColumns: ["shop_id"]
+    },{
+      foreignKeyName: "push_subscriptions_shop_id_fkey"
+      columns: ["shop_id"]
+isOneToOne: false
+      referencedRelation: "shops"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"rate_limits": {
                   Row: {
                     "count": number,"key": string,"window_start": string
@@ -229,14 +307,14 @@ isOneToOne: false
                   ]
                 },"shops": {
                   Row: {
-                    "address": string | null,"category": string | null,"created_at": string,"demo_expires_at": string | null,"description": string | null,"hours": Json | null,"id": string,"is_demo": boolean,"is_published": boolean,"language": string,"lat": number | null,"lead_time_days": number,"lng": number | null,"name": string,"owner_id": string,"phone": string | null,"pincode": string | null,"review_period_days": number,"slug": string,"timezone": string,"updated_at": string
+                    "address": string | null,"category": string | null,"created_at": string,"delivers": boolean,"demo_expires_at": string | null,"description": string | null,"hours": Json | null,"id": string,"is_demo": boolean,"is_published": boolean,"language": string,"lat": number | null,"lead_time_days": number,"lng": number | null,"name": string,"owner_id": string,"phone": string | null,"pincode": string | null,"review_period_days": number,"slug": string,"timezone": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lat"?: number | null,"lead_time_days"?: number,"lng"?: number | null,"name": string,"owner_id": string,"phone"?: string | null,"pincode"?: string | null,"review_period_days"?: number,"slug": string,"timezone"?: string,"updated_at"?: string
+                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"delivers"?: boolean,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lat"?: number | null,"lead_time_days"?: number,"lng"?: number | null,"name": string,"owner_id": string,"phone"?: string | null,"pincode"?: string | null,"review_period_days"?: number,"slug": string,"timezone"?: string,"updated_at"?: string
                   }
                   Update: {
-                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lat"?: number | null,"lead_time_days"?: number,"lng"?: number | null,"name"?: string,"owner_id"?: string,"phone"?: string | null,"pincode"?: string | null,"review_period_days"?: number,"slug"?: string,"timezone"?: string,"updated_at"?: string
+                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"delivers"?: boolean,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lat"?: number | null,"lead_time_days"?: number,"lng"?: number | null,"name"?: string,"owner_id"?: string,"phone"?: string | null,"pincode"?: string | null,"review_period_days"?: number,"slug"?: string,"timezone"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -292,7 +370,7 @@ isOneToOne: false
                   ]
                 },"public_storefront": {
                   Row: {
-                    "address": string | null,"hours": Json | null,"image_path": string | null,"in_stock": boolean | null,"language": string,"phone": string | null,"price_paise": number | null,"product_category": string | null,"product_id": string | null,"product_name": string | null,"shop_category": string | null,"shop_description": string | null,"shop_id": string,"shop_name": string,"slug": string,"timezone": string,"unit": string | null
+                    "address": string | null,"delivers": boolean,"hours": Json | null,"image_path": string | null,"in_stock": boolean | null,"language": string,"phone": string | null,"price_paise": number | null,"product_category": string | null,"product_id": string | null,"product_name": string | null,"shop_category": string | null,"shop_description": string | null,"shop_id": string,"shop_name": string,"slug": string,"timezone": string,"unit": string | null
                   }
                   ComputedFields: never
                   Relationships: [
@@ -308,6 +386,9 @@ isOneToOne: false
 { Args: { "p_shop_id"?: string }; Returns: {
               "shop_today_usd": number,"today_usd": number,"total_usd": number
             }[]
+                           },
+"complete_order":
+{ Args: { "p_order_id": string }; Returns: undefined
                            },
 "confirm_proposal":
 { Args: { "p_changes": Json,"p_proposal_id": string }; Returns: Json
@@ -325,7 +406,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "ai_job": "SETUP_EXTRACTION"|"COMMAND"|"BILL"|"SHELF"|"REVIEW"|"EXPLANATION"|"TRANSCRIBE"|"SEGMENT","ai_outcome": "OK"|"SCHEMA_REJECTED"|"TIMEOUT"|"RATE_LIMITED"|"ERROR","breaker_state": "CLOSED"|"OPEN"|"HALF_OPEN","movement_kind": "SALE"|"DELIVERY"|"CORRECTION","movement_source": "VOICE"|"BILL"|"TAP"|"SEED"|"UNDO","owner_action": "CONFIRMED"|"EDITED"|"REJECTED","proposal_kind": "SETUP"|"COMMAND"|"BILL"|"SHELF","proposal_status": "PENDING"|"CONFIRMED"|"CANCELLED"|"FAILED"|"EXPIRED"|"UNDONE","review_status": "PENDING"|"ANALYZED"|"FAILED","sentiment": "POSITIVE"|"NEUTRAL"|"NEGATIVE"
+            "ai_job": "SETUP_EXTRACTION"|"COMMAND"|"BILL"|"SHELF"|"REVIEW"|"EXPLANATION"|"TRANSCRIBE"|"SEGMENT","ai_outcome": "OK"|"SCHEMA_REJECTED"|"TIMEOUT"|"RATE_LIMITED"|"ERROR","breaker_state": "CLOSED"|"OPEN"|"HALF_OPEN","fulfilment": "PICKUP"|"DELIVERY","movement_kind": "SALE"|"DELIVERY"|"CORRECTION","movement_source": "VOICE"|"BILL"|"TAP"|"SEED"|"UNDO"|"ORDER","order_item_status": "PENDING"|"AVAILABLE"|"UNAVAILABLE","order_status": "NEW"|"ACCEPTED"|"READY"|"COMPLETED"|"CANCELLED","owner_action": "CONFIRMED"|"EDITED"|"REJECTED","proposal_kind": "SETUP"|"COMMAND"|"BILL"|"SHELF","proposal_status": "PENDING"|"CONFIRMED"|"CANCELLED"|"FAILED"|"EXPIRED"|"UNDONE","review_status": "PENDING"|"ANALYZED"|"FAILED","sentiment": "POSITIVE"|"NEUTRAL"|"NEGATIVE"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -445,7 +526,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "ai_job": ["SETUP_EXTRACTION", "COMMAND", "BILL", "SHELF", "REVIEW", "EXPLANATION", "TRANSCRIBE", "SEGMENT"],"ai_outcome": ["OK", "SCHEMA_REJECTED", "TIMEOUT", "RATE_LIMITED", "ERROR"],"breaker_state": ["CLOSED", "OPEN", "HALF_OPEN"],"movement_kind": ["SALE", "DELIVERY", "CORRECTION"],"movement_source": ["VOICE", "BILL", "TAP", "SEED", "UNDO"],"owner_action": ["CONFIRMED", "EDITED", "REJECTED"],"proposal_kind": ["SETUP", "COMMAND", "BILL", "SHELF"],"proposal_status": ["PENDING", "CONFIRMED", "CANCELLED", "FAILED", "EXPIRED", "UNDONE"],"review_status": ["PENDING", "ANALYZED", "FAILED"],"sentiment": ["POSITIVE", "NEUTRAL", "NEGATIVE"]
+            "ai_job": ["SETUP_EXTRACTION", "COMMAND", "BILL", "SHELF", "REVIEW", "EXPLANATION", "TRANSCRIBE", "SEGMENT"],"ai_outcome": ["OK", "SCHEMA_REJECTED", "TIMEOUT", "RATE_LIMITED", "ERROR"],"breaker_state": ["CLOSED", "OPEN", "HALF_OPEN"],"fulfilment": ["PICKUP", "DELIVERY"],"movement_kind": ["SALE", "DELIVERY", "CORRECTION"],"movement_source": ["VOICE", "BILL", "TAP", "SEED", "UNDO", "ORDER"],"order_item_status": ["PENDING", "AVAILABLE", "UNAVAILABLE"],"order_status": ["NEW", "ACCEPTED", "READY", "COMPLETED", "CANCELLED"],"owner_action": ["CONFIRMED", "EDITED", "REJECTED"],"proposal_kind": ["SETUP", "COMMAND", "BILL", "SHELF"],"proposal_status": ["PENDING", "CONFIRMED", "CANCELLED", "FAILED", "EXPIRED", "UNDONE"],"review_status": ["PENDING", "ANALYZED", "FAILED"],"sentiment": ["POSITIVE", "NEUTRAL", "NEGATIVE"]
           }
         }
 } as const
