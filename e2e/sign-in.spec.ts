@@ -86,7 +86,7 @@ test.describe("signed-in entry", () => {
     await expect(page).toHaveURL("/app");
     // The demo shop follows the language chosen on the sign-in screen.
     await expect(page.getByRole("navigation", { name: "Main sections" })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 1, name: "Today" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Home" })).toBeVisible();
     // Signed in, the sign-in page sends the owner back to the app.
     await page.goto("/");
     await expect(page).toHaveURL("/app");

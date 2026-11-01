@@ -1,7 +1,8 @@
 "use client";
 
-import { ListPlus, Minus, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import { ChevronLeft, ListPlus, Minus, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge, Chip, Switch } from "@/components/ui/controls";
@@ -9,6 +10,7 @@ import { EmptyState, PageHeader } from "@/components/ui/feedback";
 import { SearchField, TextField } from "@/components/ui/field";
 import { IconTile } from "@/components/ui/list";
 import { AlertDialog, Sheet } from "@/components/ui/overlay";
+import { Stepper } from "@/components/ui/quantity";
 import { useToast } from "@/components/ui/toast";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
@@ -52,6 +54,48 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
     }
   }
 
+  // V-02 − / + on each row, as on Instamart: the count changes at once and
+  // taps in a row are saved as one correction (decision K2: counts change
+  // only through the movement log). A failure puts the count back.
+  const pending = useRef(new Map<string, { delta: number; before: StockProduct; timer: ReturnType<typeof setTimeout> }>());
+
+  async function flush(id: string) {
+    const entry = pending.current.get(id);
+    pending.current.delete(id);
+    if (!entry || entry.delta === 0) return;
+    clearTimeout(entry.timer);
+    try {
+      await api("/api/v1/stock-movements", {
+        json: { product_id: id, kind: "CORRECTION", qty: entry.delta, idempotency_key: crypto.randomUUID() },
+      });
+    } catch (failure) {
+      setProducts((list) => list.map((p) => (p.id === id ? entry.before : p)));
+      toast.show({ message: t(errorKey(failure)) });
+    }
+  }
+
+  function bump(product: StockProduct, by: number) {
+    const from = product.stock_qty ?? 0;
+    const to = Math.max(0, from + by);
+    if (to === from) return;
+    setProducts((list) => list.map((p) => (p.id === product.id ? { ...p, stock_qty: to, is_in_stock: to > 0 } : p)));
+    const entry = pending.current.get(product.id);
+    if (entry) clearTimeout(entry.timer);
+    pending.current.set(product.id, {
+      delta: (entry?.delta ?? 0) + (to - from),
+      before: entry?.before ?? product,
+      timer: setTimeout(() => void flush(product.id), 700),
+    });
+  }
+
+  // Leaving the screen saves any taps still waiting.
+  useEffect(() => {
+    const waiting = pending.current;
+    return () => [...waiting.keys()].forEach((id) => void flush(id));
+    // flush only reads refs and setters; run the cleanup once, on leaving.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Close the sheet before the list reloads: adding the first product swaps
   // the empty screen for the list, which would otherwise reopen it blank.
   const saved = async (message: string) => {
@@ -63,7 +107,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
   if (products.length === 0) {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-        <PageHeader title={t("tab.stock")} trailing={<AddButton onClick={() => setEditing("new")} />} />
+        <PageHeader title={t("tab.stock")} subtitle={<BackToShop />} trailing={<AddButton onClick={() => setEditing("new")} />} />
         <div className="px-4">
           <EmptyState
             icon={<Package />}
@@ -83,7 +127,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-      <PageHeader title={t("tab.stock")} subtitle={t("stock.total", { n: products.length })} trailing={<AddButton onClick={() => setEditing("new")} />} />
+      <PageHeader title={t("tab.stock")} subtitle={<BackToShop count={products.length} />} trailing={<AddButton onClick={() => setEditing("new")} />} />
       <div className="flex flex-col gap-3 px-4">
         <SearchField label={t("search.placeholder")} clearLabel={t("search.clear")} value={query} onValueChange={setQuery} />
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none]">
@@ -112,7 +156,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
               <h2 className="px-4 text-footnote font-medium text-ink-2">{group.name}</h2>
               <ul className="overflow-hidden rounded-md bg-surface shadow-card">
                 {group.items.map((p) => (
-                  <StockRow key={p.id} product={p} onEdit={() => setEditing(p)} onInStock={(on) => setInStock(p, on)} />
+                  <StockRow key={p.id} product={p} onEdit={() => setEditing(p)} onInStock={(on) => setInStock(p, on)} onStep={(by) => bump(p, by)} />
                 ))}
               </ul>
             </section>
@@ -127,6 +171,20 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
         />
       )}
     </main>
+  );
+}
+
+// Stock lives under My shop (V-02): the way back, and how many products.
+function BackToShop({ count }: { count?: number }) {
+  const { t } = useLang();
+  return (
+    <span className="flex items-center gap-1">
+      <Link href="/app/shop" className="-ml-1 inline-flex min-h-8 items-center rounded-sm pr-1 font-semibold text-accent">
+        <ChevronLeft aria-hidden className="size-4" />
+        {t("tab.shop")}
+      </Link>
+      {count !== undefined && <span>· {t("stock.total", { n: count })}</span>}
+    </span>
   );
 }
 
@@ -146,8 +204,19 @@ function AddButton({ onClick }: { onClick: () => void }) {
 }
 
 // Doc 06 StockRow: name, unit, price, stock count or in/out badge; tap to
-// edit. The switch is its own control beside the row, not inside it.
-function StockRow({ product, onEdit, onInStock }: { product: StockProduct; onEdit: () => void; onInStock: (on: boolean) => void }) {
+// edit. The switch is its own control beside the row, not inside it, and
+// the count has − / + below the name (V-02).
+function StockRow({
+  product,
+  onEdit,
+  onInStock,
+  onStep,
+}: {
+  product: StockProduct;
+  onEdit: () => void;
+  onInStock: (on: boolean) => void;
+  onStep: (by: number) => void;
+}) {
   const { t } = useLang();
   const titleId = useId();
   const forecast = Array.isArray(product.product_forecasts) ? product.product_forecasts[0] : product.product_forecasts;
@@ -157,28 +226,38 @@ function StockRow({ product, onEdit, onInStock }: { product: StockProduct; onEdi
     ((forecast?.order_qty ?? 0) > 0 || (forecast?.reorder_point == null && product.stock_qty <= product.low_stock_level));
   const meta = [product.price_paise ? formatRupees(product.price_paise) : null, product.unit].filter(Boolean).join(" · ");
   return (
-    <li className="flex items-center gap-1 pr-3 [&+li>button>span:last-child]:border-t [&+li>button>span:last-child]:border-separator">
-      <button type="button" onClick={onEdit} className="flex min-w-0 flex-1 items-center gap-3 pl-4 text-left active:bg-fill">
-        <IconTile icon={product.is_in_stock ? <Package /> : <PackageX />} tone={product.is_in_stock ? (low ? "check" : "accent") : "danger"} />
-        <span className="flex min-h-14 min-w-0 flex-1 items-center gap-2 py-2">
-          <span className="flex min-w-0 flex-1 flex-col">
-            <span id={titleId} className={cn("line-clamp-2 text-body", !product.is_in_stock && "text-ink-2")}>
-              {product.name}
+    <li className="flex flex-col border-separator pr-3 not-first:border-t">
+      <div className="flex items-center gap-1">
+        <button type="button" onClick={onEdit} className="flex min-w-0 flex-1 items-center gap-3 pl-4 text-left active:bg-fill">
+          <IconTile icon={product.is_in_stock ? <Package /> : <PackageX />} tone={product.is_in_stock ? (low ? "check" : "accent") : "danger"} />
+          <span className="flex min-h-14 min-w-0 flex-1 items-center gap-2 py-2">
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span id={titleId} className={cn("line-clamp-2 text-body", !product.is_in_stock && "text-ink-2")}>
+                {product.name}
+              </span>
+              {meta && <span className="truncate text-footnote text-ink-2">{meta}</span>}
             </span>
-            {meta && <span className="truncate text-footnote text-ink-2">{meta}</span>}
+            {!product.is_in_stock && <Badge tone="danger">{t("status.outOfStock")}</Badge>}
           </span>
-          {!product.is_in_stock ? (
-            <Badge tone="danger">{t("status.outOfStock")}</Badge>
-          ) : low ? (
-            <Badge tone="low" icon={<TriangleAlert aria-hidden />}>
-              {product.stock_qty}
-            </Badge>
-          ) : (
-            <span className="text-body text-ink-2 tabular-nums">{product.stock_qty ?? ""}</span>
-          )}
-        </span>
-      </button>
-      <Switch checked={product.is_in_stock} onCheckedChange={onInStock} label={t("stock.inStockLabel", { name: product.name })} />
+        </button>
+        <Switch checked={product.is_in_stock} onCheckedChange={onInStock} label={t("stock.inStockLabel", { name: product.name })} />
+      </div>
+      <div className="flex items-center gap-2 pb-2.5 pl-[3.75rem]">
+        <span className="text-footnote text-ink-2">{t("check.stock")}</span>
+        <Stepper
+          value={product.stock_qty}
+          onChange={(next) => onStep((next ?? 0) - (product.stock_qty ?? 0))}
+          emptyLabel={t("check.stockNone")}
+          lessLabel={t("stock.less", { name: product.name })}
+          moreLabel={t("stock.more", { name: product.name })}
+        />
+        {/* Beside the count, not the name, so long names keep their room. */}
+        {product.is_in_stock && low && (
+          <Badge tone="low" icon={<TriangleAlert aria-hidden />}>
+            {t("status.low")}
+          </Badge>
+        )}
+      </div>
     </li>
   );
 }

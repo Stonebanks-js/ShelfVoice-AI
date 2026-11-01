@@ -1,11 +1,9 @@
-import { ChevronRight, CircleAlert, Frown, Meh, ListPlus, MessageSquareText, Package, Smile, TrendingDown, TrendingUp } from "lucide-react";
+import { Camera, CircleAlert, Frown, History, Meh, MessageSquareText, Mic, Package, ReceiptText, Smile, Store, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
-import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/controls";
-import { EmptyState } from "@/components/ui/feedback";
 import { ListGroup, ListRow } from "@/components/ui/list";
 import { translate, type Lang, type MessageKey } from "@/i18n/dictionary";
 import { formatRupees } from "@/lib/changes-view";
@@ -14,9 +12,11 @@ import { ownerClient } from "@/server/supabase";
 import { todaySummary, type TodaySummary } from "@/server/today";
 
 import Loading from "./loading";
+import { ShopCard } from "./shop-card";
 
-// O-5 Today (doc 06): the daily overview. Sales so far, what's running low
-// and what customers said, each linking to its tab; the mic is in the bar.
+// O-5 Home (doc 06 Today, reshaped by V-02): the shop first, with View,
+// Share and Edit (or Build for an empty shop), then today's sales, what's
+// running low, what customers said and the latest changes.
 export default function TodayPage() {
   return (
     <Suspense fallback={<Loading />}>
@@ -37,36 +37,19 @@ async function Today() {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6">
-      {/* The shop name opens My shop (doc 06 information architecture). */}
-      <header className="flex items-end justify-between gap-4 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-2">
-        <div className="min-w-0">
-          <Link href="/app/shop" className="-mx-1 inline-flex min-h-8 items-center gap-0.5 rounded-sm px-1 text-footnote font-semibold text-accent">
-            <span className="truncate">{state.shop.name}</span>
-            <ChevronRight aria-hidden className="size-4 shrink-0" />
-          </Link>
-          <h1 className="font-display text-large-title font-bold tracking-tight">{t("tab.today")}</h1>
-        </div>
-        <p className="pb-1.5 text-footnote text-ink-2">{weekday}</p>
+      <header className="px-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
+        <p className="text-footnote font-medium text-ink-2">{t("home.today", { day: weekday })}</p>
+        <h1 className="font-display text-large-title font-bold tracking-tight">{t("tab.home")}</h1>
       </header>
 
-      {summary.productCount === 0 ? (
-        <div className="px-4">
-          <EmptyState
-            icon={<ListPlus />}
-            title={t("today.setup.title")}
-            body={t("today.setup.body")}
-            action={
-              <ButtonLink href="/app/setup" size="lg" icon={<ListPlus aria-hidden className="size-5" />}>
-                {t("today.setup.cta")}
-              </ButtonLink>
-            }
-          />
-        </div>
-      ) : (
+      <ShopCard name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
+
+      {summary.productCount > 0 && (
         <>
           <SalesCard summary={summary} weekday={weekday.split(",")[0]} t={t} />
           <LowList summary={summary} t={t} />
           <ReviewList summary={summary} lang={lang} now={now} t={t} />
+          <RecentList summary={summary} lang={lang} now={now} t={t} />
         </>
       )}
     </main>
@@ -210,3 +193,39 @@ function ReviewList({ summary, lang, now, t }: { summary: TodaySummary; lang: La
   );
 }
 
+const KIND_ICON: Record<TodaySummary["recent"][number]["kind"], ReactNode> = {
+  COMMAND: <Mic />,
+  SETUP: <Store />,
+  BILL: <ReceiptText />,
+  SHELF: <Camera />,
+};
+
+// The last few confirmed voice and photo changes, so the owner can see what
+// the app just did (V-02).
+function RecentList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
+  const when = new Intl.RelativeTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { numeric: "auto" });
+  const ago = (iso: string) => {
+    const minutes = Math.round((new Date(iso).getTime() - now.getTime()) / 60_000);
+    if (Math.abs(minutes) < 60) return when.format(minutes, "minute");
+    const hours = Math.round(minutes / 60);
+    return Math.abs(hours) < 24 ? when.format(hours, "hour") : when.format(Math.round(hours / 24), "day");
+  };
+  return (
+    <div className="px-4">
+      <ListGroup header={t("home.recent.title")}>
+        {summary.recent.length === 0 ? (
+          <ListRow icon={<History />} iconTone="gray" title={t("home.recent.none")} wrap />
+        ) : (
+          summary.recent.map((change) => (
+            <ListRow
+              key={change.id}
+              icon={KIND_ICON[change.kind]}
+              title={t(`home.recent.${change.kind}`)}
+              subtitle={`${t("toast.saved", { n: change.changes })} · ${ago(change.decidedAt)}`}
+            />
+          ))
+        )}
+      </ListGroup>
+    </div>
+  );
+}

@@ -16,6 +16,8 @@ export interface TodaySummary {
   lowCount: number;
   reviews: Array<{ id: string; sentiment: "POSITIVE" | "NEUTRAL" | "NEGATIVE" | null; summary: string | null; createdAt: string }>;
   newReviews: number;
+  // The last few voice or photo changes the owner confirmed (V-02).
+  recent: Array<{ id: string; kind: "SETUP" | "COMMAND" | "BILL" | "SHELF"; changes: number; decidedAt: string }>;
 }
 
 type Sale = { qty: number; unit_price_paise: number | null; products: { price_paise: number | null } | { price_paise: number | null }[] | null };
@@ -45,7 +47,7 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
       .lte("occurred_at", iso(to))
       .limit(5000);
 
-  const [today, lastWeek, products, reviews] = await Promise.all([
+  const [today, lastWeek, products, reviews, recent] = await Promise.all([
     sales(dayStart, now.getTime()),
     sales(lastWeekStart, lastWeekNow),
     db
@@ -64,8 +66,16 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
       .gte("created_at", iso(now.getTime() - 7 * DAY_MS))
       .order("created_at", { ascending: false })
       .limit(50),
+    db
+      .from("proposals")
+      .select("id, kind, decided_at, confirmed_changes")
+      .eq("shop_id", shopId)
+      .eq("status", "CONFIRMED")
+      .not("decided_at", "is", null)
+      .order("decided_at", { ascending: false })
+      .limit(3),
   ]);
-  for (const r of [today, lastWeek, products, reviews]) if (r.error) throw r.error;
+  for (const r of [today, lastWeek, products, reviews, recent]) if (r.error) throw r.error;
 
   const low = products
     .data!.map((p) => ({ p, f: Array.isArray(p.product_forecasts) ? p.product_forecasts[0] : p.product_forecasts }))
@@ -89,5 +99,11 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
     lowCount: low.length,
     reviews: reviews.data!.slice(0, 2).map((r) => ({ id: r.id, sentiment: r.sentiment, summary: r.summary, createdAt: r.created_at })),
     newReviews: reviews.data!.length,
+    recent: recent.data!.map((p) => ({
+      id: p.id,
+      kind: p.kind,
+      changes: Array.isArray(p.confirmed_changes) ? p.confirmed_changes.length : 0,
+      decidedAt: p.decided_at!,
+    })),
   };
 }

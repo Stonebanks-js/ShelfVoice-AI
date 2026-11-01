@@ -11,8 +11,11 @@ test.skip(!localSupabase, "needs the local Supabase stack");
 async function openStock(page: Page) {
   await signInToDemo(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
-  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Stock" }).click();
+  // Stock lives under My shop (V-02).
+  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "My shop" }).click();
+  await page.getByRole("link", { name: /^All products and stock/ }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Stock" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "My shop" })).toHaveAttribute("aria-current", "page");
   return shop.id;
 }
 
@@ -21,14 +24,14 @@ const product = (shopId: string, prefix: string) =>
 
 test("search, chips and accessibility", async ({ page }) => {
   await openStock(page);
-  await expect(page.getByText("15 products")).toBeVisible();
+  await expect(page.getByText("· 15 products").filter({ visible: true })).toBeVisible();
   expect(await blockingViolations(page)).toEqual([]);
   await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 
   await page.getByRole("searchbox", { name: "Search products" }).fill("atta");
-  await expect(page.getByRole("button", { name: /Aashirvaad Atta/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Maggi/ })).toBeHidden();
+  await expect(page.getByRole("button", { name: /^Aashirvaad Atta/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Maggi/ })).toBeHidden();
   await page.getByRole("button", { name: "Clear search" }).click();
 
   await page.getByRole("button", { name: "Dairy", pressed: false }).click();
@@ -42,13 +45,13 @@ test("the switch marks a product out of stock", async ({ page }) => {
   await expect(page.getByRole("switch", { name: /Maggi.* in stock/ })).toHaveAttribute("aria-checked", "false");
   await expect.poll(async () => (await product(shopId, "Maggi")).data?.is_in_stock).toBe(false);
   await page.getByRole("button", { name: "Out of stock", exact: true }).click();
-  await expect(page.getByRole("button", { name: /Maggi/ })).toContainText("Out of stock");
+  await expect(page.getByRole("button", { name: /^Maggi/ })).toContainText("Out of stock");
 });
 
 test("a tap edit changes the price and records the count as a correction", async ({ page }) => {
   const shopId = await openStock(page);
   const before = (await product(shopId, "Maggi")).data!;
-  await page.getByRole("button", { name: /Maggi/ }).click();
+  await page.getByRole("button", { name: /^Maggi/ }).click();
   const sheet = page.getByRole("dialog", { name: "Edit product" });
   await sheet.getByLabel("Price (₹)").fill("16");
   await sheet.getByRole("button", { name: "One more" }).click();
@@ -61,12 +64,26 @@ test("a tap edit changes the price and records the count as a correction", async
   expect(after.stock_qty).toBe(before.stock_qty! + 2);
   const { data: moves } = await localAdmin().from("stock_movements").select("kind, qty, source").eq("product_id", after.id).eq("source", "TAP");
   expect(moves).toEqual([{ kind: "CORRECTION", qty: 2, source: "TAP" }]);
-  await expect(page.getByRole("button", { name: /Maggi/ })).toContainText("₹16");
+  await expect(page.getByRole("button", { name: /^Maggi/ })).toContainText("₹16");
+});
+
+test("− and + on a row change the count, saved as one correction", async ({ page }) => {
+  const shopId = await openStock(page);
+  const before = (await product(shopId, "Maggi")).data!;
+  const row = page.getByRole("listitem").filter({ has: page.getByRole("button", { name: /^Maggi/ }) });
+  await row.getByRole("button", { name: /^One more Maggi/ }).click();
+  await row.getByRole("button", { name: /^One more Maggi/ }).click();
+  await row.getByRole("button", { name: /^One less Maggi/ }).click();
+  await expect(row.getByRole("status")).toHaveText(String(before.stock_qty! + 1));
+  await expect.poll(async () => (await product(shopId, "Maggi")).data?.stock_qty).toBe(before.stock_qty! + 1);
+  const { data: moves } = await localAdmin().from("stock_movements").select("kind, qty").eq("product_id", before.id).eq("source", "TAP");
+  expect(moves).toEqual([{ kind: "CORRECTION", qty: 1 }]);
+  expect(await blockingViolations(page)).toEqual([]);
 });
 
 test("a wild price is refused with a reason", async ({ page }) => {
   await openStock(page);
-  await page.getByRole("button", { name: /Maggi/ }).click();
+  await page.getByRole("button", { name: /^Maggi/ }).click();
   const sheet = page.getByRole("dialog", { name: "Edit product" });
   await sheet.getByLabel("Price (₹)").fill("9999");
   await sheet.getByRole("button", { name: "Save" }).click();
@@ -83,7 +100,7 @@ test("add a product by tap, then remove it", async ({ page }) => {
   await sheet.getByLabel("Count on the shelf").fill("10");
   await sheet.getByRole("button", { name: "Save" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Tata Tea Gold added" })).toBeVisible();
-  const row = page.getByRole("button", { name: /Tata Tea Gold/ });
+  const row = page.getByRole("button", { name: /^Tata Tea Gold/ });
   await expect(row).toContainText("₹120 · 250 g");
   expect((await product(shopId, "Tata Tea Gold")).data).toMatchObject({ price_paise: 12_000, stock_qty: 10 });
 
@@ -114,6 +131,6 @@ test("a confirmed voice change shows up on the Stock row", async ({ page }) => {
   await page.goto(`/app/check/${proposal!.id}`);
   await page.getByRole("button", { name: "Confirm 1 change" }).click();
   await expect(page).toHaveURL("/app");
-  await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Stock" }).click();
-  await expect(page.getByRole("button", { name: /Maggi/ })).toContainText("77");
+  await page.goto("/app/stock");
+  await expect(page.getByRole("listitem").filter({ has: page.getByRole("button", { name: /^Maggi/ }) })).toContainText("77");
 });
