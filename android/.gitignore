@@ -1,0 +1,11 @@
+# Build outputs and signed apps: rebuilt with `bubblewrap build`.
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.aab
+*.idsig
+# The signing key lives in ~/.shelfvoice-android, never here.
+*.keystore
+*.jks

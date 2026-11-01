@@ -77,6 +77,16 @@ Data is stored with **Supabase in Seoul, South Korea** (ap-northeast-2), not in 
 
 The full policy, in Hindi and English, is at [/privacy](https://shelfvoice.vercel.app/privacy).
 
+## On Android
+
+**Install from Chrome.** Open https://shelfvoice.vercel.app in Chrome and choose **Install app** (in the ⋮ menu if no banner shows). It opens full screen from the home screen; long-press the icon for Orders and Nearby shops.
+
+**The APK.** `android/` is a Trusted Web Activity made with Google's [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap): a small Android app that opens the live site full screen in Chrome, so Google sign-in, the mic, camera, UPI apps and order notifications work as on the web, and every release reaches it without a new APK. `public/.well-known/assetlinks.json` holds the signing key's public fingerprint, which is how Chrome knows the app belongs to the site and hides the address bar.
+
+- Package `app.vercel.shelfvoice.twa`, Android 5.0 and up. Install the APK on a phone by sending it over and allowing **Install unknown apps** for the app that opens it.
+- Rebuild after changing the manifest or icons: `node scripts/android-project.mjs` (reads the live manifest; pass `http://localhost:3200/manifest.webmanifest` to use a local build), then `cd android && bubblewrap build --skipPwaValidation`. Bubblewrap needs JDK 17 and the Android SDK (build-tools 36.1.0), set in `~/.bubblewrap/config.json`.
+- The signing key is kept outside the repo, in `~/.shelfvoice-android/` with its password; every future update must be signed with it, so keep a backup. For Google Play, upload `app-release-bundle.aab`; with Play App Signing, add Play's app-signing fingerprint to `assetlinks.json` as well.
+
 ## Local setup
 
 Requirements: Node 24 (pinned in `.nvmrc`; `fnm use` picks it up), pnpm, Docker Desktop running, Git.
