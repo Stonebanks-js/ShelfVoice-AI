@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { LangProvider } from "@/i18n/lang";
 import { orderForCustomer } from "@/server/orders";
+import { currentUser } from "@/server/owner";
 import { requestLang } from "@/server/session";
 
 import { OrderStatusView } from "./order-status";
@@ -21,7 +22,8 @@ export default function OrderPage({ params, searchParams }: PageProps<"/o/[id]">
 async function Order({ params, searchParams }: Pick<PageProps<"/o/[id]">, "params" | "searchParams">) {
   const [{ id }, query] = await Promise.all([params, searchParams]);
   const token = typeof query.t === "string" ? query.t : "";
-  const order = await orderForCustomer(id, token);
+  const user = await currentUser();
+  const order = await orderForCustomer(id, token, user?.user.id ?? null);
   const lang = order ? (order.shop.language === "en" ? "en" : "hi") : await requestLang();
   return (
     <LangProvider initial={lang}>

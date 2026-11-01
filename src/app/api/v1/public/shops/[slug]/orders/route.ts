@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ipHash, limit, verifyTurnstile } from "@/server/abuse";
 import { readJson, route } from "@/server/http";
 import { NewOrder, placeOrder } from "@/server/orders";
+import { currentUser } from "@/server/owner";
 
 const Body = z.object({ order: NewOrder, turnstileToken: z.string().max(2048) }).strict();
 
@@ -15,5 +16,7 @@ export const POST = route(async (request, ctx: RouteContext<"/api/v1/public/shop
   const { order, turnstileToken } = await readJson(request, Body);
   await verifyTurnstile(turnstileToken, request);
   await limit(`orders:shop:${slug}`, 300, 86_400);
-  return Response.json(await placeOrder(slug, order, ip, requestId), { status: 201 });
+  // A signed-in customer's order also shows in their Account (V-05).
+  const customer = await currentUser();
+  return Response.json(await placeOrder(slug, order, ip, requestId, customer?.user.id ?? null), { status: 201 });
 });

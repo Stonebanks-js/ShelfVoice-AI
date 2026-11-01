@@ -29,6 +29,14 @@ const Patch = z
     hours: Hours.nullable().optional(),
     language: z.enum(["hi", "en"]).optional(),
     delivers: z.boolean().optional(),
+    // Payments and delivery (V-05).
+    upi_id: z.string().trim().regex(/^[A-Za-z0-9._-]{2,64}@[A-Za-z]{2,64}$/).nullable().optional(),
+    accepts_cash: z.boolean().optional(),
+    pay_on_delivery: z.boolean().optional(),
+    delivery_min_paise: z.number().int().min(0).max(10_000_000).nullable().optional(),
+    delivery_fee_paise: z.number().int().min(0).max(1_000_000).nullable().optional(),
+    free_delivery_above_paise: z.number().int().min(0).max(10_000_000).nullable().optional(),
+    delivery_radius_km: z.number().min(0.5).max(50).nullable().optional(),
     ...ShopLocation,
   })
   .strict()

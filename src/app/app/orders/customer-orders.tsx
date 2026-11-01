@@ -1,13 +1,15 @@
 "use client";
 
-import { Bell, BellOff, Check, CircleAlert, Inbox, MapPin, MessageCircle, Phone, Store, X } from "lucide-react";
+import { Check, CircleAlert, Inbox, MapPin, MessageCircle, Phone, RotateCcw, Store, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
+import { OrderAlerts } from "@/components/shell/order-alerts";
 import { Button } from "@/components/ui/button";
+import { TextField } from "@/components/ui/field";
 import { Badge } from "@/components/ui/controls";
 import { EmptyState, PageHeader } from "@/components/ui/feedback";
-import { AlertDialog } from "@/components/ui/overlay";
+import { AlertDialog, Sheet } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
@@ -28,6 +30,8 @@ export interface OwnerOrder {
   address: string | null;
   note: string | null;
   created_at: string;
+  delivery_fee_paise: number;
+  order_refunds: Array<{ amount_paise: number; reason: string; created_at: string }>;
   order_items: Array<{ id: string; name: string; unit: string | null; price_paise: number | null; qty: number; status: "PENDING" | "AVAILABLE" | "UNAVAILABLE" }>;
 }
 
@@ -56,7 +60,7 @@ export function CustomerOrders({ orders, shopName, vapidKey }: { orders: OwnerOr
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-6">
       <PageHeader title={t("tab.orders")} />
-      {vapidKey && <AlertsSwitch vapidKey={vapidKey} />}
+      {vapidKey && <OrderAlerts vapidKey={vapidKey} />}
       {groups.length === 0 ? (
         <div className="px-4">
           <EmptyState icon={<Inbox />} title={t("orders.none")} body={t("orders.noneBody")} />
@@ -86,10 +90,12 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
   const [items, setItems] = useState(order.order_items);
   const [busy, setBusy] = useState<Status | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [refunding, setRefunding] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const editable = order.status === "NEW" || order.status === "ACCEPTED";
   const have = items.filter((i) => i.status !== "UNAVAILABLE");
-  const total = have.reduce((sum, i) => sum + (i.price_paise ?? 0) * i.qty, 0);
+  const total = have.reduce((sum, i) => sum + (i.price_paise ?? 0) * i.qty, 0) + order.delivery_fee_paise;
+  const refunded = order.order_refunds.reduce((sum, r) => sum + r.amount_paise, 0);
   const time = new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(new Date(order.created_at));
 
   // The message the customer most needs right now, ready to send.
@@ -197,7 +203,20 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
           </li>
         ))}
       </ul>
-      {total > 0 && <p className="text-body font-semibold tabular-nums">{t("orders.total", { total: formatRupees(total) })}</p>}
+      {total > 0 && (
+        <p className="text-body font-semibold tabular-nums">
+          {t("orders.total", { total: formatRupees(total) })}
+          {order.delivery_fee_paise > 0 && (
+            <span className="font-normal text-ink-2"> · {t("deliv.fee", { fee: formatRupees(order.delivery_fee_paise) })}</span>
+          )}
+        </p>
+      )}
+      {order.order_refunds.map((r, i) => (
+        <p key={i} className="flex items-start gap-2 text-footnote text-success">
+          <RotateCcw aria-hidden className="mt-0.5 size-4 shrink-0" />
+          {t("order.refunded", { amount: formatRupees(r.amount_paise), reason: r.reason })}
+        </p>
+      ))}
 
       {error && (
         <p role="alert" className="flex items-start gap-2 rounded-md bg-danger-soft px-4 py-3 text-footnote text-danger">
@@ -233,6 +252,16 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
             {t("orders.message")}
           </a>
         )}
+        {!OPEN.includes(order.status) && total - refunded > 0 && (
+          <button
+            type="button"
+            onClick={() => setRefunding(true)}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-md bg-fill px-3 text-footnote font-semibold text-ink"
+          >
+            <RotateCcw aria-hidden className="size-4" />
+            {t("orders.refund")}
+          </button>
+        )}
         {OPEN.includes(order.status) && (
           <button type="button" onClick={() => setConfirmCancel(true)} className="ml-auto inline-flex min-h-11 items-center px-2 text-footnote font-semibold text-danger">
             {t("orders.cancel")}
@@ -240,6 +269,7 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
         )}
       </div>
 
+      {refunding && <RefundSheet order={order} left={total - refunded} onClose={() => setRefunding(false)} />}
       <AlertDialog
         open={confirmCancel}
         onClose={() => setConfirmCancel(false)}
@@ -255,97 +285,56 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
   );
 }
 
-// ------------------------------------------------------------- order alerts
-const noSubscribe = () => () => undefined;
-const pushSupported = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
-
-const keyBytes = (base64url: string) => {
-  const raw = atob(base64url.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - (base64url.length % 4)) % 4));
-  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
-};
-
-// "Get a notification for each new order": registers the service worker and
-// a push subscription for this phone (web push; no app to install).
-function AlertsSwitch({ vapidKey }: { vapidKey: string }) {
+// A refund on a finished order (V-05): the amount and why. The money goes
+// back in cash or by UPI; this records it for the shop and the customer.
+function RefundSheet({ order, left, onClose }: { order: OwnerOrder; left: number; onClose: () => void }) {
   const { t } = useLang();
-  const toast = useToast();
-  const supported = useSyncExternalStore(noSubscribe, pushSupported, () => false);
-  const [on, setOn] = useState<boolean | null>(null);
+  const router = useRouter();
+  const [amount, setAmount] = useState(String(left / 100));
+  const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
-  const [denied, setDenied] = useState(false);
+  const [error, setError] = useState<MessageKey | null>(null);
 
-  useEffect(() => {
-    if (!supported) return;
-    let live = true;
-    navigator.serviceWorker
-      .getRegistration("/sw.js")
-      .then((reg) => reg?.pushManager.getSubscription())
-      .then((sub) => live && setOn(Boolean(sub)))
-      .catch(() => live && setOn(false));
-    return () => {
-      live = false;
-    };
-  }, [supported]);
-
-  if (!supported || on === null) return null;
-
-  async function turnOn() {
+  async function save() {
+    const paise = Math.round(Number.parseFloat(amount.replace(/[₹,\s]/g, "")) * 100);
+    if (!(paise > 0) || !reason.trim()) return setError("error.invalidChange");
+    if (paise > left) return setError("error.refundTooBig");
     setBusy(true);
+    setError(null);
     try {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        setDenied(true);
-        return;
-      }
-      const reg = await navigator.serviceWorker.register("/sw.js");
-      await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(vapidKey) });
-      await api("/api/v1/push-subscriptions", { json: sub.toJSON() });
-      setOn(true);
+      await api(`/api/v1/orders/${order.id}/refunds`, { json: { amount_paise: paise, reason: reason.trim() } });
+      onClose();
+      router.refresh();
     } catch (failure) {
-      toast.show({ message: t(errorKey(failure)) });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function turnOff() {
-    setBusy(true);
-    try {
-      const reg = await navigator.serviceWorker.getRegistration("/sw.js");
-      const sub = await reg?.pushManager.getSubscription();
-      if (sub) {
-        await api("/api/v1/push-subscriptions", { method: "DELETE", json: { endpoint: sub.endpoint } });
-        await sub.unsubscribe();
-      }
-      setOn(false);
-    } catch (failure) {
-      toast.show({ message: t(errorKey(failure)) });
-    } finally {
+      setError(errorKey(failure));
       setBusy(false);
     }
   }
 
   return (
-    <div className="mx-4 flex flex-col gap-2 rounded-lg bg-surface p-4 shadow-card">
-      {on ? (
-        <div className="flex items-center gap-3">
-          <Bell aria-hidden className="size-5 shrink-0" />
-          <span className="flex-1 text-body">{t("orders.alertsOn")}</span>
-          <Button variant="plain" loading={busy} onClick={turnOff} icon={<BellOff aria-hidden className="size-5" />}>
-            {t("orders.alertsOff")}
+    <Sheet
+      open
+      onClose={onClose}
+      title={t("orders.refund.title", { code: order.code })}
+      doneLabel={t("action.cancel")}
+      footer={
+        <div className="flex flex-col gap-2">
+          {error && (
+            <p role="alert" className="rounded-md bg-danger-soft px-4 py-3 text-footnote text-danger">
+              {t(error)}
+            </p>
+          )}
+          <Button size="lg" loading={busy} onClick={save}>
+            {t("orders.refund")}
           </Button>
         </div>
-      ) : (
-        <Button variant="tinted" loading={busy} onClick={turnOn} icon={<Bell aria-hidden className="size-5" />}>
-          {t("orders.alerts")}
-        </Button>
-      )}
-      {denied && (
-        <p role="alert" className="text-footnote text-danger">
-          {t("orders.alertsDenied")}
-        </p>
-      )}
-    </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <p className="text-footnote text-ink-2">{t("orders.refund.note")}</p>
+        <TextField label={t("orders.refund.amount")} inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} />
+        <TextField label={t("orders.refund.reason")} value={reason} maxLength={200} onChange={(event) => setReason(event.target.value)} />
+      </div>
+    </Sheet>
   );
 }

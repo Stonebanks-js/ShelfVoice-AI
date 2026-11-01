@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, CircleAlert, LoaderCircle, MapPin, Search, Store } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleAlert, LoaderCircle, MapPin, Search, Store, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -69,10 +69,16 @@ export function ShopFinder() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <Link href="/" className="-ml-2 inline-flex min-h-11 items-center gap-1 self-start px-2 text-body font-semibold text-accent">
-        <ChevronLeft aria-hidden className="size-5" />
-        {t("action.back")}
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-body font-semibold text-accent">
+          <ChevronLeft aria-hidden className="size-5" />
+          {t("action.back")}
+        </Link>
+        <Link href="/me" className="inline-flex min-h-11 items-center gap-1.5 px-2 text-footnote font-semibold text-accent">
+          <UserRound aria-hidden className="size-5" />
+          {t("store.account")}
+        </Link>
+      </div>
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-large-title font-bold tracking-tight">{t("shops.title")}</h1>
         <p className="text-body text-ink-2">{t("shops.body")}</p>

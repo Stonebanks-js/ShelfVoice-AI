@@ -17,6 +17,10 @@ export function errorKey(error: unknown): MessageKey {
   if (error.code === "BAD_PHONE") return "cart.error.phone";
   if (error.code === "ADDRESS_NEEDED") return "cart.error.address";
   if (error.code === "ITEMS_CHANGED" || error.code === "NO_DELIVERY") return "cart.error.changed";
+  if (error.code === "BELOW_MINIMUM") return "cart.error.min";
+  if (error.code === "OUT_OF_RANGE") return "cart.error.far";
+  if (error.code === "LOCATION_NEEDED") return "cart.error.location";
+  if (error.code === "REFUND_TOO_BIG") return "error.refundTooBig";
   if (error.code === "TURNSTILE_REQUIRED" || error.code === "TURNSTILE_FAILED") return "cart.error.check";
   if (error.code === "UNDO_WINDOW_CLOSED") return "error.undoClosed";
   if (["INVALID_CHANGES", "VALIDATION", "CONSTRAINT", "PRODUCT_NOT_FOUND"].includes(error.code)) return "error.invalidChange";

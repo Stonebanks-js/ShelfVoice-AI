@@ -2,7 +2,7 @@
 
 A voice-first assistant for kirana shop owners: speak your shop online, know what to restock, and hear every customer, without typing. Built for the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026).
 
-**Live app:** https://shelfvoice.vercel.app. Shop owners tap **Shop owner** and continue with Google; four quick questions set the shop up. Customers tap **Customer** to find shops near them, no account needed.
+**Live app:** https://shelfvoice.vercel.app. Shop owners tap **Shop owner** and continue with Google; four quick questions set the shop up. Customers tap **Customer** to find shops near them and order, no account needed; signing in with Google keeps their addresses, past orders and wishlist.
 
 ## The problem
 
@@ -71,6 +71,7 @@ Data is stored with **Supabase in Seoul, South Korea** (ap-northeast-2), not in 
 | Bill and shelf photos | 30 days |
 | Customer review audio | 30 days; the words, sentiment and items stay until the shop is deleted |
 | Customer orders (name, phone, address) | 90 days; the sales they logged stay |
+| Customer accounts (email, details, addresses, wishlist) | Until the customer deletes the account, from Account |
 | Hashed IP address on a review | 7 days (the hash's salt changes daily; raw IPs are never stored) |
 | Logs (Axiom) | Up to 30 days; never voice, transcripts, names or phone numbers |
 

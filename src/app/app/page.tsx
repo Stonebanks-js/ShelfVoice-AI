@@ -1,4 +1,4 @@
-import { Camera, CircleAlert, Frown, History, Meh, MessageSquareText, Mic, Package, ReceiptText, ShoppingBag, Smile, Store, TrendingDown, TrendingUp } from "lucide-react";
+import { Camera, CircleAlert, Frown, History, Meh, MessageSquareText, Mic, Package, ReceiptText, ShoppingBag, Smile, Store, TrendingDown, TrendingUp, UserRound } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
@@ -37,9 +37,14 @@ async function Today() {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6">
-      <header className="px-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
-        <p className="text-footnote font-medium text-ink-2">{t("home.today", { day: weekday })}</p>
-        <h1 className="font-display text-large-title font-bold tracking-tight">{t("tab.home")}</h1>
+      <header className="flex items-end justify-between gap-3 px-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
+        <div>
+          <p className="text-footnote font-medium text-ink-2">{t("home.today", { day: weekday })}</p>
+          <h1 className="font-display text-large-title font-bold tracking-tight">{t("tab.home")}</h1>
+        </div>
+        <Link href="/app/shop" aria-label={t("home.account")} className="mb-1 grid size-11 place-items-center rounded-full bg-surface text-ink shadow-card active:bg-fill">
+          <UserRound aria-hidden className="size-5" />
+        </Link>
       </header>
 
       <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
