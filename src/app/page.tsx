@@ -1,8 +1,9 @@
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { Skeleton } from "@/components/ui/feedback";
 import { LangProvider } from "@/i18n/lang";
-import { requestLang } from "@/server/session";
+import { ownerState, requestLang } from "@/server/session";
 
 import { Start } from "./start";
 
@@ -17,7 +18,10 @@ export default function Home() {
 }
 
 async function Landing() {
-  const lang = await requestLang();
+  // A signed-in shop owner goes straight to their shop; a customer stays.
+  const state = await ownerState();
+  if (state?.shop) redirect("/app");
+  const lang = await requestLang(state);
   return (
     <LangProvider initial={lang}>
       <Start />

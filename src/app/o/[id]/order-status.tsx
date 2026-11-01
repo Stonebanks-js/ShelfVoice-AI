@@ -1,17 +1,19 @@
 "use client";
 
-import { Ban, Check, ChevronLeft, CircleCheck, Clock, PackageCheck, Phone, Truck } from "lucide-react";
+import { Ban, Check, ChevronLeft, CircleCheck, Clock, IndianRupee, PackageCheck, Phone, RotateCcw, Truck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/controls";
 import { EmptyState } from "@/components/ui/feedback";
+import { QrCode } from "@/components/ui/qr-code";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { formatRupees } from "@/lib/changes-view";
 import { cn } from "@/lib/cn";
+import { upiLink } from "@/lib/delivery";
 import type { OrderView } from "@/server/orders";
 
 const OPEN = ["NEW", "ACCEPTED", "READY"];
@@ -65,6 +67,12 @@ export function OrderStatusView({ initial, token }: { initial: OrderView | null;
   const look = headline(order);
   const have = order.items.filter((i) => i.status !== "UNAVAILABLE");
   const total = have.reduce((sum, i) => sum + (i.pricePaise ?? 0) * i.qty, 0);
+  const refunded = order.refunds.reduce((sum, r) => sum + r.amountPaise, 0);
+  const due = order.status === "CANCELLED" ? 0 : Math.max(0, total + order.deliveryFeePaise - refunded);
+  // V-05: pay the shop straight from a UPI app, once the shop has said what it has.
+  const canPay = Boolean(order.shop.upiId) && due > 0 && order.status !== "NEW" && order.status !== "CANCELLED";
+  const upi = canPay ? upiLink({ upiId: order.shop.upiId!, shopName: order.shop.name, amountPaise: due, note: `Order ${order.code}` }) : null;
+  const modes = [order.shop.acceptsCash && t("pay.CASH"), order.shop.upiId && t("pay.UPI"), order.shop.payOnDelivery && order.fulfilment === "DELIVERY" && t("pay.cod")].filter(Boolean).join(" · ");
   const time = new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(checked);
 
   return (
@@ -106,8 +114,35 @@ export function OrderStatusView({ initial, token }: { initial: OrderView | null;
           </li>
         ))}
       </ul>
-      {total > 0 && <p className="px-1 text-body font-semibold tabular-nums">{t("order.total", { total: formatRupees(total) })}</p>}
-      <p className="px-1 text-footnote text-ink-2">{t("cart.pay")}</p>
+      {(total > 0 || order.deliveryFeePaise > 0) && (
+        <div className="flex flex-col gap-1 px-1 text-body tabular-nums">
+          {order.deliveryFeePaise > 0 && (
+            <p className="flex justify-between text-footnote text-ink-2">
+              <span>{t("cart.deliveryFee")}</span>
+              <span>{formatRupees(order.deliveryFeePaise)}</span>
+            </p>
+          )}
+          {order.refunds.map((r, i) => (
+            <p key={i} className="flex items-start gap-2 text-footnote text-success">
+              <RotateCcw aria-hidden className="mt-0.5 size-4 shrink-0" />
+              {t("order.refunded", { amount: formatRupees(r.amountPaise), reason: r.reason })}
+            </p>
+          ))}
+          <p className="font-semibold">{t("order.due", { amount: formatRupees(due) })}</p>
+        </div>
+      )}
+      {upi ? (
+        <section className="flex flex-col items-center gap-3 rounded-lg bg-surface p-4 shadow-card">
+          <a href={upi} className={buttonClass("filled", "lg")}>
+            <IndianRupee aria-hidden className="size-5" />
+            {t("order.payUpi", { amount: formatRupees(due) })}
+          </a>
+          <p className="text-footnote text-ink-2">{t("order.upiQr")}</p>
+          <QrCode value={upi} label={t("order.payUpi", { amount: formatRupees(due) })} className="size-44 rounded-md" />
+        </section>
+      ) : (
+        <p className="px-1 text-footnote text-ink-2">{modes ? t("order.payModes", { modes }) : t("cart.pay")}</p>
+      )}
 
       {order.shop.phone && (
         <a href={`tel:${order.shop.phone}`} className={buttonClass("tinted", "lg", "mt-auto")}>

@@ -28,6 +28,11 @@ export interface Storefront {
   hours: Hours;
   language: Lang;
   delivers: boolean;
+  // How to pay and the delivery rules (V-05).
+  upiId: string | null;
+  acceptsCash: boolean;
+  payOnDelivery: boolean;
+  delivery: { minPaise: number | null; feePaise: number | null; freeAbovePaise: number | null; radiusKm: number | null };
   products: StorefrontProduct[];
 }
 
@@ -51,15 +56,24 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
   const shop = data[0];
   return {
     slug,
-    name: shop.shop_name,
+    name: shop.shop_name ?? "",
     category: shop.shop_category,
     description: shop.shop_description,
     phone: shop.phone,
     address: shop.address,
-    timezone: shop.timezone,
+    timezone: shop.timezone ?? "Asia/Kolkata",
     hours: asHours(shop.hours),
     language: shop.language === "en" ? "en" : "hi",
     delivers: shop.delivers ?? false,
+    upiId: shop.upi_id,
+    acceptsCash: shop.accepts_cash ?? true,
+    payOnDelivery: shop.pay_on_delivery ?? true,
+    delivery: {
+      minPaise: shop.delivery_min_paise,
+      feePaise: shop.delivery_fee_paise,
+      freeAbovePaise: shop.free_delivery_above_paise,
+      radiusKm: shop.delivery_radius_km === null ? null : Number(shop.delivery_radius_km),
+    },
     products: data
       .filter((row) => row.product_id && row.product_name)
       .map((row) => ({

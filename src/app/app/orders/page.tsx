@@ -28,7 +28,9 @@ async function Orders() {
   const since = new Date(now.getTime() - 24 * 3_600_000).toISOString();
   const { data, error } = await db
     .from("orders")
-    .select("id, code, status, customer_name, customer_phone, fulfilment, address, note, created_at, order_items(id, name, unit, price_paise, qty, status, position)")
+    .select(
+      "id, code, status, customer_name, customer_phone, fulfilment, address, note, created_at, delivery_fee_paise, order_items(id, name, unit, price_paise, qty, status, position), order_refunds(amount_paise, reason, created_at)",
+    )
     .eq("shop_id", state.shop.id)
     .or(`status.in.(NEW,ACCEPTED,READY),created_at.gte.${since}`)
     .order("created_at", { ascending: false })

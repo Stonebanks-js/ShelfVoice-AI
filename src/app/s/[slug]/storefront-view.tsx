@@ -1,9 +1,9 @@
 "use client";
 
-import { ChevronRight, CircleAlert, MapPin, Phone, ShoppingBag } from "lucide-react";
+import { ChevronRight, CircleAlert, Heart, MapPin, Phone, ShoppingBag, Truck, UserRound, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { LogoMark } from "@/components/brand/logo";
 import { VoiceBars } from "@/components/shell/mic-button";
@@ -19,16 +19,69 @@ import { api } from "@/lib/api";
 import { cartSnapshot, parseCart, rememberOrder, setCart, subscribeCart } from "@/lib/cart";
 import { formatRupees } from "@/lib/changes-view";
 import { cn } from "@/lib/cn";
+import { deliveryFee } from "@/lib/delivery";
 import { errorKey } from "@/lib/errors";
 import { useTurnstile } from "@/lib/turnstile";
+import type { Account } from "@/server/customer";
 import type { Storefront, StorefrontProduct } from "@/server/storefront";
 
 const serverCart = () => "{}";
 
+// The signed-in customer's account, or null when signed out (V-05). The shop
+// page itself is cached for everyone, so this is read in the browser.
+function useAccount() {
+  const [account, setAccount] = useState<Account | null | undefined>(undefined);
+  useEffect(() => {
+    let live = true;
+    api<Account>("/api/v1/me")
+      .then((a) => live && setAccount(a))
+      .catch(() => live && setAccount(null));
+    return () => {
+      live = false;
+    };
+  }, []);
+  return [account, setAccount] as const;
+}
+
 export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: string }) {
   const { lang, t } = useLang();
+  const router = useRouter();
   const [category, setCategory] = useState<string | null>(null);
   const [checkout, setCheckout] = useState(false);
+  const [account, setAccount] = useAccount();
+  const signIn = `/me?next=${encodeURIComponent(`/s/${shop.slug}`)}`;
+  const wished = new Set(account?.wishlist.map((w) => w.productId));
+  const favourite = Boolean(account?.favourites.some((f) => f.slug === shop.slug));
+
+  // Hearts save to the account; signed out, they lead to sign-in first.
+  async function wish(product: StorefrontProduct) {
+    if (account === undefined) return; // still checking who is signed in
+    if (account === null) return router.push(signIn);
+    const on = !wished.has(product.id);
+    const item = { productId: product.id, name: product.name, unit: product.unit, pricePaise: product.pricePaise, inStock: product.inStock, shop: shop.name, slug: shop.slug };
+    setAccount({ ...account, wishlist: on ? [item, ...account.wishlist] : account.wishlist.filter((w) => w.productId !== product.id) });
+    await api(`/api/v1/me/wishlist/${product.id}`, { method: on ? "PUT" : "DELETE" }).catch(() => setAccount(account));
+  }
+  async function favouriteShop() {
+    if (account === undefined) return;
+    if (account === null) return router.push(signIn);
+    const on = !favourite;
+    setAccount({ ...account, favourites: on ? [{ shopId: "", name: shop.name, slug: shop.slug, category: shop.category }, ...account.favourites] : account.favourites.filter((f) => f.slug !== shop.slug) });
+    await api(`/api/v1/me/favourites/${shop.slug}`, { method: on ? "PUT" : "DELETE" }).catch(() => setAccount(account));
+  }
+
+  const modes = [shop.acceptsCash && t("pay.CASH"), shop.upiId && t("pay.UPI"), shop.delivers && shop.payOnDelivery && t("pay.cod")].filter(Boolean).join(" · ");
+  const rules = shop.delivery;
+  const deliveryNote = shop.delivers
+    ? [
+        rules.radiusKm ? t("deliv.within", { km: rules.radiusKm }) : t("cart.delivery"),
+        rules.feePaise ? t("deliv.fee", { fee: formatRupees(rules.feePaise) }) : t("deliv.free"),
+        rules.feePaise && rules.freeAbovePaise ? t("deliv.freeAbove", { amount: formatRupees(rules.freeAbovePaise) }) : null,
+        rules.minPaise ? t("deliv.min", { amount: formatRupees(rules.minPaise) }) : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : null;
   const raw = useSyncExternalStore(subscribeCart, () => cartSnapshot(shop.slug), serverCart);
   const cart = useMemo(() => parseCart(raw), [raw]);
 
@@ -51,10 +104,19 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
   return (
     <main className={cn("mx-auto flex min-h-dvh w-full max-w-2xl flex-col", count > 0 && "pb-24")}>
       {/* The signboard: shop name, open now, where, and two ways to reach it. */}
-      <header className="flex flex-col gap-3 px-4 pt-[max(2rem,env(safe-area-inset-top))] pb-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-display text-large-title font-bold tracking-tight">{shop.name}</h1>
-          {shop.category && <p className="text-body text-ink-2">{shop.category}</p>}
+      <header className="flex flex-col gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
+        <div className="flex justify-end">
+          <Link href="/me" className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-footnote font-semibold text-accent">
+            <UserRound aria-hidden className="size-5" />
+            {t("store.account")}
+          </Link>
+        </div>
+        <div className="flex items-start gap-2">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <h1 className="font-display text-large-title font-bold tracking-tight">{shop.name}</h1>
+            {shop.category && <p className="text-body text-ink-2">{shop.category}</p>}
+          </div>
+          <HeartButton on={favourite} label={t("store.favourite")} onClick={favouriteShop} disabled={account === undefined} />
         </div>
         <div>
           <OpenBadge hours={shop.hours} timeZone={shop.timezone} />
@@ -66,6 +128,18 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           </p>
         )}
         {shop.description && <p className="text-body">{shop.description}</p>}
+        {deliveryNote && (
+          <p className="flex items-start gap-2 text-footnote text-ink-2">
+            <Truck aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {deliveryNote}
+          </p>
+        )}
+        {modes && (
+          <p className="flex items-start gap-2 text-footnote text-ink-2">
+            <Wallet aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {t("store.payModes", { modes })}
+          </p>
+        )}
         {shop.phone && (
           <div className="grid grid-cols-2 gap-2 pt-1">
             <a href={`tel:${shop.phone}`} className={buttonClass("tinted", "md")}>
@@ -98,7 +172,15 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           )}
           <ul className="mx-4 overflow-hidden rounded-md bg-surface shadow-card">
             {shown.map((p) => (
-              <ProductRow key={p.id} product={p} qty={cart[p.id] ?? 0} onQty={(qty) => setQty(p.id, qty)} />
+              <ProductRow
+                key={p.id}
+                product={p}
+                qty={cart[p.id] ?? 0}
+                onQty={(qty) => setQty(p.id, qty)}
+                wished={wished.has(p.id)}
+                onWish={() => wish(p)}
+                wishReady={account !== undefined}
+              />
             ))}
           </ul>
         </section>
@@ -153,6 +235,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           lines={lines}
           total={total}
           whatsapp={whatsapp}
+          account={account ?? null}
           onQty={setQty}
           onClose={() => setCheckout(false)}
           onPlaced={() => setCart(shop.slug, {})}
@@ -164,10 +247,25 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
 
 // One product, with ADD and then − n +, as on Instamart. Out-of-stock items
 // can't be added; prices only if the owner set them; never a stock count.
-function ProductRow({ product: p, qty, onQty }: { product: StorefrontProduct; qty: number; onQty: (qty: number) => void }) {
+function ProductRow({
+  product: p,
+  qty,
+  onQty,
+  wished,
+  onWish,
+  wishReady,
+}: {
+  product: StorefrontProduct;
+  qty: number;
+  onQty: (qty: number) => void;
+  wished: boolean;
+  onWish: () => void;
+  wishReady: boolean;
+}) {
   const { t } = useLang();
   return (
-    <li className="flex items-center gap-3 border-separator px-4 py-3 not-first:border-t">
+    <li className="flex items-center gap-2 border-separator py-3 pr-4 pl-1 not-first:border-t">
+      <HeartButton on={wished} label={t("store.wish", { name: p.name })} onClick={onWish} small disabled={!wishReady} />
       <div className="flex min-w-0 flex-1 flex-col">
         <span className={cn("text-body", !p.inStock && "text-ink-2")}>
           {p.name}
@@ -203,16 +301,35 @@ function ProductRow({ product: p, qty, onQty }: { product: StorefrontProduct; qt
   );
 }
 
+// Disabled for the moment it takes to learn who is signed in.
+function HeartButton({ on, label, onClick, small = false, disabled = false }: { on: boolean; label: string; onClick: () => void; small?: boolean; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn("grid shrink-0 place-items-center rounded-full active:bg-fill disabled:opacity-40", small ? "size-11" : "size-12")}
+    >
+      <Heart aria-hidden className={cn(small ? "size-5" : "size-6", on ? "fill-voice text-voice" : "text-ink-2")} />
+    </button>
+  );
+}
+
 type Line = { product: StorefrontProduct; qty: number };
 
-// Checkout (V-04): the cart, pickup or delivery, name and number, then Place
-// order. No account and no payment: the customer pays the shop.
+// Checkout (V-04, V-05): the cart, pickup or delivery, name and number, then
+// Place order. A signed-in customer's details and saved addresses fill in;
+// the shop's delivery rules apply (minimum, charge, distance). No payment
+// here: the customer pays the shop, in cash or by UPI.
 function CheckoutSheet({
   shop,
   siteKey,
   lines,
   total,
   whatsapp,
+  account,
   onQty,
   onClose,
   onPlaced,
@@ -222,6 +339,7 @@ function CheckoutSheet({
   lines: Line[];
   total: number;
   whatsapp: string | null;
+  account: Account | null;
   onQty: (id: string, qty: number) => void;
   onClose: () => void;
   onPlaced: () => void;
@@ -229,13 +347,41 @@ function CheckoutSheet({
   const { t } = useLang();
   const router = useRouter();
   const { containerRef, token: turnstileToken } = useTurnstile(siteKey);
+  const saved = account?.addresses ?? [];
   const [fulfilment, setFulfilment] = useState<"PICKUP" | "DELIVERY">("PICKUP");
-  const [form, setForm] = useState({ name: "", phone: "", address: "", note: "" });
+  const [form, setForm] = useState({ name: account?.profile?.name ?? "", phone: account?.profile?.phone?.replace(/^\+91/, "") ?? "", address: "", note: "" });
+  // A saved address by id, or "new" for one typed here.
+  const [addressId, setAddressId] = useState<string>(saved.find((a) => a.is_default)?.id ?? saved[0]?.id ?? "new");
+  const [here, setHere] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const set = (field: keyof typeof form) => (event: { target: { value: string } }) => setForm({ ...form, [field]: event.target.value });
 
-  const ready = lines.length > 0 && form.name.trim() && form.phone.trim() && (fulfilment === "PICKUP" || form.address.trim());
+  const chosen = saved.find((a) => a.id === addressId) ?? null;
+  const delivering = fulfilment === "DELIVERY";
+  const address = delivering ? (chosen?.address ?? form.address).trim() : "";
+  const point = chosen && chosen.lat !== null && chosen.lng !== null ? { lat: chosen.lat, lng: chosen.lng } : here;
+  const fee = delivering ? deliveryFee(shop.delivery, total) : 0;
+  const needsPoint = delivering && Boolean(shop.delivery.radiusKm) && !point;
+  const ready = lines.length > 0 && form.name.trim() && form.phone.trim() && (!delivering || (address && fee !== "BELOW_MINIMUM" && !needsPoint));
+
+  function locate() {
+    setError(null);
+    if (!navigator.geolocation) return setError("cart.error.location");
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setHere({ lat: Math.round(position.coords.latitude * 10_000) / 10_000, lng: Math.round(position.coords.longitude * 10_000) / 10_000 });
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        setError("cart.error.location");
+      },
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
+    );
+  }
 
   async function place() {
     setBusy(true);
@@ -249,8 +395,9 @@ function CheckoutSheet({
             name: form.name.trim(),
             phone: form.phone.trim(),
             fulfilment,
-            address: fulfilment === "DELIVERY" ? form.address.trim() : null,
+            address: delivering ? address : null,
             note: form.note.trim() || null,
+            ...(delivering && point ? point : {}),
             items: lines.map((l) => ({ productId: l.product.id, qty: l.qty })),
           },
         },
@@ -264,6 +411,7 @@ function CheckoutSheet({
     }
   }
 
+  const grand = total + (typeof fee === "number" ? fee : 0);
   return (
     <Sheet
       open
@@ -280,7 +428,7 @@ function CheckoutSheet({
           )}
           <Button size="lg" loading={busy} disabled={!ready} onClick={place}>
             {t("cart.place")}
-            {total > 0 && <span className="font-normal tabular-nums"> · {formatRupees(total)}</span>}
+            {grand > 0 && <span className="font-normal tabular-nums"> · {formatRupees(grand)}</span>}
           </Button>
           {whatsapp && (
             <a href={whatsapp} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center justify-center text-footnote font-semibold text-accent">
@@ -313,12 +461,9 @@ function CheckoutSheet({
             </li>
           ))}
         </ul>
-        <p className="-mt-3 px-1 text-footnote text-ink-2">{t("cart.pay")}</p>
 
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-footnote font-medium text-ink-2">
-            {t("cart.how")}
-          </span>
+          <span className="px-1 text-footnote font-medium text-ink-2">{t("cart.how")}</span>
           {shop.delivers ? (
             <Segmented<"PICKUP" | "DELIVERY">
               label={t("cart.how")}
@@ -336,8 +481,64 @@ function CheckoutSheet({
 
         <TextField label={t("cart.name")} value={form.name} onChange={set("name")} autoComplete="name" maxLength={60} />
         <TextField label={t("cart.phone")} value={form.phone} onChange={set("phone")} inputMode="tel" autoComplete="tel" maxLength={20} />
-        {fulfilment === "DELIVERY" && <TextField label={t("cart.address")} value={form.address} onChange={set("address")} autoComplete="street-address" maxLength={300} />}
+
+        {delivering && (
+          <div className="flex flex-col gap-2">
+            {saved.length > 0 && (
+              <div role="radiogroup" aria-label={t("cart.deliverTo")} className="flex flex-col gap-2">
+                <span className="px-1 text-footnote font-medium text-ink-2">{t("cart.deliverTo")}</span>
+                {[...saved.map((a) => ({ id: a.id, title: a.label, body: a.address })), { id: "new", title: t("cart.newAddress"), body: "" }].map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={addressId === option.id}
+                    onClick={() => setAddressId(option.id)}
+                    className={cn("flex min-h-12 flex-col justify-center rounded-md bg-surface px-4 py-2 text-left shadow-card", addressId === option.id && "ring-2 ring-accent")}
+                  >
+                    <span className="text-body font-semibold">{option.title}</span>
+                    {option.body && <span className="text-footnote text-ink-2">{option.body}</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+            {addressId === "new" && <TextField label={t("cart.address")} value={form.address} onChange={set("address")} autoComplete="street-address" maxLength={300} />}
+            {shop.delivery.radiusKm && !(chosen && chosen.lat !== null) && (
+              <>
+                <p className="px-1 text-footnote text-ink-2">{t("cart.shareLocation")}</p>
+                <Button variant={here ? "gray" : "tinted"} loading={locating} icon={<MapPin aria-hidden className="size-5" />} onClick={locate}>
+                  {here ? t("setup.where.located") : t("shops.locate")}
+                </Button>
+              </>
+            )}
+          </div>
+        )}
+
         <TextField label={t("cart.note")} value={form.note} onChange={set("note")} maxLength={300} />
+
+        <div className="flex flex-col gap-1 px-1 text-body tabular-nums">
+          <p className="flex justify-between text-footnote text-ink-2">
+            <span>{t("cart.subtotal")}</span>
+            <span>{formatRupees(total)}</span>
+          </p>
+          {delivering && typeof fee === "number" && (
+            <p className="flex justify-between text-footnote text-ink-2">
+              <span>{t("cart.deliveryFee")}</span>
+              <span>{fee ? formatRupees(fee) : t("deliv.free")}</span>
+            </p>
+          )}
+          {fee === "BELOW_MINIMUM" ? (
+            <p role="status" className="text-footnote font-semibold text-danger">
+              {t("cart.belowMin", { amount: formatRupees(shop.delivery.minPaise! - total) })}
+            </p>
+          ) : (
+            <p className="flex justify-between font-semibold">
+              <span>{t("cart.totalLine")}</span>
+              <span>{formatRupees(grand)}</span>
+            </p>
+          )}
+        </div>
+        <p className="-mt-3 px-1 text-footnote text-ink-2">{t("cart.pay")}</p>
         <p className="px-1 text-footnote text-ink-2">{t("cart.privacy", { shop: shop.name })}</p>
         {/* Turnstile shows itself here only if Cloudflare needs a tap. */}
         <div ref={containerRef} />
@@ -345,4 +546,3 @@ function CheckoutSheet({
     </Sheet>
   );
 }
-

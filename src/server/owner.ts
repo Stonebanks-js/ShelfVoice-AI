@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { User } from "@supabase/supabase-js";
+import { connection } from "next/server";
 
 import type { Database } from "@/types/database";
 
@@ -21,6 +22,17 @@ export async function requireOwner(): Promise<Owner> {
   const { data, error } = await db.auth.getUser();
   if (error || !data.user) throw new ApiError(401, "UNAUTHENTICATED", "Please sign in");
   return { db, user: data.user };
+}
+
+// Whoever is signed in, or null: for pages and routes anyone may use, which
+// do a little more for a signed-in customer (V-05). Per request: the Supabase
+// client reads the clock as it starts, which Next would otherwise flag while
+// prerendering a page shell (as in ownerState).
+export async function currentUser(): Promise<Owner | null> {
+  await connection();
+  const db = await ownerClient();
+  const { data } = await db.auth.getUser();
+  return data.user ? { db, user: data.user } : null;
 }
 
 // One owner account owns one shop (doc 01 FR-01); RLS returns only theirs.

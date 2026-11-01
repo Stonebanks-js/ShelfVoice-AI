@@ -55,6 +55,7 @@ const en: PrivacyContent = {
     rows: [
       { what: "Shop pages", detail: "Open without an account. We keep nothing about who looked.", keep: "Nothing kept" },
       { what: "Voice reviews", detail: "Your recording, the words we understood, whether you sounded happy, and the items you mentioned. The shop can hide a review from its page. Please don't say your name or phone number. For adults 18 and over.", keep: "Audio 30 days, words until the shop is deleted" },
+      { what: "Your account, if you sign in", detail: "Your Google email, and the name, mobile number, addresses, wishlist and favourite shops you save. Only you see them; a shop sees your name, number and address only on an order you send it. Delete it any time from Account.", keep: "Until you delete your account" },
       { what: "Orders", detail: "Your name, mobile number, the items, pickup or delivery, and your address if you chose delivery. Only that shop sees them. You pay the shop directly; we never handle money.", keep: "90 days" },
       { what: "Your internet address", detail: "Never stored as it is. A scrambled code that changes every day is used to stop spam.", keep: "7 days" },
     ],
@@ -124,6 +125,7 @@ const hi: PrivacyContent = {
     rows: [
       { what: "दुकान के पेज", detail: "बिना खाते के खुलते हैं। किसने देखा, इसके बारे में हम कुछ नहीं रखते।", keep: "कुछ नहीं रखा जाता" },
       { what: "आवाज़ वाले रिव्यू", detail: "आपकी रिकॉर्डिंग, हमने जो शब्द समझे, आप खुश लगे या नहीं, और आपने जिन सामानों का ज़िक्र किया। दुकान किसी रिव्यू को अपने पेज से छिपा सकती है। कृपया अपना नाम या फ़ोन नंबर न बोलें। सिर्फ़ 18 साल और उससे बड़े लोगों के लिए।", keep: "आवाज़ 30 दिन, शब्द दुकान मिटने तक" },
+      { what: "आपका खाता, अगर आप साइन इन करें", detail: "आपका Google ईमेल, और आपके सेव किए नाम, मोबाइल नंबर, पते, पसंदीदा सामान और दुकानें। इन्हें सिर्फ़ आप देखते हैं; दुकान आपका नाम, नंबर और पता सिर्फ़ उस ऑर्डर पर देखती है जो आप उसे भेजते हैं। खाता से इसे कभी भी मिटाएँ।", keep: "जब तक आप खाता न मिटाएँ" },
       { what: "ऑर्डर", detail: "आपका नाम, मोबाइल नंबर, सामान, दुकान से लेना या डिलीवरी, और डिलीवरी चुनी तो आपका पता। इन्हें सिर्फ़ वही दुकान देखती है। पैसे आप सीधे दुकान को देते हैं; हम कभी पैसे नहीं संभालते।", keep: "90 दिन" },
       { what: "आपका इंटरनेट पता", detail: "जैसा है वैसा कभी नहीं रखा जाता। स्पैम रोकने के लिए एक बदला हुआ कोड इस्तेमाल होता है, जो हर दिन बदलता है।", keep: "7 दिन" },
     ],

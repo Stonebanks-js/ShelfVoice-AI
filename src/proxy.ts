@@ -48,9 +48,10 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Signed-in owners skip the first screen and sign-in; the owner app needs a session.
+  // Signed-in people skip the owner sign-in; the owner app needs a session.
+  // The first screen sends owners on itself (customers stay there).
   const isApp = path === "/app" || path.startsWith("/app/");
-  if ((user && (path === "/" || path === "/owner")) || (!user && isApp)) {
+  if ((user && path === "/owner") || (!user && isApp)) {
     const redirect = NextResponse.redirect(new URL(user ? "/app" : "/", request.url));
     for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
     redirect.headers.set("x-request-id", requestId);
