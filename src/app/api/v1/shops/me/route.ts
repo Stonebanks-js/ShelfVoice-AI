@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { deleteShop } from "@/server/delete-shop";
 import { fromPostgres, readJson, route } from "@/server/http";
+import { bothOrNeither, ShopLocation } from "@/server/location";
 import { requireOwner, requireShop } from "@/server/owner";
 import { refreshStorefront } from "@/server/storefront";
 
@@ -24,12 +25,13 @@ const Patch = z
     name: z.string().trim().min(1).max(80).optional(),
     category: z.string().trim().max(80).nullable().optional(),
     phone: z.string().regex(/^\+[1-9][0-9]{6,14}$/).nullable().optional(),
-    address: z.string().trim().max(300).nullable().optional(),
     description: z.string().trim().max(500).nullable().optional(),
     hours: Hours.nullable().optional(),
     language: z.enum(["hi", "en"]).optional(),
+    ...ShopLocation,
   })
-  .strict();
+  .strict()
+  .refine(bothOrNeither, { message: "Latitude and longitude go together", path: ["lat"] });
 
 // Edit shop details from My shop (doc 06 O-9), under the owner's RLS.
 export const PATCH = route(async (request) => {

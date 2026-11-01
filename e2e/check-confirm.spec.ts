@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
 // F-04 review gate: Check and confirm (O-4) and voice setup (O-3) against the
 // local database. The Meta step is replaced with a proposal written straight
@@ -9,7 +9,7 @@ import { blockingViolations, localAdmin, localSupabase, signInToDemo } from "./s
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 async function demoShop(page: Page) {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
   const { data: products } = await localAdmin().from("products").select("id, name, price_paise, is_in_stock").eq("shop_id", shop.id);
   const find = (prefix: string) => products!.find((p) => p.name.startsWith(prefix))!;

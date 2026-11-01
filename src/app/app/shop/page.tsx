@@ -28,7 +28,7 @@ async function Shop() {
   const [{ data: shop, error }, { count, error: countError }] = await Promise.all([
     db
       .from("shops")
-      .select("id, name, slug, category, phone, address, description, hours, timezone, is_published, is_demo, demo_expires_at")
+      .select("id, name, slug, category, phone, address, description, hours, timezone, is_published, pincode, lat, lng")
       .eq("id", state.shop.id)
       .single(),
     db.from("products").select("id", { count: "exact", head: true }).eq("shop_id", state.shop.id).is("archived_at", null),

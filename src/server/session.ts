@@ -10,7 +10,7 @@ import { ownerClient } from "./supabase";
 
 export interface OwnerState {
   user: { id: string; isAnonymous: boolean };
-  shop: { id: string; name: string; slug: string; category: string | null; language: Lang; isPublished: boolean; isDemo: boolean } | null;
+  shop: { id: string; name: string; slug: string; category: string | null; language: Lang; isPublished: boolean } | null;
 }
 
 // The signed-in owner and their shop, read once per request for pages. Null
@@ -22,7 +22,7 @@ export const ownerState = cache(async (): Promise<OwnerState | null> => {
   const db = await ownerClient();
   const { data } = await db.auth.getUser();
   if (!data.user) return null;
-  const { data: shop } = await db.from("shops").select("id, name, slug, category, language, is_published, is_demo").maybeSingle();
+  const { data: shop } = await db.from("shops").select("id, name, slug, category, language, is_published").maybeSingle();
   return {
     user: { id: data.user.id, isAnonymous: data.user.is_anonymous ?? false },
     shop: shop
@@ -33,7 +33,6 @@ export const ownerState = cache(async (): Promise<OwnerState | null> => {
           category: shop.category,
           language: shop.language === "en" ? "en" : "hi",
           isPublished: shop.is_published,
-          isDemo: shop.is_demo,
         }
       : null,
   };

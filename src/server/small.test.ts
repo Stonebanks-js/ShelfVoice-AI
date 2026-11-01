@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { AUDIO_LIMITS, checkWav } from "./audio";
 import { Changes, priceChangeAllowed, rupeesToPaise, toE164 } from "./changes";
-import { DEMO_PRODUCTS, simulateHistory } from "./demo/template";
+import { DEMO_PRODUCTS, simulateHistory } from "./sample-shop/template";
 import { redact } from "./log";
 import { slugFor } from "./shops";
 
@@ -81,7 +81,7 @@ describe("storefront slugs (decision K5)", () => {
   });
 });
 
-describe("demo shop history", () => {
+describe("sample shop history", () => {
   const history = simulateHistory();
 
   it("never takes any product below zero and ends at the planned stock", () => {

@@ -2,7 +2,7 @@
 // judge the reorder policy against the gates. Fixed seed, so results repeat.
 import { describe, expect, it } from "vitest";
 
-import { poisson, rng } from "@/server/demo/template";
+import { poisson, rng } from "@/server/sample-shop/template";
 import { forecast, roundUpToPack, stdDev } from "@/server/forecast/formula";
 
 const DAYS = 90;

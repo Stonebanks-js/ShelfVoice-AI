@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, localAdmin, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
 // F-10 review gate: the bill photo (O-10). The photo is resized and loses its
 // EXIF (GPS included) before it leaves the phone; the bill reader is replaced
@@ -51,7 +51,7 @@ async function shopFor(page: Page) {
 }
 
 test("a bill photo is resized, loses its EXIF and comes back as changes to check", async ({ page }) => {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shopId, maggiId } = await shopFor(page);
   const { data: proposal } = await localAdmin()
     .from("proposals")
@@ -98,7 +98,7 @@ test("a bill photo is resized, loses its EXIF and comes back as changes to check
 });
 
 test("a bill that can't be read says what to do", async ({ page }) => {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   await page.route("**/api/v1/proposals/bill", (route) =>
     route.fulfill({ status: 422, json: { error: { code: "AI_NOT_UNDERSTOOD", message: "x" } } }),
   );
@@ -126,7 +126,7 @@ test("a bill that can't be read says what to do", async ({ page }) => {
 });
 
 test("Take photo asks for the rear camera", async ({ page }) => {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   await page.goto("/app/camera");
   await expect(page.locator('input[type="file"][capture="environment"]')).toHaveAttribute("accept", "image/*");
 });

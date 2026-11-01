@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
 // F-06 review gate: the Stock tab (O-6) against the local database: search,
 // chips, the in/out switch, edits by tap (price, count as a correction),
@@ -9,7 +9,7 @@ import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwn
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 async function openStock(page: Page) {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
   // Stock lives under My shop (V-02).
   await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "My shop" }).click();

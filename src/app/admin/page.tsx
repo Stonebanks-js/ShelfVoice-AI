@@ -1,4 +1,4 @@
-import { Bot, CircleAlert, Clock, MessageSquareText, Package, Store, UserRound } from "lucide-react";
+import { Bot, CircleAlert, MessageSquareText, Package, Store, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -120,7 +120,6 @@ async function Admin() {
             </span>
           }
         />
-        <ListRow icon={<Clock />} iconTone="gray" title="Demo sign-ins" value={<span className="tabular-nums">{today.demoSignInsToday}</span>} />
       </ListGroup>
 
       <ListGroup header="Real shops" footer="Demo copies are left out.">

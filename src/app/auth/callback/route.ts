@@ -14,5 +14,5 @@ export async function GET(request: Request) {
     if (!error) return NextResponse.redirect(new URL("/app", url.origin), 303);
     log("warn", "auth.callback.failed", { error: error.message });
   }
-  return NextResponse.redirect(new URL("/?signin=failed", url.origin), 303);
+  return NextResponse.redirect(new URL("/owner?signin=failed", url.origin), 303);
 }

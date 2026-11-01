@@ -1,18 +1,13 @@
 "use client";
 
-import { CircleAlert } from "lucide-react";
+import { ChevronLeft, CircleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-import { LogoMark, Wordmark } from "@/components/brand/logo";
 import { VoiceBars } from "@/components/shell/mic-button";
-import { buttonClass, Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 import { Segmented } from "@/components/ui/controls";
-import type { Lang, MessageKey } from "@/i18n/dictionary";
+import type { Lang } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
-import { api } from "@/lib/api";
-import { errorKey } from "@/lib/errors";
 
 // What the app does, shown rather than listed: a spoken line becomes two
 // priced products, as it will on the owner's own shop page.
@@ -44,28 +39,16 @@ function Example() {
   );
 }
 
-export function SignIn({ failed }: { failed: boolean }) {
+export function OwnerSignIn({ failed }: { failed: boolean }) {
   const { lang, setLang, t } = useLang();
-  const router = useRouter();
-  const [demoBusy, setDemoBusy] = useState(false);
-  const [error, setError] = useState<MessageKey | null>(failed ? "signin.failed" : null);
-
-  async function tryDemo() {
-    setDemoBusy(true);
-    setError(null);
-    try {
-      await api<{ shopId: string }>("/api/v1/auth/demo", { method: "POST" });
-      router.replace("/app");
-      router.refresh();
-    } catch (failure) {
-      setError(errorKey(failure));
-      setDemoBusy(false);
-    }
-  }
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-3">
+        <Link href="/" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-body font-semibold text-accent">
+          <ChevronLeft aria-hidden className="size-5" />
+          {t("action.back")}
+        </Link>
         <Segmented<Lang>
           label={t("lang.label")}
           value={lang}
@@ -79,24 +62,19 @@ export function SignIn({ failed }: { failed: boolean }) {
       </div>
 
       <div className="flex flex-1 flex-col justify-center gap-8 py-10">
-        <div className="flex flex-col gap-4">
-          <LogoMark className="-ml-2 h-24 w-auto self-start" />
-          <div>
-            <h1 className="text-large-title">
-              <Wordmark name={t("app.name")} />
-            </h1>
-            <p className="mt-1 text-headline text-ink-2">{t("app.tagline")}</p>
-          </div>
+        <div className="flex flex-col gap-2">
+          <p className="text-footnote font-semibold text-ink-2">{t("start.owner.title")}</p>
+          <h1 className="font-display text-large-title font-bold tracking-tight">{t("owner.title")}</h1>
         </div>
         <Example />
       </div>
 
       {/* Doc 06: the primary action sits in the thumb zone. */}
       <div className="flex flex-col gap-3">
-        {error && (
+        {failed && (
           <p role="alert" className="flex items-start gap-2 rounded-md bg-danger-soft px-4 py-3 text-footnote text-danger">
             <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {t(error)}
+            {t("signin.failed")}
           </p>
         )}
         {/* A plain link: the sign-in route redirects to Google. */}
@@ -104,10 +82,7 @@ export function SignIn({ failed }: { failed: boolean }) {
           <GoogleMark />
           {t("signin.google")}
         </a>
-        <Button variant="tinted" size="lg" loading={demoBusy} onClick={tryDemo}>
-          {t("signin.demo")}
-        </Button>
-        <p className="text-center text-footnote text-ink-2">{t("signin.demoNote")}</p>
+        <p className="text-center text-footnote text-ink-2">{t("owner.note")}</p>
         <Link
           href={`/privacy?lang=${lang}`}
           className="inline-flex min-h-11 items-center self-center text-footnote text-ink-2 underline-offset-4 hover:underline"

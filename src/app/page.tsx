@@ -4,23 +4,23 @@ import { Skeleton } from "@/components/ui/feedback";
 import { LangProvider } from "@/i18n/lang";
 import { requestLang } from "@/server/session";
 
-import { SignIn } from "./sign-in";
+import { Start } from "./start";
 
-// O-1 Sign in (doc 06): get in fast with Google or the demo shop. The
-// language comes from the request, so the screen streams in behind a shell.
-export default function Home({ searchParams }: PageProps<"/">) {
+// The first screen (doc 06 O-1, changed by E-36): shop owner or customer.
+// The language comes from the request, so the screen streams in behind a shell.
+export default function Home() {
   return (
     <Suspense fallback={<SignInSkeleton />}>
-      <Landing searchParams={searchParams} />
+      <Landing />
     </Suspense>
   );
 }
 
-async function Landing({ searchParams }: Pick<PageProps<"/">, "searchParams">) {
-  const [lang, params] = await Promise.all([requestLang(), searchParams]);
+async function Landing() {
+  const lang = await requestLang();
   return (
     <LangProvider initial={lang}>
-      <SignIn failed={params.signin === "failed"} />
+      <Start />
     </LangProvider>
   );
 }

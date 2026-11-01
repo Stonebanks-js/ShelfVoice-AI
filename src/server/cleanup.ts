@@ -144,6 +144,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupResult> {
     result.ipHashesCleared = count ?? 0;
   });
 
+  // No new demo shops since E-36; this clears any left from before.
   await step("delete_demo_shops", async () => {
     const { data, error } = await db
       .from("shops")

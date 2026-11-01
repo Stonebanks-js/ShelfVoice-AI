@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-import { blockingViolations, darkMode, localSupabase, ownTestAddress, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-05 review gate: Home (O-5, reshaped by V-02) with the demo shop's real
+// F-05 review gate: Home (O-5, reshaped by V-02) with the sample shop's real
 // numbers, both languages, both themes, and a new shop with nothing in it yet.
 
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 test("shows today's sales, what's running low and new reviews", async ({ page }) => {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   await expect(page.getByRole("heading", { level: 1, name: "Home" })).toBeVisible();
   // The shop comes first, with ways to see it, share it and change it.
   const shop = page.getByRole("region", { name: "Sharma Kirana Store" });
@@ -41,12 +41,8 @@ test("shows today's sales, what's running low and new reviews", async ({ page })
 });
 
 test("reads in Hindi for a Hindi shop", async ({ page, context }) => {
-  await ownTestAddress(page);
   await context.clearCookies();
-  await page.goto("/");
-  await page.getByRole("radio", { name: "हिन्दी" }).click();
-  await page.getByRole("button", { name: "डेमो दुकान देखें" }).click();
-  await page.waitForURL("/app");
+  await signInToSampleShop(page, "hi");
   await expect(page.getByRole("heading", { level: 1, name: "होम" })).toBeVisible();
   await expect(page.getByRole("region", { name: "आज की बिक्री" })).toContainText(/\d+ सामान बिके/);
   await expect(page.getByRole("heading", { name: /कम बचा है/ })).toBeVisible();
@@ -64,7 +60,7 @@ test("a new shop with no products is invited to build it", async ({ page }) => {
 
 test("no sideways scroll on a 320 px phone", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   await expect(page.getByRole("region", { name: "Sales today" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 });

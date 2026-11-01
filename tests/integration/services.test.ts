@@ -21,7 +21,7 @@ vi.mock("@/server/ai", async (importOriginal) => ({
   meta: () => fake,
 }));
 
-const { createDemoCopy } = await import("@/server/demo/copy");
+const { createSampleShop } = await import("@/server/sample-shop/copy");
 const { refreshForecasts } = await import("@/server/forecast/refresh");
 const proposals = await import("@/server/proposals");
 const { storeReview, analyseStoredReview, reviewFeed } = await import("@/server/reviews");
@@ -49,7 +49,7 @@ async function uploadClip(owner: Awaited<ReturnType<typeof testOwner>>, audio = 
 describe("demo copy and forecasts", () => {
   it("gives a demo user their own seeded shop with forecasts", async () => {
     const owner = await testOwner(false);
-    const shopId = await createDemoCopy(owner.user.id);
+    const shopId = await createSampleShop(owner.user.id);
     const { data: products } = await owner.db.from("products").select("name, stock_qty, product_forecasts(order_qty, stockout_boost_until)").eq("shop_id", shopId);
     expect(products).toHaveLength(15);
     const atta = products!.find((p) => p.name === "Aashirvaad Atta")!;
@@ -64,7 +64,7 @@ describe("demo copy and forecasts", () => {
   it("seeds an evening demo copy without future movements", async () => {
     const owner = await testOwner(false);
     const now = new Date("2026-10-29T13:12:00Z");
-    const shopId = await createDemoCopy(owner.user.id, now);
+    const shopId = await createSampleShop(owner.user.id, now);
     const { data: latest } = await admin.from("stock_movements").select("occurred_at").eq("shop_id", shopId).order("occurred_at", { ascending: false }).limit(1).single();
     expect(new Date(latest!.occurred_at).getTime()).toBeLessThanOrEqual(now.getTime());
     const { count } = await admin.from("product_forecasts").select("product_id", { count: "exact", head: true }).eq("shop_id", shopId);
@@ -73,7 +73,7 @@ describe("demo copy and forecasts", () => {
 
   it("opens the demo shop in the visitor's language", async () => {
     const owner = await testOwner(false);
-    const shopId = await createDemoCopy(owner.user.id, new Date(), "en");
+    const shopId = await createSampleShop(owner.user.id, new Date(), "en");
     const { data } = await admin.from("shops").select("language").eq("id", shopId).single();
     expect(data?.language).toBe("en");
   });
@@ -142,7 +142,7 @@ describe("Today summary (doc 06 O-5)", () => {
   it("adds up today's sales, the running-low items and new reviews for a demo shop", async () => {
     const owner = await testOwner(false);
     const now = new Date();
-    const shopId = await createDemoCopy(owner.user.id, now, "en");
+    const shopId = await createSampleShop(owner.user.id, now, "en");
     const summary = await todaySummary(owner.db, shopId, now);
 
     expect(summary.productCount).toBe(15);
@@ -163,7 +163,7 @@ describe("Today summary (doc 06 O-5)", () => {
 
   it("leaves silent recordings out but keeps ones still being understood", async () => {
     const owner = await testOwner(false);
-    const shopId = await createDemoCopy(owner.user.id);
+    const shopId = await createSampleShop(owner.user.id);
     const consent_at = new Date().toISOString();
     await admin.from("reviews").insert([
       { shop_id: shopId, status: "ANALYZED", transcript: "", summary: "No speech heard.", consent_at },
@@ -192,7 +192,7 @@ describe("Today summary (doc 06 O-5)", () => {
   it("never shows another shop's numbers", async () => {
     const owner = await testOwner();
     const other = await testOwner(false);
-    const otherShop = await createDemoCopy(other.user.id);
+    const otherShop = await createSampleShop(other.user.id);
     const summary = await todaySummary(owner.db, otherShop);
     expect(summary).toMatchObject({ productCount: 0, salesPaise: 0, newReviews: 0 });
   });
@@ -201,7 +201,7 @@ describe("Today summary (doc 06 O-5)", () => {
 describe("order list (doc 06 O-7)", () => {
   it("puts the customer-flagged atta first with a quantity and a reason quoting it", async () => {
     const owner = await testOwner(false);
-    const shopId = await createDemoCopy(owner.user.id, new Date(), "en");
+    const shopId = await createSampleShop(owner.user.id, new Date(), "en");
     const { data: shop } = await owner.db.from("shops").select("*").eq("id", shopId).single();
     const { items, leadTimeDays } = await restockList({ db: owner.db, user: owner.user, shop: shop!, requestId: owner.requestId });
 
@@ -223,7 +223,7 @@ describe("order list (doc 06 O-7)", () => {
 describe("review feed (doc 06 O-8)", () => {
   it("lists reviews newest first with a play link only while the audio exists", async () => {
     const owner = await testOwner(false);
-    const shopId = await createDemoCopy(owner.user.id, new Date(), "en");
+    const shopId = await createSampleShop(owner.user.id, new Date(), "en");
     const [newest, older] = await reviewFeed(owner.db, shopId);
     expect(newest).toMatchObject({ sentiment: "NEGATIVE", audioUrl: null, audioRemoved: false });
     expect(older.sentiment).toBe("POSITIVE");
@@ -245,7 +245,7 @@ describe("review feed (doc 06 O-8)", () => {
   it("shows nothing from another shop", async () => {
     const owner = await testOwner();
     const other = await testOwner(false);
-    const otherShop = await createDemoCopy(other.user.id);
+    const otherShop = await createSampleShop(other.user.id);
     expect(await reviewFeed(owner.db, otherShop)).toEqual([]);
   });
 });
@@ -253,9 +253,9 @@ describe("review feed (doc 06 O-8)", () => {
 describe("delete my shop (doc 01 FR-16, W-17)", () => {
   it("removes the shop, its rows, its files and the account, and nothing else", async () => {
     const owner = await testOwner(false);
-    const shopId = await createDemoCopy(owner.user.id);
+    const shopId = await createSampleShop(owner.user.id);
     const bystander = await testOwner(false);
-    const otherShop = await createDemoCopy(bystander.user.id);
+    const otherShop = await createSampleShop(bystander.user.id);
     for (const path of [`${shopId}/owner/a.wav`, `${shopId}/reviews/b.wav`, `${otherShop}/owner/c.wav`]) {
       await admin.storage.from("voice").upload(path, toneWav(1), { contentType: "audio/wav" });
     }

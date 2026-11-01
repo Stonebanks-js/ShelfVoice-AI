@@ -14,7 +14,7 @@ export interface Owner {
   user: User;
 }
 
-// The signed-in owner (Google or anonymous demo sign-in), with a client
+// The signed-in owner (Google sign-in), with a client
 // that runs under their RLS policies.
 export async function requireOwner(): Promise<Owner> {
   const db = await ownerClient();

@@ -4,10 +4,10 @@ import { Suspense } from "react";
 import { ownerState, requestLang } from "@/server/session";
 
 import Loading from "../loading";
-import { LanguageChoice } from "./language-choice";
+import { SetupSteps } from "./setup-steps";
 
-// O-2 Language (doc 06): the first-run choice, preselected from the phone.
-// Only for a new owner with no shop yet; demo users arrive with one.
+// O-2 setup (doc 06, E-36): language, shop name, kind and place, for a new
+// owner with no shop yet. The language is preselected from the phone.
 export default function WelcomePage() {
   return (
     <Suspense fallback={<Loading />}>
@@ -20,5 +20,5 @@ async function Welcome() {
   const state = await ownerState();
   if (!state) redirect("/");
   if (state.shop) redirect("/app");
-  return <LanguageChoice initial={await requestLang(state)} />;
+  return <SetupSteps initial={await requestLang(state)} />;
 }

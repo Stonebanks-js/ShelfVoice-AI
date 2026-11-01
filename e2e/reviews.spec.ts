@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
 // F-08 review gate: the review feed (O-8) against the local database:
 // sentiment, words, item chips, Hide and Show, filters, the 30-day audio.
@@ -8,7 +8,7 @@ import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwn
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 async function openReviews(page: Page) {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
   await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Reviews" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Reviews" })).toBeVisible();
