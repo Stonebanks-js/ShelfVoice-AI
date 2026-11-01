@@ -9,6 +9,7 @@ import { Badge, Switch } from "@/components/ui/controls";
 import { EmptyState, PageHeader } from "@/components/ui/feedback";
 import { TextField } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/overlay";
+import { PriceInput, paiseText, rupeesInput, Stepper } from "@/components/ui/quantity";
 import { useToast } from "@/components/ui/toast";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
@@ -55,6 +56,13 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const [closed, setClosed] = useState(proposal.status !== "PENDING");
+  // Prices as typed on new-product cards, so "14." survives until it's a number.
+  const [priceText, setPriceText] = useState<Record<number, string>>({});
+
+  // A price or count set on the card itself counts as checked (doc 06), so
+  // the card is included.
+  const setNew = (key: number, patch: { price_paise?: number | null; stock_qty?: number | null }) =>
+    setItems((list) => list.map((i) => (i.key === key && i.change.op === "add_product" ? { ...i, change: { ...i.change, ...patch }, selected: true } : i)));
 
   const selected = items.filter((i) => i.selected);
   const confirmLabel =
@@ -180,11 +188,24 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
                   </button>
                   <div className="flex min-w-0 flex-1 flex-col gap-1 py-2.5">
                     <p className="text-body font-semibold">{view.title}</p>
-                    {view.details.map((d) => (
-                      <p key={d} className="text-footnote text-ink-2">
-                        {d}
-                      </p>
-                    ))}
+                    {item.change.op === "add_product" ? (
+                      <NewProductFields
+                        change={item.change}
+                        name={item.change.name}
+                        price={priceText[item.key] ?? paiseText(item.change.price_paise)}
+                        onPrice={(text) => {
+                          setPriceText({ ...priceText, [item.key]: text });
+                          setNew(item.key, { price_paise: rupeesInput(text) });
+                        }}
+                        onStock={(stock_qty) => setNew(item.key, { stock_qty })}
+                      />
+                    ) : (
+                      view.details.map((d) => (
+                        <p key={d} className="text-footnote text-ink-2">
+                          {d}
+                        </p>
+                      ))
+                    )}
                     {unclear && (
                       <span>
                         <Badge tone="check" icon={<CircleAlert aria-hidden />}>
@@ -250,6 +271,11 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
           onSave={(change) => {
             // An edited change was checked by the owner, so it's included.
             setItems(items.map((i) => (i.key === editing.key ? { ...i, change, selected: true } : i)));
+            setPriceText((texts) => {
+              const next = { ...texts };
+              delete next[editing.key];
+              return next;
+            });
             setEditing(null);
           }}
         />
@@ -258,7 +284,52 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
   );
 }
 
-const rupees = (paise: number | null | undefined) => (paise ? String(paise / 100) : "");
+const rupees = paiseText;
+
+// A new product's price and stock, set right on its card (V-01): shelf and
+// bill photos list many products, too many to open one by one.
+function NewProductFields({
+  change,
+  name,
+  price,
+  onPrice,
+  onStock,
+}: {
+  change: Extract<Change, { op: "add_product" }>;
+  name: string;
+  price: string;
+  onPrice: (text: string) => void;
+  onStock: (count: number | null) => void;
+}) {
+  const { t } = useLang();
+  const about = [change.unit, change.category].filter(Boolean).join(" · ");
+  return (
+    <>
+      {about && <p className="text-footnote text-ink-2">{about}</p>}
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <PriceInput
+          className="w-24"
+          placeholder={t("field.price")}
+          aria-label={t("check.price", { name })}
+          aria-invalid={price !== "" && rupeesInput(price) === null ? true : undefined}
+          value={price}
+          onChange={(event) => onPrice(event.target.value)}
+        />
+        <span className="flex items-center gap-2">
+          <span className="text-footnote text-ink-2">{t("check.stock")}</span>
+          <Stepper
+            value={change.stock_qty ?? null}
+            onChange={onStock}
+            clearable
+            emptyLabel={t("check.stockNone")}
+            lessLabel={t("check.stockLess", { name })}
+            moreLabel={t("check.stockMore", { name })}
+          />
+        </span>
+      </div>
+    </>
+  );
+}
 const toPaise = (value: string) => {
   const n = Number.parseFloat(value);
   return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : null;
@@ -284,7 +355,13 @@ function EditSheet({
   const [form, setForm] = useState((): Record<string, string> => {
     switch (change.op) {
       case "add_product":
-        return { name: change.name, price: rupees(change.price_paise), unit: change.unit ?? "", category: change.category ?? "" };
+        return {
+          name: change.name,
+          price: rupees(change.price_paise),
+          unit: change.unit ?? "",
+          category: change.category ?? "",
+          count: change.stock_qty == null ? "" : String(change.stock_qty),
+        };
       case "update_shop":
         return { name: change.name ?? "", phone: change.phone?.replace(/^\+91/, "") ?? "", address: change.address ?? "" };
       case "update_price":
@@ -308,7 +385,9 @@ function EditSheet({
       case "add_product": {
         const name = form.name.trim();
         if (!name) return setInvalid("name");
-        next = { ...change, name, price_paise: toPaise(form.price), unit: form.unit.trim() || null, category: form.category.trim() || null };
+        const count = form.count.trim() ? toInt(form.count, 0) : null;
+        if (form.count.trim() && count === null) return setInvalid("count");
+        next = { ...change, name, price_paise: toPaise(form.price), unit: form.unit.trim() || null, category: form.category.trim() || null, stock_qty: count };
         break;
       }
       case "update_shop": {
@@ -373,6 +452,7 @@ function EditSheet({
           field("price", "field.price", { inputMode: "decimal" }),
           field("unit", "field.unit"),
           field("category", "field.category"),
+          field("count", "field.count", { inputMode: "numeric" }),
         ]}
         {change.op === "update_shop" && [
           field("name", "field.name"),

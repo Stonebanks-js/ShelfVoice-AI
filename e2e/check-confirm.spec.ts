@@ -140,9 +140,11 @@ for (const [status, code, words, retry] of [
 test("voice setup screen is ready to record", async ({ page }) => {
   await demoShop(page);
   await page.goto("/app/setup");
+  await page.getByRole("link", { name: /^Speak/ }).click();
+  await expect(page).toHaveURL("/app/setup/voice");
   await expect(page.getByRole("heading", { level: 1, name: "Tell us about your shop" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Tap to speak" })).toBeVisible();
   await expect(page.getByText("0:00 / 2:00")).toBeHidden();
-  await expect(page.getByRole("link", { name: "Skip for now" })).toHaveAttribute("href", "/app");
+  await expect(page.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/app/setup");
   expect(await blockingViolations(page)).toEqual([]);
 });

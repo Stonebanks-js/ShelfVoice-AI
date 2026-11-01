@@ -72,6 +72,7 @@ const en: PrivacyContent = {
       { what: "Google", detail: "Sign-in for shop owners." },
       { what: "Cloudflare Turnstile", detail: "Checks that a review comes from a person, not a bot, on the review page only." },
       { what: "Axiom", detail: "Error and speed logs. They hold the page and the error, never voice, words, names or phone numbers, and are kept up to 30 days." },
+      { what: "Open Food Facts", detail: "A free public product database. When an owner scans a barcode, only the barcode number is sent, to look up the product's name." },
     ],
   },
   cookies: {
@@ -140,6 +141,7 @@ const hi: PrivacyContent = {
       { what: "Google", detail: "दुकानदारों के साइन इन के लिए।" },
       { what: "Cloudflare Turnstile", detail: "सिर्फ़ रिव्यू वाले पेज पर, यह जाँचने के लिए कि रिव्यू किसी इंसान ने दिया है, बॉट ने नहीं।" },
       { what: "Axiom", detail: "गड़बड़ी और स्पीड के लॉग। इनमें पेज और गड़बड़ी होती है, कभी आवाज़, शब्द, नाम या फ़ोन नंबर नहीं, और ये ज़्यादा से ज़्यादा 30 दिन रखे जाते हैं।" },
+      { what: "Open Food Facts", detail: "सामान की एक मुफ़्त सार्वजनिक सूची। दुकानदार बारकोड स्कैन करे तो सिर्फ़ बारकोड का नंबर भेजा जाता है, सामान का नाम जानने के लिए।" },
     ],
   },
   cookies: {

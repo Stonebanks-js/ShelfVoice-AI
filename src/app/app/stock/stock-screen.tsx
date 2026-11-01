@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Minus, Mic, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
+import { ListPlus, Minus, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -70,7 +70,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
             title={t("stock.empty.title")}
             body={t("stock.empty.body")}
             action={
-              <ButtonLink href="/app/setup" size="lg" icon={<Mic aria-hidden className="size-5" />}>
+              <ButtonLink href="/app/add" size="lg" icon={<ListPlus aria-hidden className="size-5" />}>
                 {t("stock.empty.cta")}
               </ButtonLink>
             }
@@ -130,13 +130,13 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
   );
 }
 
-// Add by tap, or read a supplier's bill (O-10).
+// Add by tap, or many at once: list, shelf photo, barcodes, bill, sheet (V-01).
 function AddButton({ onClick }: { onClick: () => void }) {
   const { t } = useLang();
   return (
     <div className="flex gap-2">
-      <ButtonLink href="/app/camera" variant="gray" icon={<Camera aria-hidden className="size-5" />}>
-        {t("camera.scan")}
+      <ButtonLink href="/app/add" variant="gray" icon={<ListPlus aria-hidden className="size-5" />}>
+        {t("stock.addMany")}
       </ButtonLink>
       <Button variant="tinted" onClick={onClick} icon={<Plus aria-hidden className="size-5" />}>
         {t("stock.add")}

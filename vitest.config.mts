@@ -42,6 +42,7 @@ export default defineConfig({
       TURNSTILE_SECRET_KEY: "1x0000000000000000000000000000000AA",
       META_MODE: process.env.META_MODE ?? "recorded",
       CRON_SECRET: "test-cron-secret-with-at-least-32-characters",
+      OPEN_FOOD_FACTS_URL: "off",
     },
     coverage: {
       provider: "v8",

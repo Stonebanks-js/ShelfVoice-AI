@@ -1,7 +1,8 @@
 import "server-only";
 
+import { matchStarter } from "@/lib/catalog/starter";
 import { meta } from "@/server/ai";
-import { type CatalogItem, extractSetup, interpretCommand, readBill } from "@/server/ai/jobs";
+import { type CatalogItem, extractSetup, interpretCommand, readBill, readShelf } from "@/server/ai/jobs";
 import { AiError } from "@/server/ai/meta";
 import { AUDIO_LIMITS, checkWav } from "@/server/audio";
 import { type Change, Changes, priceChangeAllowed } from "@/server/changes";
@@ -67,7 +68,7 @@ async function existing(ctx: Ctx, inputPath: string) {
   return data;
 }
 
-async function store(ctx: Ctx, kind: "SETUP" | "COMMAND" | "BILL", inputPath: string, transcript: string | null, changes: Change[]) {
+async function store(ctx: Ctx, kind: "SETUP" | "COMMAND" | "BILL" | "SHELF", inputPath: string, transcript: string | null, changes: Change[]) {
   const { data, error } = await ctx.db
     .from("proposals")
     .insert({ shop_id: ctx.shop.id, kind, input_path: inputPath, transcript, changes: toJson(Changes.parse(changes)) })
@@ -111,11 +112,22 @@ export async function voiceProposal(ctx: Ctx, path: string, kind: "SETUP" | "COM
   }
 }
 
-// ------------------------------------------------------------- bill proposal
-export async function billProposal(ctx: Ctx, path: string) {
+// ------------------------------------------------------------ photo proposal
+// A typical price, category and spoken names for a product read off a photo,
+// from the ready-made lists (V-01); the owner checks the price.
+function suggest(name: string, unit: string | null) {
+  const item = matchStarter(name, unit);
+  return item ? { category: item.category, pricePaise: item.pricePaise, aliases: item.aliases } : null;
+}
+
+// A supplier's bill (deliveries, and new products) or a shelf (new
+// products) photographed by the owner, read into changes to check.
+export async function photoProposal(ctx: Ctx, path: string, kind: "bill" | "shelf") {
+  // A bill's photo can't come back as a shelf's (or the other way round).
+  if (!path.startsWith(`${ctx.shop.id}/${kind}/`)) throw new ApiError(422, "BAD_PATH", "That file isn't one of your uploads");
   const prior = await existing(ctx, path);
   if (prior) return { proposal: prior };
-  const image = await download(ctx, "photos", path, "bill");
+  const image = await download(ctx, "photos", path, kind);
   // Magic bytes: JPEG starts FF D8 FF (doc 03 upload checks).
   if (image.byteLength > 3 * 1024 * 1024 || image[0] !== 0xff || image[1] !== 0xd8 || image[2] !== 0xff) {
     throw new ApiError(422, "BAD_IMAGE", "The photo must be a JPEG under 3 MB");
@@ -123,7 +135,11 @@ export async function billProposal(ctx: Ctx, path: string) {
   const catalog = await catalogFor(ctx);
   try {
     const dataUrl = `data:image/jpeg;base64,${Buffer.from(image).toString("base64")}`;
-    const changes = await readBill(meta(), { job: "BILL", shopId: ctx.shop.id, requestId: ctx.requestId }, dataUrl, catalog);
+    if (kind === "shelf") {
+      const changes = await readShelf(meta(), { job: "SHELF", shopId: ctx.shop.id, requestId: ctx.requestId }, dataUrl, catalog, suggest);
+      return { proposal: await store(ctx, "SHELF", path, null, changes) };
+    }
+    const changes = await readBill(meta(), { job: "BILL", shopId: ctx.shop.id, requestId: ctx.requestId }, dataUrl, catalog, suggest);
     return { proposal: await store(ctx, "BILL", path, null, changes) };
   } catch (error) {
     aiFailure(error);

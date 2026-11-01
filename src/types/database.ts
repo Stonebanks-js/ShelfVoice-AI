@@ -75,6 +75,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"barcode_lookups": {
+                  Row: {
+                    "brand": string | null,"code": string,"fetched_at": string,"found": boolean,"name": string | null,"quantity": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "brand"?: string | null,"code": string,"fetched_at"?: string,"found": boolean,"name"?: string | null,"quantity"?: string | null
+                  }
+                  Update: {
+                    "brand"?: string | null,"code"?: string,"fetched_at"?: string,"found"?: boolean,"name"?: string | null,"quantity"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"festival_calendar": {
                   Row: {
                     "categories": (string)[],"ends_on": string,"factor": number,"id": number,"name": string,"starts_on": string
@@ -123,14 +137,14 @@ isOneToOne: false
                   ]
                 },"products": {
                   Row: {
-                    "aliases": (string)[],"archived_at": string | null,"category": string | null,"created_at": string,"id": string,"image_path": string | null,"is_in_stock": boolean,"is_published": boolean,"low_stock_level": number,"name": string,"pack_size": number,"price_paise": number | null,"shop_id": string,"stock_qty": number | null,"unit": string | null,"updated_at": string
+                    "aliases": (string)[],"archived_at": string | null,"barcode": string | null,"category": string | null,"created_at": string,"id": string,"image_path": string | null,"is_in_stock": boolean,"is_published": boolean,"low_stock_level": number,"name": string,"pack_size": number,"price_paise": number | null,"shop_id": string,"stock_qty": number | null,"unit": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "aliases"?: (string)[],"archived_at"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"name": string,"pack_size"?: number,"price_paise"?: number | null,"shop_id": string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
+                    "aliases"?: (string)[],"archived_at"?: string | null,"barcode"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"name": string,"pack_size"?: number,"price_paise"?: number | null,"shop_id": string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "aliases"?: (string)[],"archived_at"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"name"?: string,"pack_size"?: number,"price_paise"?: number | null,"shop_id"?: string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
+                    "aliases"?: (string)[],"archived_at"?: string | null,"barcode"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"name"?: string,"pack_size"?: number,"price_paise"?: number | null,"shop_id"?: string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {

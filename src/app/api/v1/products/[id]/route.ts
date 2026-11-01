@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { Barcode } from "@/server/catalog";
 import { priceChangeAllowed } from "@/server/changes";
 import { ApiError, fromPostgres, readJson, route } from "@/server/http";
 import { requireShop } from "@/server/owner";
@@ -18,6 +19,7 @@ const Patch = z
     is_published: z.boolean().optional(),
     low_stock_level: z.number().int().min(0).max(10_000).optional(),
     pack_size: z.number().int().min(1).max(10_000).optional(),
+    barcode: Barcode.nullable().optional(),
   })
   .strict();
 

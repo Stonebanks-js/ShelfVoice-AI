@@ -49,6 +49,10 @@ export const serverSchema = clientSchema
     AI_SHOP_DAILY_BUDGET_USD: z.coerce.number().positive().default(2),
     AI_TOTAL_BUDGET_USD: z.coerce.number().positive().max(150).default(100),
 
+    // Open Food Facts names scanned barcodes (V-01, E-36): free, public, no
+    // key. "off" skips it, so tests never reach the internet.
+    OPEN_FOOD_FACTS_URL: z.union([z.literal("off"), z.url()]).default("https://world.openfoodfacts.org"),
+
     RELEASE: z.string().default("dev"),
   })
   .superRefine((env, ctx) => {

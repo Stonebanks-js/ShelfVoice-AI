@@ -100,7 +100,7 @@ test("an empty shop is asked what it sells", async ({ page }) => {
   await signInAsNewOwner(page);
   await page.goto("/app/stock");
   await expect(page.getByRole("heading", { name: "Your shop has no products yet" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Tell us by voice" })).toHaveAttribute("href", "/app/setup");
+  await expect(page.getByRole("main").getByRole("link", { name: "Add products" })).toHaveAttribute("href", "/app/add");
 });
 
 test("a confirmed voice change shows up on the Stock row", async ({ page }) => {

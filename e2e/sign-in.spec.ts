@@ -104,7 +104,7 @@ test.describe("signed-in entry", () => {
       expect(await blockingViolations(page)).toEqual([]);
       await page.getByRole("button", { name: "Continue" }).click();
       await expect(page).toHaveURL("/app/setup");
-      await expect(page.getByRole("heading", { level: 1, name: "Tell us about your shop" })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: "Add your products" })).toBeVisible();
 
       const { data: shop } = await admin.from("shops").select("language").eq("owner_id", userId).single();
       expect(shop?.language).toBe("en");

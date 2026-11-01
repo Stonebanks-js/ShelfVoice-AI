@@ -10,7 +10,7 @@ import { IconTile } from "@/components/ui/list";
 import { useLang } from "@/i18n/lang";
 import { submitVoice } from "@/lib/voice";
 
-export function SetupScreen() {
+export function VoiceSetup() {
   const { t } = useLang();
   const router = useRouter();
   return (
@@ -45,8 +45,8 @@ export function SetupScreen() {
             router.push(`/app/check/${id}`);
           }}
         />
-        <Link href="/app" className={buttonClass("plain", "md")}>
-          {t("setup.skip")}
+        <Link href="/app/setup" className={buttonClass("plain", "md")}>
+          {t("action.back")}
         </Link>
       </div>
     </main>
