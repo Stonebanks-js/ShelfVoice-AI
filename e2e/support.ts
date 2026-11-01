@@ -52,13 +52,14 @@ export async function ownTestAddress(page: Page) {
   await page.setExtraHTTPHeaders({ "x-forwarded-for": `10.${octet()}.${octet()}.${octet()}` });
 }
 
-// Signs in to a fresh demo shop through the real sign-in screen, in English.
-export async function signInToDemo(page: Page) {
+// A new owner with the seeded sample shop (15 products, 90 days of sales,
+// two reviews), opened on Home. Replaces the demo sign-in removed by E-36.
+export async function signInToSampleShop(page: Page, language: "en" | "hi" = "en") {
   await ownTestAddress(page);
-  await page.context().clearCookies();
-  await page.goto("/");
-  await page.getByRole("radio", { name: "English" }).click();
-  await page.getByRole("button", { name: "Try the demo shop" }).click();
+  const userId = await signInAsNewOwner(page, { withShop: false });
+  const response = await page.request.post("/api/test/sample-shop", { data: { userId, language } });
+  if (!response.ok()) throw new Error(`sample shop: ${response.status()} ${await response.text()}`);
+  await page.goto("/app");
   await page.waitForURL("/app");
 }
 

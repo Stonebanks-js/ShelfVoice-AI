@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { localSupabase, signInToDemo } from "./support";
+import { localSupabase, signInToSampleShop } from "./support";
 
 // F-13 review gate: security headers on every page, no Content Security
 // Policy violations across the main screens, and browser errors reaching
@@ -28,7 +28,7 @@ test("security headers are on every page", async ({ page }) => {
   expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
   expect(headers["strict-transport-security"]).toContain("max-age=63072000");
   expect(headers["permissions-policy"]).toContain("microphone=(self)");
-  expect(headers["permissions-policy"]).toContain("geolocation=()");
+  expect(headers["permissions-policy"]).toContain("geolocation=(self)");
 });
 
 test("the style guide's recorder works under the CSP", async ({ page }) => {
@@ -93,7 +93,7 @@ test.describe("with the local stack", () => {
 
   test("no CSP violations across the owner app and the public pages", async ({ page, context }) => {
     const violations = watchCsp(page);
-    await signInToDemo(page);
+    await signInToSampleShop(page);
     const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { slug: string } }>));
     for (const path of ["/app", "/app/stock", "/app/orders", "/app/reviews", "/app/shop", "/app/camera"]) {
       await page.goto(path);

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
 // F-07 review gate: the order list (O-7) against the local database. AI
 // wording runs in recorded mode here, so every reason is the template
@@ -9,7 +9,7 @@ import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwn
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 async function openOrders(page: Page) {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
   await page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Orders" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Orders" })).toBeVisible();

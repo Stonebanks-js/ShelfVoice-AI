@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   // round trip (doc 06: the storefront and review page load in 15 seconds or
   // less on a phone).
   const path = request.nextUrl.pathname;
-  if (path.startsWith("/s/") || path.startsWith("/r/") || path === "/privacy") {
+  if (path.startsWith("/s/") || path.startsWith("/r/") || path === "/privacy" || path === "/shops") {
     const response = NextResponse.next({ request: { headers } });
     response.headers.set("x-request-id", requestId);
     return response;
@@ -48,9 +48,9 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Signed-in owners skip the sign-in page; the owner app needs a session.
+  // Signed-in owners skip the first screen and sign-in; the owner app needs a session.
   const isApp = path === "/app" || path.startsWith("/app/");
-  if ((user && path === "/") || (!user && isApp)) {
+  if ((user && (path === "/" || path === "/owner")) || (!user && isApp)) {
     const redirect = NextResponse.redirect(new URL(user ? "/app" : "/", request.url));
     for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
     redirect.headers.set("x-request-id", requestId);

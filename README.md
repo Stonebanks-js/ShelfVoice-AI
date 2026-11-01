@@ -2,7 +2,7 @@
 
 A voice-first assistant for kirana shop owners: speak your shop online, know what to restock, and hear every customer, without typing. Built for the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026).
 
-**Live app:** https://shelfvoice.vercel.app. Tap **Try the demo shop** for a sample kirana shop with 90 days of history, no sign-up needed.
+**Live app:** https://shelfvoice.vercel.app. Shop owners tap **Shop owner** and continue with Google; four quick questions set the shop up. Customers tap **Customer** to find shops near them, no account needed.
 
 ## The problem
 
@@ -33,7 +33,7 @@ Model output is always parsed and checked against a schema before it is used. Pr
 ```
 Phone browser ──► Next.js 16 on Vercel (Mumbai, bom1)
                     │  server routes, proxy (sessions, request IDs), cron
-                    ├──► Supabase (Seoul): Postgres with row-level security, Storage, Auth (Google + anonymous demo)
+                    ├──► Supabase (Seoul): Postgres with row-level security, Storage, Auth (Google)
                     ├──► Meta Model API: Muse Spark, Voice Transcribe
                     ├──► Cloudflare Turnstile (review page bot check)
                     ├──► Open Food Facts (product names for scanned barcodes; only the number is sent)
@@ -71,7 +71,6 @@ Data is stored with **Supabase in Seoul, South Korea** (ap-northeast-2), not in 
 | Bill and shelf photos | 30 days |
 | Customer review audio | 30 days; the words, sentiment and items stay until the shop is deleted |
 | Hashed IP address on a review | 7 days (the hash's salt changes daily; raw IPs are never stored) |
-| Demo shops | 24 hours |
 | Logs (Axiom) | Up to 30 days; never voice, transcripts, names or phone numbers |
 
 The full policy, in Hindi and English, is at [/privacy](https://shelfvoice.vercel.app/privacy).

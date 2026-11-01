@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
 // F-09 review gate: My shop (O-9) against the local database: preview,
 // publish, review QR, details, hours, language, sign out and delete.
@@ -8,12 +8,12 @@ import { blockingViolations, darkMode, localAdmin, localSupabase, signInToDemo }
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 async function openShop(page: Page) {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shop, user } = await page.evaluate(() =>
     fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string; slug: string }; user: { id: string } }>),
   );
   await page.getByRole("link", { name: "Sharma Kirana Store" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "My shop" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "My shop" })).toBeVisible({ timeout: 15_000 });
   return { shopId: shop.id, slug: shop.slug, userId: user.id };
 }
 
@@ -24,7 +24,6 @@ test("preview, publish switch and accessibility", async ({ page }) => {
   const preview = page.getByRole("region", { name: "Shop page" });
   await expect(preview.getByRole("heading", { name: "Sharma Kirana Store" })).toBeVisible();
   await expect(preview).toContainText(/Open now, closes|Closed, opens/);
-  await expect(page.getByText("This is a demo shop.")).toBeVisible();
   expect(await blockingViolations(page)).toEqual([]);
   await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);

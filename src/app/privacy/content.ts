@@ -48,7 +48,6 @@ const en: PrivacyContent = {
       { what: "Your shop", detail: "Name, address, phone, hours, products, prices, and the stock and sales you record.", keep: "Until you delete your shop" },
       { what: "Voice notes", detail: "What you say to the app. The words we understood stay with each change you confirm.", keep: "Audio 7 days, words 90 days" },
       { what: "Bill and shelf photos", detail: "Your phone removes the photo's location and camera details before it is sent.", keep: "30 days" },
-      { what: "The demo shop", detail: "A copy only you can see, with no account.", keep: "24 hours" },
     ],
   },
   customers: {
@@ -117,7 +116,6 @@ const hi: PrivacyContent = {
       { what: "आपकी दुकान", detail: "नाम, पता, फ़ोन, समय, सामान, दाम, और आपके दर्ज किए स्टॉक और बिक्री।", keep: "दुकान मिटाने तक" },
       { what: "वॉइस नोट", detail: "आप ऐप से जो बोलते हैं। हमने जो शब्द समझे, वे आपके हर पक्के किए बदलाव के साथ रहते हैं।", keep: "आवाज़ 7 दिन, शब्द 90 दिन" },
       { what: "बिल और शेल्फ़ की फ़ोटो", detail: "भेजने से पहले आपका फ़ोन फ़ोटो से जगह और कैमरे की जानकारी हटा देता है।", keep: "30 दिन" },
-      { what: "डेमो दुकान", detail: "एक कॉपी जो सिर्फ़ आप देख सकते हैं, बिना खाते के।", keep: "24 घंटे" },
     ],
   },
   customers: {

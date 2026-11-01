@@ -229,14 +229,14 @@ isOneToOne: false
                   ]
                 },"shops": {
                   Row: {
-                    "address": string | null,"category": string | null,"created_at": string,"demo_expires_at": string | null,"description": string | null,"hours": Json | null,"id": string,"is_demo": boolean,"is_published": boolean,"language": string,"lead_time_days": number,"name": string,"owner_id": string,"phone": string | null,"review_period_days": number,"slug": string,"timezone": string,"updated_at": string
+                    "address": string | null,"category": string | null,"created_at": string,"demo_expires_at": string | null,"description": string | null,"hours": Json | null,"id": string,"is_demo": boolean,"is_published": boolean,"language": string,"lat": number | null,"lead_time_days": number,"lng": number | null,"name": string,"owner_id": string,"phone": string | null,"pincode": string | null,"review_period_days": number,"slug": string,"timezone": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lead_time_days"?: number,"name": string,"owner_id": string,"phone"?: string | null,"review_period_days"?: number,"slug": string,"timezone"?: string,"updated_at"?: string
+                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lat"?: number | null,"lead_time_days"?: number,"lng"?: number | null,"name": string,"owner_id": string,"phone"?: string | null,"pincode"?: string | null,"review_period_days"?: number,"slug": string,"timezone"?: string,"updated_at"?: string
                   }
                   Update: {
-                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lead_time_days"?: number,"name"?: string,"owner_id"?: string,"phone"?: string | null,"review_period_days"?: number,"slug"?: string,"timezone"?: string,"updated_at"?: string
+                    "address"?: string | null,"category"?: string | null,"created_at"?: string,"demo_expires_at"?: string | null,"description"?: string | null,"hours"?: Json | null,"id"?: string,"is_demo"?: boolean,"is_published"?: boolean,"language"?: string,"lat"?: number | null,"lead_time_days"?: number,"lng"?: number | null,"name"?: string,"owner_id"?: string,"phone"?: string | null,"pincode"?: string | null,"review_period_days"?: number,"slug"?: string,"timezone"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -314,6 +314,11 @@ isOneToOne: false
                            },
 "hit_rate_limit":
 { Args: { "p_key": string,"p_window_seconds": number }; Returns: number
+                           },
+"nearby_shops":
+{ Args: { "p_lat": number,"p_limit"?: number,"p_lng": number,"p_pincode": string }; Returns: {
+              "address": string,"category": string,"distance_km": number,"hours": Json,"name": string,"pincode": string,"slug": string,"timezone": string
+            }[]
                            },
 "undo_proposal":
 { Args: { "p_proposal_id": string,"p_window_seconds"?: number }; Returns: Json

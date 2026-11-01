@@ -7,16 +7,15 @@ import { adminClient } from "@/server/supabase";
 
 import { DEMO_PRODUCTS, DEMO_SHOP, simulateHistory } from "./template";
 
-const DEMO_TTL_HOURS = 24;
 const DAY_MS = 86_400_000;
 const IST_OFFSET_MS = 330 * 60_000;
 
-// Gives one anonymous demo user their own fresh copy of the demo shop (doc 03:
-// visitors never change each other's data). Written with the service role,
-// because only the server creates demo copies (errata E-29).
-export async function createDemoCopy(userId: string, now = new Date(), language: "hi" | "en" = "hi"): Promise<string> {
+// A seeded shop with 90 days of history for a test owner: the tests' fixture
+// since the public demo shop was removed (E-36). Written with the service
+// role; reached only through the test-only route and the integration tests.
+export async function createSampleShop(userId: string, now = new Date(), language: "hi" | "en" = "hi"): Promise<string> {
   const db = adminClient();
-  const slug = `demo-${randomBytes(4).toString("hex")}`;
+  const slug = `sample-${randomBytes(4).toString("hex")}`;
 
   const { data: shop, error: shopError } = await db
     .from("shops")
@@ -28,10 +27,8 @@ export async function createDemoCopy(userId: string, now = new Date(), language:
       address: DEMO_SHOP.address,
       phone: DEMO_SHOP.phone,
       hours: DEMO_SHOP.hours,
-      language, // the language the visitor was using on sign-in
+      language,
       is_published: true,
-      is_demo: true,
-      demo_expires_at: new Date(now.getTime() + DEMO_TTL_HOURS * 3_600_000).toISOString(),
     })
     .select("id")
     .single();
@@ -104,7 +101,7 @@ export async function createDemoCopy(userId: string, now = new Date(), language:
   ]);
   if (reviewError) throw reviewError;
 
-  // Forecasts ready before the visitor opens the order list.
+  // Forecasts ready before the owner opens the order list.
   await refreshForecasts(shop.id, undefined, now);
   return shop.id;
 }

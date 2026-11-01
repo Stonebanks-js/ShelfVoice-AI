@@ -24,7 +24,7 @@ export async function ownerClient(): Promise<Db> {
 }
 
 // Bypasses RLS. Only for work doc 03 assigns to the server: public review
-// inserts, background jobs, demo copies, rate limits, AI call logging, undo.
+// inserts, background jobs, sample shops for tests, rate limits, AI call logging, undo.
 let admin: Db | undefined;
 export function adminClient(): Db {
   admin ??= createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {

@@ -1,6 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToSampleShop } from "./support";
 
 // F-12 review gate: the admin page (A-1, W-20b) is a real 404 to everyone not
 // on ADMIN_EMAILS (set for these runs in playwright.config.ts), shows today's
@@ -23,12 +23,12 @@ test("signed out, the admin page and its API don't exist", async ({ page }) => {
 test.describe("with the local stack", () => {
   test.skip(!localSupabase, "needs the local Supabase stack");
 
-  test("owners and demo visitors get a 404", async ({ page }) => {
+  test("owners get a 404", async ({ page }) => {
     await signInAsNewOwner(page);
     await expectHidden(page);
     await ownTestAddress(page);
     await page.context().clearCookies();
-    await signInToDemo(page);
+    await signInToSampleShop(page);
     await expectHidden(page);
   });
 
@@ -45,7 +45,6 @@ test.describe("with the local stack", () => {
     await expect(page.getByText("Voice command", { exact: true })).toBeVisible();
     await expect(page.getByText(/\d+ calls? · \$\d+\.\d\d · p95 \d+\.\d s/).first()).toBeVisible();
     await expect(page.getByText("Confirmed as proposed")).toBeVisible();
-    await expect(page.getByText("Demo sign-ins")).toBeVisible();
     await expect(page.getByText(/^\d+ · \d+ new today$/)).toBeVisible();
     expect(await page.locator("meta[name=robots]").getAttribute("content")).toContain("noindex");
     expect(await blockingViolations(page)).toEqual([]);

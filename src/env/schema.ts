@@ -54,8 +54,14 @@ export const serverSchema = clientSchema
     OPEN_FOOD_FACTS_URL: z.union([z.literal("off"), z.url()]).default("https://world.openfoodfacts.org"),
 
     RELEASE: z.string().default("dev"),
+
+    // The Playwright journeys' sample-shop route (E-36). Never on a deploy.
+    E2E_TEST_ROUTES: z.enum(["1"]).optional(),
   })
   .superRefine((env, ctx) => {
+    if (deployed && env.E2E_TEST_ROUTES) {
+      ctx.addIssue({ code: "custom", path: ["E2E_TEST_ROUTES"], message: "test routes are never allowed on a deploy" });
+    }
     if (env.META_MODE !== "recorded" && !env.META_API_KEY) {
       ctx.addIssue({
         code: "custom",

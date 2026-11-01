@@ -42,7 +42,7 @@ async function Today() {
         <h1 className="font-display text-large-title font-bold tracking-tight">{t("tab.home")}</h1>
       </header>
 
-      <ShopCard name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
+      <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
 
       {summary.productCount > 0 && (
         <>

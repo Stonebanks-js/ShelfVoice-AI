@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
 // F-03b review gate (doc 04 "Upload interrupted"; doc 06 offline state): a
 // voice note recorded without a connection waits on the phone with a clock,
@@ -10,7 +10,7 @@ import { blockingViolations, darkMode, localAdmin, localSupabase, signInToDemo }
 test.skip(!localSupabase, "needs the local Supabase stack");
 
 async function demoWithMockedVoice(page: Page) {
-  await signInToDemo(page);
+  await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string } }>));
   const { data: maggi } = await localAdmin().from("products").select("id").eq("shop_id", shop.id).like("name", "Maggi%").single();
   const { data: proposal } = await localAdmin()

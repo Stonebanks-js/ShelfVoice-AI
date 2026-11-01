@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 
 import { localSupabase } from "./support";
 
-// Every journey makes a demo shop (about 1,400 rows). On the local stack they
+// Most journeys make a sample shop (about 1,400 rows). On the local stack they
 // pile up across runs and slow everything down, so each run starts by
 // clearing shops and accounts older than ten minutes. Local only: the check
 // in support.ts refuses anything that isn't 127.0.0.1, and CI has no stack.

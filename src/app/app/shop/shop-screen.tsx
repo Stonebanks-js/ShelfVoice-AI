@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Download, ExternalLink, Info, Languages, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2 } from "lucide-react";
+import { Check, Clock, Download, ExternalLink, Languages, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Share, ShieldCheck, Store, Tag, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
@@ -33,7 +33,9 @@ export interface OwnerShop {
   hours: Hours;
   timezone: string;
   is_published: boolean;
-  is_demo: boolean;
+  pincode: string | null;
+  lat: number | null;
+  lng: number | null;
 }
 
 export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; origin: string; productCount: number }) {
@@ -110,12 +112,6 @@ export function ShopScreen({ shop, origin, productCount }: { shop: OwnerShop; or
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6">
       <PageHeader title={t("tab.shop")} />
 
-      {shop.is_demo && (
-        <p className="mx-4 -mt-2 flex gap-2 rounded-lg bg-accent-soft p-4 text-footnote text-accent">
-          <Info aria-hidden className="mt-0.5 size-4 shrink-0" />
-          {t("shop.demo")}
-        </p>
-      )}
 
       {/* Doc 06: a live preview of what customers see. */}
       <section aria-label={t("shop.page")} className="mx-4 flex flex-col gap-3 rounded-lg bg-surface p-4 shadow-card">
@@ -329,7 +325,11 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
     phone: shop.phone?.replace(/^\+91/, "") ?? "",
     address: shop.address ?? "",
     description: shop.description ?? "",
+    pincode: shop.pincode ?? "",
   });
+  // Where the shop is, for customers nearby (V-03).
+  const [where, setWhere] = useState(shop.lat !== null && shop.lng !== null ? { lat: shop.lat, lng: shop.lng } : null);
+  const [locating, setLocating] = useState(false);
   const [invalid, setInvalid] = useState<string | null>(null);
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
@@ -340,6 +340,7 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
     if (!form.name.trim()) return setInvalid("name");
     const phone = form.phone.trim() ? toE164(form.phone) : null;
     if (form.phone.trim() && !phone) return setInvalid("phone");
+    if (form.pincode.trim() && !/^[1-9][0-9]{5}$/.test(form.pincode.trim())) return setInvalid("pincode");
     setBusy(true);
     try {
       await api("/api/v1/shops/me", {
@@ -350,6 +351,9 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
           phone,
           address: form.address.trim() || null,
           description: form.description.trim() || null,
+          pincode: form.pincode.trim() || null,
+          lat: where?.lat ?? null,
+          lng: where?.lng ?? null,
         },
       });
       toast.show({ message: t("stock.saved") });
@@ -361,7 +365,25 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
     }
   }
 
-  const field = (key: keyof typeof form, label: MessageKey, inputMode?: "tel" | "text") => (
+  function locate() {
+    setError(null);
+    if (!navigator.geolocation) return setError("setup.where.denied");
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const round = (n: number) => Math.round(n * 100_000) / 100_000;
+        setWhere({ lat: round(position.coords.latitude), lng: round(position.coords.longitude) });
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        setError("setup.where.denied");
+      },
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
+    );
+  }
+
+  const field = (key: keyof typeof form, label: MessageKey, inputMode?: "tel" | "text" | "numeric") => (
     <TextField label={t(label)} value={form[key]} onChange={set(key)} inputMode={inputMode} error={invalid === key ? t("error.invalidChange") : undefined} />
   );
 
@@ -389,6 +411,15 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
         {field("category", "shop.type")}
         {field("phone", "field.phone", "tel")}
         {field("address", "field.address")}
+        {field("pincode", "field.pincode", "numeric")}
+        <Button
+          variant={where ? "gray" : "tinted"}
+          loading={locating}
+          icon={where ? <Check aria-hidden className="size-5" /> : <MapPin aria-hidden className="size-5" />}
+          onClick={locate}
+        >
+          {where ? t("setup.where.located") : t("setup.where.locate")}
+        </Button>
         {field("description", "shop.about")}
       </div>
     </Sheet>

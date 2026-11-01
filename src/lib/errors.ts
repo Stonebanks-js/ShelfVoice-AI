@@ -9,11 +9,11 @@ export function errorKey(error: unknown): MessageKey {
   if (error.code === "OFFLINE") return "error.offline";
   if (error.status === 429) return "error.rateLimited";
   if (error.status === 401) return "error.signedOut";
-  if (error.code === "DEMO_UNAVAILABLE") return "error.demoUnavailable";
   if (error.code === "PRICE_OUT_OF_RANGE") return "error.priceRange";
   if (error.code === "STOCK_NEGATIVE") return "error.stockNegative";
   if (error.code === "PROPOSAL_NOT_PENDING") return "error.notPending";
   if (error.code === "BAD_BARCODE") return "scan.bad";
+  if (error.code === "BAD_LOCATION") return "shops.body";
   if (error.code === "UNDO_WINDOW_CLOSED") return "error.undoClosed";
   if (["INVALID_CHANGES", "VALIDATION", "CONSTRAINT", "PRODUCT_NOT_FOUND"].includes(error.code)) return "error.invalidChange";
   return "error.generic";

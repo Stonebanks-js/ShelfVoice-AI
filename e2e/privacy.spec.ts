@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localSupabase, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localSupabase, signInToSampleShop } from "./support";
 
 // F-14 review gate: the privacy page says where data lives (Seoul, errata
 // E-28) and how long each kind is kept, in Hindi and English, and is linked
@@ -52,7 +52,7 @@ test.describe("with the local stack", () => {
   test.skip(!localSupabase, "needs the local Supabase stack");
 
   test("the storefront, the review page and My shop link to it", async ({ page, context }) => {
-    await signInToDemo(page);
+    await signInToSampleShop(page);
     const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { slug: string } }>));
     await page.goto("/app/shop");
     await expect(page.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy?lang=en");

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInToDemo } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInToSampleShop } from "./support";
 
 // F-11 review gate: the public storefront (P-1) and the voice review page
 // (P-2), seen as a customer with no account. Turnstile's browser script is
@@ -9,9 +9,9 @@ import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress
 
 test.skip(!localSupabase, "needs the local Supabase stack");
 
-// A demo shop made by an owner, then the owner's cookies dropped.
-async function demoAsCustomer(page: Page) {
-  await signInToDemo(page);
+// The sample shop made by an owner, then the owner's cookies dropped.
+async function sampleShopAsCustomer(page: Page) {
+  await signInToSampleShop(page);
   const { shop } = await page.evaluate(() => fetch("/api/v1/shops/me").then((r) => r.json() as Promise<{ shop: { id: string; slug: string } }>));
   return shop;
 }
@@ -31,7 +31,7 @@ async function fakeTurnstile(page: Page) {
 
 test.describe("storefront", () => {
   test("shows the shop, its products and the ways to reach it", async ({ page, context }) => {
-    const shop = await demoAsCustomer(page);
+    const shop = await sampleShopAsCustomer(page);
     await context.clearCookies();
     await page.goto(`/s/${shop.slug}`);
 
@@ -62,7 +62,7 @@ test.describe("storefront", () => {
   });
 
   test("owner changes show up at once: out of stock, then unpublished", async ({ page, browser }) => {
-    const shop = await demoAsCustomer(page);
+    const shop = await sampleShopAsCustomer(page);
     const { data: maggi } = await localAdmin().from("products").select("id").eq("shop_id", shop.id).like("name", "Maggi%").single();
     const customer = await (await browser.newContext()).newPage();
     await customer.goto(`/s/${shop.slug}`);
@@ -91,7 +91,7 @@ test.describe("storefront", () => {
 
 test.describe("voice review", () => {
   test("consent, 15-second recording, thank you", async ({ page, context }) => {
-    const shop = await demoAsCustomer(page);
+    const shop = await sampleShopAsCustomer(page);
     await context.clearCookies();
     await ownTestAddress(page);
     await fakeTurnstile(page);
@@ -116,7 +116,7 @@ test.describe("voice review", () => {
   });
 
   test("a failed send offers Try again with the same recording", async ({ page, context }) => {
-    const shop = await demoAsCustomer(page);
+    const shop = await sampleShopAsCustomer(page);
     await context.clearCookies();
     await ownTestAddress(page);
     await fakeTurnstile(page);
@@ -137,7 +137,7 @@ test.describe("voice review", () => {
   });
 
   test("too many reviews asks the customer to come back tomorrow", async ({ page, context }) => {
-    const shop = await demoAsCustomer(page);
+    const shop = await sampleShopAsCustomer(page);
     await context.clearCookies();
     await fakeTurnstile(page);
     await page.route(`**/api/v1/public/shops/${shop.slug}/reviews`, (route) =>
