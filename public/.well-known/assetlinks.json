@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.shelfvoice.twa",
+      "sha256_cert_fingerprints": ["8A:F4:2C:9E:FC:78:F2:0B:A7:63:60:6B:9B:64:D5:BF:F8:22:03:39:90:D5:12:5D:67:86:57:E3:34:BA:90:FF"]
+    }
+  }
+]
