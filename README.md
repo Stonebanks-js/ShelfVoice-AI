@@ -24,7 +24,7 @@ Every AI feature runs on Meta models through the Meta Model API. No other AI pro
 |---|---|
 | Muse Spark 1.3 | Reading a spoken shop description into a product list, turning commands into tool calls (sell, add stock, change price), reading supplier bills from photos, analysing customer reviews, wording restock reasons |
 | Muse Voice Transcribe 1.0 | Turning owner voice notes and customer reviews (Hindi, English or a mix) into text |
-| SAM 3.1 | Planned for product cut-outs from shelf photos (W-18); not called yet |
+| SAM 3.1 | Not used: product cut-outs from shelf photos (FR-10) were dropped before release |
 
 Model output is always parsed and checked against a schema before it is used. Prices, stock counts and reorder quantities are computed in code, never by a model.
 
