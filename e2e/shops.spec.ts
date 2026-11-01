@@ -54,14 +54,14 @@ test("a customer finds shops by pincode and by location, nearest first", async (
   await page.getByRole("textbox", { name: "Pincode" }).fill(shops.pincode);
   await page.getByRole("button", { name: "Find" }).click();
   const list = page.getByRole("list", { name: "Shops near you" });
-  await expect(list.getByRole("link", { name: new RegExp(`Near Kirana ${shops.tag}`) })).toContainText("In your area");
-  await expect(list.getByRole("link", { name: new RegExp(`Far Kirana ${shops.tag}`) })).toBeVisible();
-  await expect(list.getByRole("link", { name: new RegExp(`Hidden Kirana ${shops.tag}`) })).toHaveCount(0);
+  await expect(list.getByRole("link", { name: `Near Kirana ${shops.tag}` })).toContainText("In your area");
+  await expect(list.getByRole("link", { name: `Far Kirana ${shops.tag}` })).toBeVisible();
+  await expect(list.getByRole("link", { name: `Hidden Kirana ${shops.tag}` })).toHaveCount(0);
 
   await context.grantPermissions(["geolocation"]);
   await context.setGeolocation({ latitude: shops.lat, longitude: shops.lng });
   await page.getByRole("button", { name: "Use my location" }).click();
-  const ours = list.getByRole("link", { name: new RegExp(`Kirana ${shops.tag}`) });
+  const ours = list.getByRole("link", { name: `Kirana ${shops.tag}` });
   await expect(ours).toHaveCount(2);
   await expect(ours.first()).toContainText(`Near Kirana ${shops.tag}`);
   // The customer's point is rounded to about 100 m, so distances move a little.
