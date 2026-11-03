@@ -10,6 +10,8 @@ import { EmptyState } from "@/components/ui/feedback";
 import { TextField } from "@/components/ui/field";
 import { localeFor, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
+
+import { ShopMap } from "./shop-map";
 import { api } from "@/lib/api";
 import { errorKey } from "@/lib/errors";
 import { asHours } from "@/lib/hours";
@@ -22,6 +24,8 @@ interface NearbyShop {
   hours: unknown;
   timezone: string;
   distanceKm: number | null;
+  lat: number | null;
+  lng: number | null;
 }
 
 // Customers (V-03, E-36): published shops near the phone, or in a typed
@@ -32,6 +36,8 @@ export function ShopFinder() {
   const [busy, setBusy] = useState<"locate" | "pincode" | null>(null);
   const [shops, setShops] = useState<NearbyShop[] | null>(null);
   const [error, setError] = useState<MessageKey | null>(null);
+  // Where the customer is, as rounded as the search: the map's blue dot.
+  const [me, setMe] = useState<{ lat: number; lng: number } | null>(null);
 
   async function search(query: string, how: "locate" | "pincode") {
     setBusy(how);
@@ -54,7 +60,9 @@ export function ShopFinder() {
       (position) => {
         // Rounded to about 100 m: enough to sort shops, no more.
         const round = (n: number) => Math.round(n * 1000) / 1000;
-        void search(`lat=${round(position.coords.latitude)}&lng=${round(position.coords.longitude)}`, "locate");
+        const here = { lat: round(position.coords.latitude), lng: round(position.coords.longitude) };
+        setMe(here);
+        void search(`lat=${here.lat}&lng=${here.lng}`, "locate");
       },
       () => {
         setBusy(null);
@@ -91,7 +99,9 @@ export function ShopFinder() {
         className="flex items-end gap-2"
         onSubmit={(event) => {
           event.preventDefault();
-          if (pincodeOk) void search(`pincode=${pincode}`, "pincode");
+          if (!pincodeOk) return;
+          setMe(null);
+          void search(`pincode=${pincode}`, "pincode");
         }}
       >
         <TextField
@@ -126,27 +136,31 @@ export function ShopFinder() {
         (shops.length === 0 ? (
           <EmptyState icon={<Store />} title={t("shops.none")} body={t("shops.noneBody")} />
         ) : (
-          <ul aria-label={t("shops.title")} className="flex flex-col gap-3 md:grid md:grid-cols-2 md:items-start lg:grid-cols-3 lg:gap-4">
-            {shops.map((shop) => (
-              <li key={shop.slug}>
-                <Link href={`/s/${shop.slug}`} className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-card active:bg-fill">
-                  <span className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="text-headline font-semibold">{shop.name}</span>
-                    <span className="text-footnote text-ink-2">
-                      {[shop.category, shop.distanceKm !== null ? t("shops.km", { km: km.format(Math.max(shop.distanceKm, 0.1)) }) : t("shops.area")]
-                        .filter(Boolean)
-                        .join(" · ")}
+          // The map above the list on a phone; beside it, pinned, from 1024 px (V-09).
+          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-6">
+            <ShopMap shops={shops} me={me} className="h-64 sm:h-80 lg:sticky lg:top-6 lg:order-2 lg:h-[min(38rem,calc(100dvh-3rem))]" />
+            <ul aria-label={t("shops.title")} className="flex flex-col gap-3 md:grid md:grid-cols-2 md:items-start lg:order-1 lg:grid-cols-1 lg:gap-4">
+              {shops.map((shop) => (
+                <li key={shop.slug}>
+                  <Link href={`/s/${shop.slug}`} className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-card active:bg-fill">
+                    <span className="flex min-w-0 flex-1 flex-col gap-1">
+                      <span className="text-headline font-semibold">{shop.name}</span>
+                      <span className="text-footnote text-ink-2">
+                        {[shop.category, shop.distanceKm !== null ? t("shops.km", { km: km.format(Math.max(shop.distanceKm, 0.1)) }) : t("shops.area")]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                      {shop.address && <span className="line-clamp-2 text-footnote text-ink-2">{shop.address}</span>}
+                      <span className="mt-1">
+                        <OpenBadge hours={asHours(shop.hours)} timeZone={shop.timezone} />
+                      </span>
                     </span>
-                    {shop.address && <span className="line-clamp-2 text-footnote text-ink-2">{shop.address}</span>}
-                    <span className="mt-1">
-                      <OpenBadge hours={asHours(shop.hours)} timeZone={shop.timezone} />
-                    </span>
-                  </span>
-                  <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+                    <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
 
       <Link href="/owner" className="mt-auto inline-flex min-h-11 items-center self-center text-footnote font-semibold text-accent">

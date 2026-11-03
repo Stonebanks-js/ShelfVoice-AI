@@ -29,6 +29,7 @@ export async function proxy(request: NextRequest) {
     path === "/manifest.webmanifest" ||
     path === "/sw.js" ||
     path === "/offline.html" ||
+    path.startsWith("/vendor/") ||
     path.startsWith("/.well-known/")
   ) {
     const response = NextResponse.next({ request: { headers } });

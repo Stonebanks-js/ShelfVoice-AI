@@ -30,7 +30,7 @@ export interface PrivacyContent {
 
 const en: PrivacyContent = {
   title: "Privacy",
-  updated: "Updated 31 October 2026",
+  updated: "Updated 3 November 2026",
   keepLabel: "How long",
   intro:
     "Shelf Voice helps kirana shop owners run their shop by voice, and lets their customers leave a voice review. This page says what we keep, where it is stored and when it is deleted.",
@@ -74,6 +74,7 @@ const en: PrivacyContent = {
       { what: "Cloudflare Turnstile", detail: "Checks that a review comes from a person, not a bot, on the review page only." },
       { what: "Axiom", detail: "Error and speed logs. They hold the page and the error, never voice, words, names or phone numbers, and are kept up to 30 days." },
       { what: "Open Food Facts", detail: "A free public product database. When an owner scans a barcode, only the barcode number is sent, to look up the product's name." },
+      { what: "OpenFreeMap", detail: "Draws the map on Shops near you, from OpenStreetMap. Your phone asks it for the map of the area on screen; it never gets your name or account, and Shelf Voice keeps your position only for that search, rounded to about 100 m." },
     ],
   },
   cookies: {
@@ -100,7 +101,7 @@ const en: PrivacyContent = {
 
 const hi: PrivacyContent = {
   title: "गोपनीयता",
-  updated: "31 अक्टूबर 2026 को अपडेट किया गया",
+  updated: "3 नवंबर 2026 को अपडेट किया गया",
   keepLabel: "कब तक",
   intro:
     "Shelf Voice किराना दुकानदारों को आवाज़ से दुकान चलाने में मदद करता है, और उनके ग्राहकों को आवाज़ में रिव्यू देने देता है। यह पेज बताता है कि हम क्या रखते हैं, कहाँ रखते हैं और कब मिटाते हैं।",
@@ -144,6 +145,7 @@ const hi: PrivacyContent = {
       { what: "Cloudflare Turnstile", detail: "सिर्फ़ रिव्यू वाले पेज पर, यह जाँचने के लिए कि रिव्यू किसी इंसान ने दिया है, बॉट ने नहीं।" },
       { what: "Axiom", detail: "गड़बड़ी और स्पीड के लॉग। इनमें पेज और गड़बड़ी होती है, कभी आवाज़, शब्द, नाम या फ़ोन नंबर नहीं, और ये ज़्यादा से ज़्यादा 30 दिन रखे जाते हैं।" },
       { what: "Open Food Facts", detail: "सामान की एक मुफ़्त सार्वजनिक सूची। दुकानदार बारकोड स्कैन करे तो सिर्फ़ बारकोड का नंबर भेजा जाता है, सामान का नाम जानने के लिए।" },
+      { what: "OpenFreeMap", detail: "आस-पास की दुकानें वाले पेज पर OpenStreetMap से नक्शा दिखाता है। आपका फ़ोन स्क्रीन पर दिख रहे इलाके का नक्शा माँगता है; इसे आपका नाम या खाता कभी नहीं मिलता, और Shelf Voice आपकी जगह सिर्फ़ उसी खोज के लिए, लगभग 100 मीटर तक गोल करके, इस्तेमाल करता है।" },
     ],
   },
   cookies: {

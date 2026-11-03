@@ -37,6 +37,7 @@ Phone browser ──► Next.js 16 on Vercel (Mumbai, bom1)
                     ├──► Meta Model API: Muse Spark, Voice Transcribe
                     ├──► Cloudflare Turnstile (review page bot check)
                     ├──► Open Food Facts (product names for scanned barcodes; only the number is sent)
+                    ├──► OpenFreeMap (map tiles on Shops near you; OpenStreetMap data, no key)
                     └──► Axiom logs, Better Stack heartbeats, Discord alerts
 ```
 

@@ -285,6 +285,46 @@
   }
 }
 
+/* Shops near you on a map (V-09): the customer as a blue dot, each shop as
+   a red pin with its initial. MapLibre places them; these draw them. */
+.sv-map-me {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgb(37 99 235 / 0.22), 0 2px 6px rgb(0 0 0 / 0.25);
+}
+.sv-map-pin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 7px; /* room for the pointer, so the tip sits on the spot */
+  border-radius: 9999px;
+  background: var(--accent-fill);
+  border: 2px solid #fff;
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.25);
+  color: #fff;
+  font: 700 15px/1 var(--font-display);
+  cursor: pointer;
+  transition: scale 150ms ease-out;
+}
+.sv-map-pin::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  translate: -50% 0;
+  border: 7px solid transparent;
+  border-top-color: var(--accent-fill);
+  border-bottom: 0;
+}
+.sv-map-pin:hover {
+  scale: 1.1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

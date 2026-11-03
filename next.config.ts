@@ -9,14 +9,16 @@ const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const deployed = supabase.startsWith("https://");
 const dev = process.env.NODE_ENV === "development";
 const turnstile = "https://challenges.cloudflare.com";
+// Map tiles, fonts and icons for Shops near you (V-09), OpenStreetMap data.
+const mapTiles = "https://tiles.openfreemap.org";
 
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' ${turnstile}${dev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' blob: data: ${supabase}`,
+  `img-src 'self' blob: data: ${supabase} ${mapTiles}`,
   "font-src 'self'",
-  `connect-src 'self' ${supabase}`,
+  `connect-src 'self' ${supabase} ${mapTiles}`,
   `media-src 'self' blob: ${supabase}`,
   `frame-src ${turnstile}`,
   "worker-src 'self' blob:",

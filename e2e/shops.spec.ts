@@ -67,6 +67,14 @@ test("a customer finds shops by pincode and by location, nearest first", async (
   // The customer's point is rounded to about 100 m, so distances move a little.
   await expect(ours.first()).toContainText(/0\.\d km away/);
   await expect(ours.nth(1)).toContainText(/[23](\.\d)? km away/);
+  // Each shop comes with a map pin, rounded to about 100 m and no finer (V-09).
+  const { shops: found } = await page.evaluate(
+    (q) => fetch(`/api/v1/public/shops/nearby?lat=${q.lat}&lng=${q.lng}`).then((r) => r.json()),
+    { lat: Math.round(shops.lat * 1000) / 1000, lng: Math.round(shops.lng * 1000) / 1000 },
+  );
+  const near = (found as Array<{ name: string; lat: number; lng: number }>).find((s) => s.name === `Near Kirana ${shops.tag}`)!;
+  expect(near.lat).toBe(Math.round((shops.lat + 0.5 / 111) * 1000) / 1000);
+  expect(near.lng).toBe(Math.round(shops.lng * 1000) / 1000);
   await darkMode(page);
   expect(await blockingViolations(page)).toEqual([]);
 

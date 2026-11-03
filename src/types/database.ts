@@ -516,7 +516,7 @@ isOneToOne: false
                            },
 "nearby_shops":
 { Args: { "p_lat": number,"p_limit"?: number,"p_lng": number,"p_pincode": string }; Returns: {
-              "address": string,"category": string,"distance_km": number,"hours": Json,"name": string,"pincode": string,"slug": string,"timezone": string
+              "address": string,"category": string,"distance_km": number,"hours": Json,"lat": number,"lng": number,"name": string,"pincode": string,"slug": string,"timezone": string
             }[]
                            },
 "undo_proposal":
