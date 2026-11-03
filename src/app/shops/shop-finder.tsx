@@ -68,7 +68,7 @@ export function ShopFinder() {
   const km = new Intl.NumberFormat(localeFor(lang), { maximumFractionDigits: 1 });
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-5 px-4 lg:max-w-6xl lg:px-8 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-between">
         <Link href="/" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-body font-semibold text-accent">
           <ChevronLeft aria-hidden className="size-5" />
@@ -126,7 +126,7 @@ export function ShopFinder() {
         (shops.length === 0 ? (
           <EmptyState icon={<Store />} title={t("shops.none")} body={t("shops.noneBody")} />
         ) : (
-          <ul aria-label={t("shops.title")} className="flex flex-col gap-3">
+          <ul aria-label={t("shops.title")} className="flex flex-col gap-3 md:grid md:grid-cols-2 md:items-start lg:grid-cols-3 lg:gap-4">
             {shops.map((shop) => (
               <li key={shop.slug}>
                 <Link href={`/s/${shop.slug}`} className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-card active:bg-fill">

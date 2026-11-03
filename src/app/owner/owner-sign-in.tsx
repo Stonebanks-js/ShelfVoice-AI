@@ -15,7 +15,7 @@ function Example() {
   const { t } = useLang();
   return (
     <figure className="flex flex-col gap-2">
-      <div className="rounded-lg bg-surface p-4 shadow-card">
+      <div className="rounded-xl bg-surface p-4 shadow-float">
         <p className="flex items-center gap-2 border-b border-separator pb-3 text-body font-medium">
           <VoiceBars className="size-5 shrink-0 text-voice" />
           {t("signin.example.said")}
@@ -34,54 +34,65 @@ function Example() {
           ))}
         </dl>
       </div>
-      <figcaption className="px-1 text-footnote text-ink-2">{t("signin.example.note")}</figcaption>
+      <figcaption className="px-1 text-footnote text-on-accent">{t("signin.example.note")}</figcaption>
     </figure>
   );
 }
 
+// E-37: the first screen's shape. On a phone the red panel holds the promise
+// and the example, and the sign-in rises over it at the bottom, in thumb
+// reach; from 1024 px the two sit side by side.
 export function OwnerSignIn({ failed }: { failed: boolean }) {
   const { lang, t } = useLang();
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <div className="flex items-center justify-between gap-3">
-        <Link href="/" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-body font-semibold text-accent">
-          <ChevronLeft aria-hidden className="size-5" />
-          {t("action.back")}
-        </Link>
-        <LanguagePicker />
-      </div>
-
-      <div className="flex flex-1 flex-col justify-center gap-8 py-10">
-        <div className="flex flex-col gap-2">
-          <p className="text-footnote font-semibold text-ink-2">{t("start.owner.title")}</p>
-          <h1 className="font-display text-large-title font-bold tracking-tight">{t("owner.title")}</h1>
+    <main className="flex min-h-dvh flex-col lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+      <section className="relative flex flex-1 flex-col overflow-hidden bg-accent-fill px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-14 text-on-accent lg:min-h-dvh lg:px-14 lg:pt-8 lg:pb-12">
+        <div className="relative flex items-center justify-between gap-3">
+          <Link href="/" className="-ml-2 inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-body font-semibold">
+            <ChevronLeft aria-hidden className="size-5" />
+            {t("action.back")}
+          </Link>
+          {/* The pill stays white on the red so its words keep their contrast. */}
+          <div className="[&_[data-testid=language-picker]]:bg-surface [&_[data-testid=language-picker]]:text-ink">
+            <LanguagePicker />
+          </div>
         </div>
-        <Example />
-      </div>
+        <div className="relative flex flex-1 flex-col justify-center gap-6 py-8 lg:gap-8">
+          <div className="flex flex-col gap-2">
+            <p className="text-body font-semibold">{t("start.owner.title")}</p>
+            <h1 className="max-w-lg font-display text-[2.25rem] leading-[1.05] font-bold tracking-tight lg:text-[3.5rem]">{t("owner.title")}</h1>
+          </div>
+          <div className="max-w-md text-ink">
+            <Example />
+          </div>
+        </div>
+      </section>
 
       {/* Doc 06: the primary action sits in the thumb zone. */}
-      <div className="flex flex-col gap-3">
-        {failed && (
-          <p role="alert" className="flex items-start gap-2 rounded-md bg-danger-soft px-4 py-3 text-footnote text-danger">
-            <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {t("signin.failed")}
-          </p>
-        )}
-        {/* A plain link: the sign-in route redirects to Google. */}
-        <a href="/api/v1/auth/google" className={buttonClass("filled", "lg")}>
-          <GoogleMark />
-          {t("signin.google")}
-        </a>
-        <p className="text-center text-footnote text-ink-2">{t("owner.note")}</p>
-        <Link
-          href={`/privacy?lang=${lang}`}
-          className="inline-flex min-h-11 items-center self-center text-footnote text-ink-2 underline-offset-4 hover:underline"
-        >
-          {t("privacy.link")}
-        </Link>
-      </div>
+      <section className="relative -mt-6 flex flex-col rounded-t-[1.75rem] bg-bg px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:mt-0 lg:justify-center lg:rounded-none lg:px-14">
+        <div className="mx-auto flex w-full max-w-md flex-col gap-3">
+          {failed && (
+            <p role="alert" className="flex items-start gap-2 rounded-md bg-danger-soft px-4 py-3 text-footnote text-danger">
+              <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+              {t("signin.failed")}
+            </p>
+          )}
+          {/* A plain link: the sign-in route redirects to Google. Google's
+              rules allow its mark only on a white or near-black button. */}
+          <a href="/api/v1/auth/google" className={buttonClass("ink", "lg")}>
+            <GoogleMark />
+            {t("signin.google")}
+          </a>
+          <p className="text-center text-footnote text-ink-2">{t("owner.note")}</p>
+          <Link
+            href={`/privacy?lang=${lang}`}
+            className="inline-flex min-h-11 items-center self-center text-footnote text-ink-2 underline-offset-4 hover:underline"
+          >
+            {t("privacy.link")}
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
-

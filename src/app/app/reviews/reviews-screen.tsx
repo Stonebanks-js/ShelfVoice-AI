@@ -94,7 +94,7 @@ export function ReviewsScreen({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-4">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-4 lg:max-w-6xl lg:px-4">
       <PageHeader title={t("tab.reviews")} subtitle={more ? undefined : t("reviews.count", { n: reviews.length })} />
       <div className="-mx-0 flex gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none]">
         {(
@@ -113,7 +113,7 @@ export function ReviewsScreen({
       {shown.length === 0 ? (
         <p className="px-8 py-6 text-center text-body text-ink-2">{t("reviews.none")}</p>
       ) : (
-        <ul className="flex flex-col gap-3 px-4">
+        <ul className="flex flex-col gap-3 px-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
           {shown.map((review) => (
             <ReviewCard key={review.id} review={review} productNames={productNames} onHidden={(hidden) => setHidden(review, hidden)} />
           ))}

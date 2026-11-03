@@ -5,6 +5,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/controls";
 import { ListGroup, ListRow } from "@/components/ui/list";
+import { ProductThumb } from "@/components/ui/product-thumb";
 import { type Lang, localeFor, type MessageKey, translate } from "@/i18n/dictionary";
 import { formatRupees } from "@/lib/changes-view";
 import { ownerState, requestLang } from "@/server/session";
@@ -36,27 +37,45 @@ async function Today() {
   const weekday = new Intl.DateTimeFormat(localeFor(lang), { weekday: "long", timeZone: "Asia/Kolkata" }).format(now);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6">
-      <header className="flex items-end justify-between gap-3 px-4 pt-[max(1.5rem,env(safe-area-inset-top))]">
+    // Phone: one column, the day's answer first. From 1024 px a two-column
+    // dashboard: the day on the left, the shop and what customers said on
+    // the right (E-37).
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6 lg:max-w-6xl lg:px-4">
+      <header className="flex items-end justify-between gap-3 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] lg:pt-8">
         <div>
           <p className="text-footnote font-medium text-ink-2">{t("home.today", { day: weekday })}</p>
           <h1 className="font-display text-large-title font-bold tracking-tight">{t("tab.home")}</h1>
         </div>
-        <Link href="/app/shop" aria-label={t("home.account")} className="mb-1 grid size-11 place-items-center rounded-full bg-surface text-ink shadow-card active:bg-fill">
+        <Link
+          href="/app/shop"
+          aria-label={t("home.account")}
+          className="mb-1 grid size-11 place-items-center rounded-full bg-surface text-ink shadow-card transition-transform active:scale-95"
+        >
           <UserRound aria-hidden className="size-5" />
         </Link>
       </header>
 
-      <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
-
-      {summary.productCount > 0 && (
-        <>
-          <OrdersList summary={summary} lang={lang} now={now} t={t} />
-          <SalesCard summary={summary} weekday={weekday.split(",")[0]} t={t} />
-          <LowList summary={summary} t={t} />
-          <ReviewList summary={summary} lang={lang} now={now} t={t} />
-          <RecentList summary={summary} lang={lang} now={now} t={t} />
-        </>
+      {summary.productCount === 0 ? (
+        <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={0} />
+      ) : (
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+          <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+            <SalesCard summary={summary} weekday={weekday.split(",")[0]} t={t} />
+          </div>
+          <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+            <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
+          </div>
+          <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+            <OrdersList summary={summary} lang={lang} now={now} t={t} />
+          </div>
+          <div className="min-w-0 lg:col-start-1 lg:row-start-3">
+            <LowList summary={summary} t={t} />
+          </div>
+          <div className="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-span-2 lg:row-start-2">
+            <ReviewList summary={summary} lang={lang} now={now} t={t} />
+            <RecentList summary={summary} lang={lang} now={now} t={t} />
+          </div>
+        </div>
       )}
     </main>
   );
@@ -67,19 +86,29 @@ type T = (key: MessageKey, vars?: Record<string, string | number>) => string;
 function SalesCard({ summary, weekday, t }: { summary: TodaySummary; weekday: string; t: T }) {
   const change = summary.lastWeekPaise > 0 ? Math.round(((summary.salesPaise - summary.lastWeekPaise) / summary.lastWeekPaise) * 100) : null;
   return (
-    <section aria-labelledby="sales-title" className="mx-4 rounded-lg bg-surface p-4 shadow-card">
-      <h2 id="sales-title" className="text-footnote font-semibold text-ink-2">
+    // The day's answer, in the logo's red (E-37); white on it is 5.9:1.
+    <section aria-labelledby="sales-title" className="relative mx-4 overflow-hidden rounded-xl bg-accent-fill p-5 text-on-accent shadow-float lg:p-6">
+      <svg aria-hidden viewBox="0 0 200 120" className="pointer-events-none absolute -right-6 -bottom-8 h-28 w-auto opacity-15 lg:h-40">
+        {/* The logo's voice bars, large and quiet, as the card's mark. */}
+        {[20, 55, 90, 125, 160].map((x, i) => {
+          const h = [40, 70, 100, 70, 40][i];
+          return <rect key={x} x={x} y={60 - h / 2} width="18" height={h} rx="9" fill="currentColor" />;
+        })}
+      </svg>
+      <h2 id="sales-title" className="text-footnote font-semibold">
         {t("today.sales")}
       </h2>
       {summary.salesPaise === 0 ? (
-        <p className="mt-2 text-body text-ink-2">{t("today.noSales")}</p>
+        <p className="mt-2 max-w-sm text-body">{t("today.noSales")}</p>
       ) : (
         <>
-          <p className="font-display text-figure font-bold tabular-nums tracking-tight">{formatRupees(summary.salesPaise)}</p>
-          <p className="text-footnote text-ink-2">{t("today.units", { n: summary.unitsSold })}</p>
+          <p className="mt-1 font-display text-figure font-bold tabular-nums tracking-tight lg:text-[3.25rem] lg:leading-[3.5rem]">
+            {formatRupees(summary.salesPaise)}
+          </p>
+          <p className="text-footnote">{t("today.units", { n: summary.unitsSold })}</p>
           {change !== null && (
             // Icon plus words, never colour alone (doc 06).
-            <p className={`mt-2 flex items-center gap-1.5 text-footnote font-medium ${change >= 0 ? "text-success" : "text-danger"}`}>
+            <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-footnote font-semibold">
               {change >= 0 ? <TrendingUp aria-hidden className="size-4" /> : <TrendingDown aria-hidden className="size-4" />}
               {change === 0
                 ? t("today.vsSame", { day: weekday })
@@ -129,8 +158,7 @@ function LowList({ summary, t }: { summary: TodaySummary; t: T }) {
               key={item.id}
               wrap
               href="/app/restock"
-              icon={<Package />}
-              iconTone="check"
+              media={<ProductThumb name={item.name} size="sm" />}
               title={item.name}
               subtitle={
                 item.flagged ? (

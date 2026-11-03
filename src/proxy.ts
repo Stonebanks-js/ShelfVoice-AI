@@ -17,7 +17,8 @@ export async function proxy(request: NextRequest) {
 
   // Customer pages and the privacy page never use a session: skip the auth
   // round trip (doc 06: the storefront and review page load in 15 seconds or
-  // less on a phone). Nor do the app manifest and the Android app's link check.
+  // less on a phone). Nor do the app manifest, the service worker, its
+  // offline page and the Android app's link check.
   const path = request.nextUrl.pathname;
   if (
     path.startsWith("/s/") ||
@@ -26,6 +27,8 @@ export async function proxy(request: NextRequest) {
     path === "/shops" ||
     path.startsWith("/o/") ||
     path === "/manifest.webmanifest" ||
+    path === "/sw.js" ||
+    path === "/offline.html" ||
     path.startsWith("/.well-known/")
   ) {
     const response = NextResponse.next({ request: { headers } });

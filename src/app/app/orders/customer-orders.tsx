@@ -58,7 +58,7 @@ export function CustomerOrders({ orders, shopName, vapidKey }: { orders: OwnerOr
   ).filter((g) => g.items.length > 0);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-6">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-6 lg:max-w-6xl lg:px-4">
       <PageHeader title={t("tab.orders")} />
       {vapidKey && <OrderAlerts vapidKey={vapidKey} />}
       {groups.length === 0 ? (
@@ -71,7 +71,7 @@ export function CustomerOrders({ orders, shopName, vapidKey }: { orders: OwnerOr
             <h2 id={`orders-${group.title}`} className="px-1 text-footnote font-semibold text-ink-2">
               {t(group.title)} · {group.items.length}
             </h2>
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
               {group.items.map((order) => (
                 <OrderCard key={order.id} order={order} shopName={shopName} />
               ))}

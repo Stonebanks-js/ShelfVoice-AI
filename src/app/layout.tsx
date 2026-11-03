@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_Devanagari } from "next/font/google";
+import { Bricolage_Grotesque, Noto_Sans_Devanagari } from "next/font/google";
 
+import { AppInstall } from "@/components/shell/app-install";
 import { ClientMonitor } from "@/components/shell/client-monitor";
 
 import "./globals.css";
@@ -12,9 +13,18 @@ const devanagari = Noto_Sans_Devanagari({
   display: "swap",
 });
 
+// Headings, figures and prices (E-37); body text stays on the phone's font.
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Shelf Voice",
   description: "Speak your shop online, know what to restock, and hear every customer.",
+  // Added to an iPhone's home screen, it opens as an app, not a tab (E-37).
+  appleWebApp: { capable: true, title: "Shelf Voice", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
@@ -22,7 +32,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover", // lets the tab bar sit above the home indicator
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f2f2f7" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f5f7" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
 };
@@ -31,10 +41,11 @@ export const viewport: Viewport = {
 // its own subtree, so Hindi is announced correctly (doc 06).
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${devanagari.variable} h-full antialiased`}>
+    <html lang="en" className={`${devanagari.variable} ${bricolage.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-bg font-sans text-ink">
         {children}
         <ClientMonitor />
+        <AppInstall />
       </body>
     </html>
   );

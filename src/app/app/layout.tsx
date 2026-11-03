@@ -7,10 +7,10 @@ import { LangRoot } from "@/i18n/lang-root";
 import { ownerState, requestLang } from "@/server/session";
 
 import Loading from "./loading";
-import { OwnerTabBar } from "./owner-tab-bar";
+import { OwnerMain, OwnerTabBar } from "./owner-tab-bar";
 
 // The owner app shell (doc 06 U3): every screen in the owner's language, the
-// tab bar once a shop exists. Per-user, so it streams in behind a skeleton.
+// tab bar (a sidebar on desktop, E-37) once a shop exists. Per-user, so it streams in behind a skeleton.
 export default function AppLayout({ children }: LayoutProps<"/app">) {
   return (
     <Suspense fallback={<Loading />}>
@@ -27,8 +27,8 @@ async function AppFrame({ children }: { children: React.ReactNode }) {
     <LangRoot initial={lang}>
       <ToastProvider>
         <ClipQueueProvider ownerId={state.user.id}>
-          <div className="flex min-h-dvh flex-col pb-[calc(env(safe-area-inset-bottom)+6rem)]">{children}</div>
-          {state.shop && <OwnerTabBar />}
+          <OwnerMain withBar={Boolean(state.shop)}>{children}</OwnerMain>
+          {state.shop && <OwnerTabBar shop={{ name: state.shop.name, slug: state.shop.slug }} />}
         </ClipQueueProvider>
       </ToastProvider>
     </LangRoot>

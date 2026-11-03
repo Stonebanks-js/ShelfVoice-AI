@@ -18,6 +18,7 @@ export function Stepper({
   lessLabel,
   moreLabel,
   className,
+  filled = false,
 }: {
   value: number | null;
   onChange: (value: number | null) => void;
@@ -28,6 +29,7 @@ export function Stepper({
   lessLabel: string;
   moreLabel: string;
   className?: string;
+  filled?: boolean; // the brand-red pill of a cart line (E-37)
 }) {
   const less = () => {
     if (value === null) return;
@@ -35,13 +37,30 @@ export function Stepper({
     onChange(value - 1);
   };
   const more = () => onChange(value === null ? Math.max(min, 1) : Math.min(max, value + 1));
-  const button = "grid size-11 shrink-0 place-items-center text-ink active:bg-fill disabled:opacity-30";
+  const button = cn(
+    "grid size-11 shrink-0 place-items-center active:bg-fill disabled:opacity-30",
+    filled ? "text-on-accent active:bg-black/15" : "text-ink",
+  );
   return (
-    <div className={cn("inline-flex h-11 items-center rounded-md border border-fill-strong bg-surface", className)}>
+    <div
+      className={cn(
+        "inline-flex h-11 items-center rounded-md border",
+        // ADD becoming the stepper pops once, so the change is seen.
+        filled ? "animate-pop border-accent-fill bg-accent-fill text-on-accent" : "border-fill-strong bg-surface",
+        className,
+      )}
+    >
       <button type="button" aria-label={lessLabel} onClick={less} disabled={value === null || (value <= min && !clearable)} className={cn(button, "rounded-l-md")}>
         <Minus aria-hidden className="size-4" strokeWidth={2.5} />
       </button>
-      <output aria-live="polite" className={cn("min-w-9 px-1 text-center whitespace-nowrap tabular-nums", value === null ? "text-footnote text-ink-2" : "text-body font-semibold")}>
+      <output
+        aria-live="polite"
+        className={cn(
+          "min-w-9 flex-1 px-1 text-center whitespace-nowrap tabular-nums",
+          value === null ? "text-footnote text-ink-2" : "text-body font-semibold",
+          filled && "text-on-accent",
+        )}
+      >
         {value ?? emptyLabel}
       </output>
       <button type="button" aria-label={moreLabel} onClick={more} disabled={value !== null && value >= max} className={cn(button, "rounded-r-md")}>

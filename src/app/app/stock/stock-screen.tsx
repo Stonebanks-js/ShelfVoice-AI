@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ListPlus, Minus, Package, PackageX, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
+import { ChevronLeft, ListPlus, Minus, Package, Plus, SearchX, Trash2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
@@ -8,8 +8,8 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge, Chip, Switch } from "@/components/ui/controls";
 import { EmptyState, PageHeader } from "@/components/ui/feedback";
 import { SearchField, TextField } from "@/components/ui/field";
-import { IconTile } from "@/components/ui/list";
 import { AlertDialog, Sheet } from "@/components/ui/overlay";
+import { ProductThumb } from "@/components/ui/product-thumb";
 import { Stepper } from "@/components/ui/quantity";
 import { useToast } from "@/components/ui/toast";
 import type { MessageKey } from "@/i18n/dictionary";
@@ -126,7 +126,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 lg:max-w-6xl lg:px-4">
       <PageHeader title={t("tab.stock")} subtitle={<BackToShop count={products.length} />} trailing={<AddButton onClick={() => setEditing("new")} />} />
       <div className="flex flex-col gap-3 px-4">
         <SearchField label={t("search.placeholder")} clearLabel={t("search.clear")} value={query} onValueChange={setQuery} />
@@ -150,11 +150,12 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
           <EmptyState icon={<SearchX />} title={t("stock.noMatch", { q: query || t("status.outOfStock") })} />
         </div>
       ) : (
-        <div className="flex flex-col gap-6 px-4 pb-4">
+        // Two columns of categories from 1024 px (E-37).
+        <div className="flex flex-col gap-6 px-4 pb-4 lg:block lg:columns-2 lg:gap-6 lg:[&>*]:mb-6 lg:[&>*]:break-inside-avoid">
           {groups.map((group) => (
             <section key={group.name} className="flex flex-col gap-1.5">
               <h2 className="px-4 text-footnote font-medium text-ink-2">{group.name}</h2>
-              <ul className="overflow-hidden rounded-md bg-surface shadow-card">
+              <ul className="overflow-hidden rounded-lg bg-surface shadow-card">
                 {group.items.map((p) => (
                   <StockRow key={p.id} product={p} onEdit={() => setEditing(p)} onInStock={(on) => setInStock(p, on)} onStep={(by) => bump(p, by)} />
                 ))}
@@ -229,7 +230,7 @@ function StockRow({
     <li className="flex flex-col border-separator pr-3 not-first:border-t">
       <div className="flex items-center gap-1">
         <button type="button" onClick={onEdit} className="flex min-w-0 flex-1 items-center gap-3 pl-4 text-left active:bg-fill">
-          <IconTile icon={product.is_in_stock ? <Package /> : <PackageX />} tone={product.is_in_stock ? (low ? "check" : "accent") : "danger"} />
+          <ProductThumb name={product.name} category={product.category} size="sm" className={cn("my-2", !product.is_in_stock && "opacity-45 grayscale")} />
           <span className="flex min-h-14 min-w-0 flex-1 items-center gap-2 py-2">
             <span className="flex min-w-0 flex-1 flex-col">
               <span id={titleId} className={cn("line-clamp-2 text-body", !product.is_in_stock && "text-ink-2")}>
@@ -242,7 +243,7 @@ function StockRow({
         </button>
         <Switch checked={product.is_in_stock} onCheckedChange={onInStock} label={t("stock.inStockLabel", { name: product.name })} />
       </div>
-      <div className="flex items-center gap-2 pb-2.5 pl-[3.75rem]">
+      <div className="flex items-center gap-2 pb-2.5 pl-[4.25rem]">
         <span className="text-footnote text-ink-2">{t("check.stock")}</span>
         <Stepper
           value={product.stock_qty}
