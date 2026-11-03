@@ -44,7 +44,7 @@ async function area(page: import("@playwright/test").Page) {
 
 test("a customer finds shops by pincode and by location, nearest first", async ({ page, context }) => {
   const shops = await area(page);
-  await page.goto("/");
+  await page.goto("/?who=1");
   await chooseLanguage(page, "English");
   await page.getByRole("link", { name: /^Customer/ }).click();
   await expect(page).toHaveURL("/shops");
@@ -54,7 +54,8 @@ test("a customer finds shops by pincode and by location, nearest first", async (
   await page.getByRole("textbox", { name: "Pincode" }).fill(shops.pincode);
   await page.getByRole("button", { name: "Find" }).click();
   const list = page.getByRole("list", { name: "Shops near you" });
-  await expect(list.getByRole("link", { name: `Near Kirana ${shops.tag}` })).toContainText("In your area");
+  // V-10: measured from the middle of the pincode's shops, and pickup or delivery said up front.
+  await expect(list.getByRole("link", { name: `Near Kirana ${shops.tag}` })).toContainText(`km from ${shops.pincode} · Pickup only`);
   await expect(list.getByRole("link", { name: `Far Kirana ${shops.tag}` })).toBeVisible();
   await expect(list.getByRole("link", { name: `Hidden Kirana ${shops.tag}` })).toHaveCount(0);
 

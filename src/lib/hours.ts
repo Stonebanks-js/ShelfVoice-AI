@@ -58,7 +58,10 @@ export function openStatus(hours: Hours, now: Date, timeZone = "Asia/Kolkata"): 
 
 export function formatTime(hhmm: string, lang: Lang): string {
   const date = new Date(Date.UTC(2026, 0, 1, Number(hhmm.slice(0, 2)), Number(hhmm.slice(3, 5))));
-  return new Intl.DateTimeFormat(localeFor(lang), { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(date);
+  // English reads "7:00 am"; the Indian languages' own formats put a Latin
+  // "AM" beside their script ("बुध 7:00 am बजे"), so they use the 24-hour
+  // clock their railway timetables use (testers, Nov 3).
+  return new Intl.DateTimeFormat(localeFor(lang), { hour: "numeric", minute: "2-digit", ...(lang === "en" ? {} : { hourCycle: "h23" as const }), timeZone: "UTC" }).format(date);
 }
 
 export function dayName(day: Day, lang: Lang, width: "short" | "long" = "short"): string {

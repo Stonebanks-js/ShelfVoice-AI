@@ -237,6 +237,15 @@
   from { transform: scaleX(1); }
   to { transform: scaleX(0); }
 }
+/* The splash (V-10): the logo settles in, the voice bars speak. */
+@keyframes splash-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes splash-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
 /* A screen arriving: a short rise from an already-visible start (E-37). */
 @keyframes rise-in {
   from { transform: translateY(8px); opacity: 0.6; }
@@ -321,11 +330,45 @@
   border-top-color: var(--accent-fill);
   border-bottom: 0;
 }
+.sv-map-cluster {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  background: #101010;
+  border: 3px solid var(--accent-fill);
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.25);
+  color: #fff;
+  font: 700 15px/1 var(--font-display);
+  cursor: pointer;
+}
 .sv-map-pin:hover {
   scale: 1.1;
 }
 
+/* Screen changes (V-10): the old screen leaves fast, the new one arrives
+   gently, so the two never compete. */
+::view-transition-old(.page) {
+  animation: 140ms ease-out both vt-fade-out;
+}
+::view-transition-new(.page) {
+  animation: 260ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both vt-rise-in;
+}
+@keyframes vt-fade-out {
+  to { opacity: 0; }
+}
+@keyframes vt-rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
   *,
   *::before,
   *::after {

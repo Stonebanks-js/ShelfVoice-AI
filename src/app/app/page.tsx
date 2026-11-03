@@ -13,6 +13,7 @@ import { ownerClient } from "@/server/supabase";
 import { todaySummary, type TodaySummary } from "@/server/today";
 
 import Loading from "./loading";
+import { ShopAlerts } from "./shop-alerts";
 import { ShopCard } from "./shop-card";
 
 // O-5 Home (doc 06 Today, reshaped by V-02): the shop first, with View,
@@ -55,15 +56,17 @@ async function Today() {
         </Link>
       </header>
 
+      <ShopAlerts id={state.shop.id} published={state.shop.isPublished} hasProducts={summary.productCount > 0} hasLocation={state.shop.hasLocation} />
+
       {summary.productCount === 0 ? (
-        <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={0} />
+        <ShopCard name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={0} />
       ) : (
         <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
           <div className="min-w-0 lg:col-start-1 lg:row-start-1">
             <SalesCard summary={summary} weekday={weekday.split(",")[0]} t={t} />
           </div>
           <div className="min-w-0 lg:col-start-2 lg:row-start-1">
-            <ShopCard id={state.shop.id} name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
+            <ShopCard name={state.shop.name} slug={state.shop.slug} published={state.shop.isPublished} productCount={summary.productCount} />
           </div>
           <div className="min-w-0 lg:col-start-1 lg:row-start-2">
             <OrdersList summary={summary} lang={lang} now={now} t={t} />

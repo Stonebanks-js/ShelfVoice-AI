@@ -8,12 +8,14 @@ export interface NearbyShop {
   name: string;
   category: string | null;
   address: string | null;
+  pincode: string | null;
   hours: unknown;
   timezone: string;
   distanceKm: number | null;
   // Rounded to about 100 m by the database: a pin on the map (V-09).
   lat: number | null;
   lng: number | null;
+  delivers: boolean;
 }
 
 // Published shops near a point, or in a pincode area (V-03). Public data
@@ -26,15 +28,17 @@ export async function nearbyShops(where: { lat?: number; lng?: number; pincode?:
     p_limit: 30,
   } as never);
   if (error) throw fromPostgres(error);
-  return (data as Array<{ slug: string; name: string; category: string | null; address: string | null; hours: unknown; timezone: string; distance_km: number | null; lat: number | null; lng: number | null }>).map((s) => ({
+  return (data as Array<{ slug: string; name: string; category: string | null; address: string | null; pincode: string | null; hours: unknown; timezone: string; distance_km: number | null; lat: number | null; lng: number | null; delivers: boolean }>).map((s) => ({
     slug: s.slug,
     name: s.name,
     category: s.category,
     address: s.address,
+    pincode: s.pincode,
     hours: s.hours,
     timezone: s.timezone,
     distanceKm: s.distance_km === null ? null : Math.round(s.distance_km * 10) / 10,
     lat: s.lat,
     lng: s.lng,
+    delivers: s.delivers,
   }));
 }

@@ -16,6 +16,11 @@ test.describe("first screen and sign-in", () => {
     await page.goto("/");
     await chooseLanguage(page, "English");
     await expect(page.getByRole("heading", { level: 1, name: "Shelf Voice" })).toBeVisible();
+    // V-10: a welcome first, then the two choices behind "Get started".
+    await expect(page.getByText("Speak, and your shop is online")).toBeVisible();
+    expect(await blockingViolations(page)).toEqual([]);
+    await page.getByRole("link", { name: "Get started" }).click();
+    await expect(page).toHaveURL("/?who=1");
     const choices = page.getByRole("navigation", { name: "Who are you?" });
     await expect(choices.getByRole("link", { name: /^Shop owner/ })).toHaveAttribute("href", "/owner");
     await expect(choices.getByRole("link", { name: /^Customer/ })).toHaveAttribute("href", "/shops");
@@ -30,7 +35,7 @@ test.describe("first screen and sign-in", () => {
   });
 
   test("shop owners continue with Google", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?who=1");
     await chooseLanguage(page, "English");
     await page.getByRole("link", { name: /^Shop owner/ }).click();
     await expect(page).toHaveURL("/owner");
@@ -43,7 +48,7 @@ test.describe("first screen and sign-in", () => {
   });
 
   test("remembers the language choice", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?who=1");
     await chooseLanguage(page, "हिन्दी");
     await page.reload();
     await expect(page.getByRole("link", { name: /^ग्राहक/ })).toBeVisible();
@@ -52,7 +57,7 @@ test.describe("first screen and sign-in", () => {
   test("follows the phone's language on a first visit", async ({ browser }) => {
     const context = await browser.newContext({ locale: "hi-IN" });
     const page = await context.newPage();
-    await page.goto("/");
+    await page.goto("/?who=1");
     await expect(page.getByRole("link", { name: /^दुकानदार/ })).toBeVisible();
     await context.close();
   });
