@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Noto_Sans_Devanagari } from "next/font/google";
+import { ViewTransition } from "react";
 
 import { AppInstall } from "@/components/shell/app-install";
 import { ClientMonitor } from "@/components/shell/client-monitor";
@@ -43,7 +44,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${devanagari.variable} ${bricolage.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-bg font-sans text-ink">
-        {children}
+        {/* Screens change with a short fade and rise (V-10); navigations are
+            transitions, so React runs it through the browser's View
+            Transitions where they exist and skips it where they don't. */}
+        <ViewTransition default="page">{children}</ViewTransition>
         <ClientMonitor />
         <AppInstall />
       </body>

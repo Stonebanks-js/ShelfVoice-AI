@@ -1,7 +1,7 @@
 "use client";
 
 import { Banknote, Check, Clock, Download, ExternalLink, IndianRupee, LifeBuoy, ListPlus, LogOut, MapPin, Package, Phone, QrCode, Settings2, Share, ShieldCheck, ShoppingBag, Store, Tag, Trash2, Truck, Wallet } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import qrcode from "qrcode-generator";
 import { useMemo, useState } from "react";
 
@@ -67,7 +67,11 @@ export function ShopScreen({
   const router = useRouter();
   const toast = useToast();
   const [published, setPublished] = useState(shop.is_published);
-  const [sheet, setSheet] = useState<"qr" | "qrShop" | "details" | "hours" | "upi" | "delivery" | null>(null);
+  // Home's "add your location" alert opens the details sheet straight away.
+  const params = useSearchParams();
+  const [sheet, setSheet] = useState<"qr" | "qrShop" | "details" | "hours" | "upi" | "delivery" | null>(() =>
+    params.get("open") === "details" ? "details" : null,
+  );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const shopUrl = `${origin}/s/${shop.slug}`;
@@ -248,7 +252,7 @@ export function ShopScreen({
             {delivers && <ListRow icon={<Settings2 />} title={t("shop.deliverySettings")} subtitle={deliverySummary} wrap onClick={() => setSheet("delivery")} />}
           </ListGroup>
 
-          <ListGroup header={t("shop.details")}>
+          <ListGroup header={t("shop.details")} footer={t("shop.oneShop")}>
             <ListRow icon={<Store />} title={t("field.name")} value={<span className="line-clamp-1 max-w-40">{shop.name}</span>} onClick={() => setSheet("details")} />
             <ListRow icon={<Tag />} title={t("shop.type")} value={shop.category ?? t("shop.notSet")} onClick={() => setSheet("details")} />
             <ListRow
@@ -306,8 +310,8 @@ export function ShopScreen({
         </div>
       </div>
 
-      {sheet === "qr" && <QrSheet url={reviewUrl} shopName={shop.name} kind="review" onClose={() => setSheet(null)} />}
-      {sheet === "qrShop" && <QrSheet url={shopUrl} shopName={shop.name} kind="shop" onClose={() => setSheet(null)} />}
+      {sheet === "qr" && <QrSheet url={reviewUrl} shopName={shop.name} kind="review" hidden={!published} onClose={() => setSheet(null)} />}
+      {sheet === "qrShop" && <QrSheet url={shopUrl} shopName={shop.name} kind="shop" hidden={!published} onClose={() => setSheet(null)} />}
       {sheet === "upi" && <UpiSheet upiId={shop.upi_id} onClose={() => setSheet(null)} />}
       {sheet === "delivery" && <DeliverySheet shop={shop} onClose={() => setSheet(null)} />}
       {sheet === "details" && <DetailsSheet shop={shop} onClose={() => setSheet(null)} />}
@@ -328,7 +332,7 @@ export function ShopScreen({
 }
 
 // The counter QR (doc 06 O-9): opens the customer review page.
-function QrSheet({ url, shopName, kind, onClose }: { url: string; shopName: string; kind: "review" | "shop"; onClose: () => void }) {
+function QrSheet({ url, shopName, kind, hidden, onClose }: { url: string; shopName: string; kind: "review" | "shop"; hidden: boolean; onClose: () => void }) {
   const { t } = useLang();
   const title = t(kind === "review" ? "shop.qrTitle" : "shop.qrShopTitle");
   const qr = useMemo(() => {
@@ -387,6 +391,11 @@ function QrSheet({ url, shopName, kind, onClose }: { url: string; shopName: stri
     >
       <div className="flex flex-col items-center gap-4">
         <p className="text-center text-body text-ink-2">{t(kind === "review" ? "shop.qrBody" : "shop.qrShopBody")}</p>
+        {hidden && (
+          <p role="status" className="w-full rounded-md bg-warn-soft px-4 py-3 text-footnote text-ink">
+            {t("shop.qrHidden")}
+          </p>
+        )}
         <div className="rounded-lg bg-white p-4">
           <svg role="img" aria-label={`QR: ${url}`} viewBox={`-2 -2 ${size + 4} ${size + 4}`} className="size-56" shapeRendering="crispEdges">
             <path d={path} fill="#101010" />

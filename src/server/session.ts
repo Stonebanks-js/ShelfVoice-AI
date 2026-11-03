@@ -12,7 +12,7 @@ import { ownerClient } from "./supabase";
 
 export interface OwnerState {
   user: { id: string; isAnonymous: boolean };
-  shop: { id: string; name: string; slug: string; category: string | null; language: Lang; isPublished: boolean } | null;
+  shop: { id: string; name: string; slug: string; category: string | null; language: Lang; isPublished: boolean; hasLocation: boolean } | null;
 }
 
 // The signed-in owner and their shop, read once per request for pages. Null
@@ -24,7 +24,7 @@ export const ownerState = cache(async (): Promise<OwnerState | null> => {
   const db = await ownerClient();
   const { data } = await db.auth.getUser();
   if (!data.user) return null;
-  const { data: shop } = await db.from("shops").select("id, name, slug, category, language, is_published").maybeSingle();
+  const { data: shop } = await db.from("shops").select("id, name, slug, category, language, is_published, lat").maybeSingle();
   return {
     user: { id: data.user.id, isAnonymous: data.user.is_anonymous ?? false },
     shop: shop
@@ -35,6 +35,7 @@ export const ownerState = cache(async (): Promise<OwnerState | null> => {
           category: shop.category,
           language: isLang(shop.language) ? shop.language : "hi",
           isPublished: shop.is_published,
+          hasLocation: shop.lat !== null,
         }
       : null,
   };
@@ -49,6 +50,14 @@ export async function languageSuggestion(current: Lang): Promise<{ state: string
   const found = langFromRegion(h.get("x-vercel-ip-country"), h.get("x-vercel-ip-country-region"));
   if (!found || found.lang === current) return null;
   return { ...found, question: translate(found.lang, "lang.suggest", { state: found.state }) };
+}
+
+// A customer's pages (shop, review, order) are in the language they chose,
+// else the shop's own: testers who picked Hindi got Bengaluru shops in
+// Kannada with no way back (V-10).
+export async function customerLang(shopLang: Lang): Promise<Lang> {
+  const chosen = (await cookies()).get("sv_lang")?.value;
+  return isLang(chosen) ? chosen : shopLang;
 }
 
 // Doc 06 U2: the owner's saved choice, else the cookie set by the language

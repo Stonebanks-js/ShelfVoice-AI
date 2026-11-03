@@ -1,10 +1,11 @@
 "use client";
 
-import { CircleAlert, CircleCheck, Mic, RotateCcw } from "lucide-react";
+import { ChevronLeft, CircleAlert, CircleCheck, Mic, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { LogoMark } from "@/components/brand/logo";
+import { LanguagePicker } from "@/components/shell/language-picker";
 import { MicButton } from "@/components/shell/mic-button";
 import { Button } from "@/components/ui/button";
 import type { MessageKey } from "@/i18n/dictionary";
@@ -76,7 +77,15 @@ export function ReviewFlow({ slug, shopName, siteKey }: { slug: string; shopName
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pt-[max(2.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <p className="text-footnote font-semibold text-ink-2">{shopName}</p>
+      {/* A way back to the shop, and the language (testers, Nov 3). */}
+      <div className="flex items-center gap-2">
+        <Link href={`/s/${slug}`} className="-ml-2 inline-flex min-h-11 min-w-0 items-center gap-1 px-2 text-footnote font-semibold text-accent">
+          <ChevronLeft aria-hidden className="size-5 shrink-0" />
+          <span className="truncate">{shopName}</span>
+        </Link>
+        <span className="flex-1" />
+        <LanguagePicker />
+      </div>
       <h1 className="mt-1 font-display text-title font-bold tracking-tight">{t("review.title", { shop: shopName })}</h1>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-6 py-10">

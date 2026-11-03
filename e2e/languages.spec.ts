@@ -8,7 +8,7 @@ import { blockingViolations, chooseLanguage, localAdmin, localSupabase, signInTo
 
 test("the picker switches the first screen to Kannada, and it stays", async ({ page, context }) => {
   await context.clearCookies();
-  await page.goto("/");
+  await page.goto("/?who=1");
   await chooseLanguage(page, "ಕನ್ನಡ");
   await expect(page.getByRole("heading", { name: "ನೀವು ಯಾರು?" })).toBeVisible();
   await expect(page.locator('div.contents[lang="kn"]').first()).toBeAttached();
@@ -29,8 +29,10 @@ test("a visitor in Karnataka is asked about Kannada, once", async ({ browser }) 
     await expect(ask.locator('p[lang="kn"]')).toBeVisible(); // the question again, in Kannada
     expect(await blockingViolations(page)).toEqual([]);
     await ask.getByRole("button", { name: "ಕನ್ನಡ" }).click();
+    await page.getByTestId("get-started").click();
     await expect(page.getByRole("heading", { name: "ನೀವು ಯಾರು?" })).toBeVisible();
-    await page.reload();
+    await page.goto("/");
+    await expect(page.getByTestId("get-started")).toBeVisible();
     await expect(page.locator("#lang-suggest")).toHaveCount(0); // chosen: not asked again
   } finally {
     await context.close();

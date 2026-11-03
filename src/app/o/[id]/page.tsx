@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { LangRoot } from "@/i18n/lang-root";
 import { orderForCustomer } from "@/server/orders";
 import { currentUser } from "@/server/owner";
-import { requestLang } from "@/server/session";
+import { customerLang, requestLang } from "@/server/session";
 
 import { OrderStatusView } from "./order-status";
 import { isLang } from "@/i18n/dictionary";
@@ -25,7 +25,7 @@ async function Order({ params, searchParams }: Pick<PageProps<"/o/[id]">, "param
   const token = typeof query.t === "string" ? query.t : "";
   const user = await currentUser();
   const order = await orderForCustomer(id, token, user?.user.id ?? null);
-  const lang = order && isLang(order.shop.language) ? order.shop.language : await requestLang();
+  const lang = order && isLang(order.shop.language) ? await customerLang(order.shop.language) : await requestLang();
   return (
     <LangRoot initial={lang}>
       <OrderStatusView initial={order} token={token} />

@@ -57,5 +57,6 @@ describe("hours display", () => {
     expect(dayName("mon", "hi")).toBe("सोम");
     expect(formatTime("07:00", "en")).toMatch(/^7:00\sam$/i);
     expect(formatTime("22:30", "en")).toMatch(/^10:30\spm$/i);
+    expect(formatTime("19:00", "hi")).toBe("19:00");
   });
 });

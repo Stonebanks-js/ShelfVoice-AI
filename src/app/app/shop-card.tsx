@@ -2,28 +2,22 @@
 
 import { Eye, EyeOff, ExternalLink, ListPlus, Pencil, Share } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-import { Button, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { useLang } from "@/i18n/lang";
-import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
-import { errorKey } from "@/lib/errors";
 
 // The owner's shop at the top of Home (V-02, E-36): owners asked where to
 // build the shop and where to see it, so both are the first thing on screen.
 // An empty shop gets one big Build button instead; a hidden one with
 // products gets the button that shows it to customers (V-03).
 export function ShopCard({
-  id,
   name,
   slug,
   published,
   productCount,
 }: {
-  id: string;
   name: string;
   slug: string;
   published: boolean;
@@ -31,22 +25,7 @@ export function ShopCard({
 }) {
   const { t } = useLang();
   const toast = useToast();
-  const router = useRouter();
-  const [publishing, setPublishing] = useState(false);
   const path = `/s/${slug}`;
-
-  async function publish() {
-    setPublishing(true);
-    try {
-      await api(`/api/v1/shops/${id}/publish`, { json: { published: true } });
-      toast.show({ message: t("home.publishedNow") });
-      router.refresh();
-    } catch (failure) {
-      toast.show({ message: t(errorKey(failure)) });
-    } finally {
-      setPublishing(false);
-    }
-  }
 
   async function share() {
     const url = `${window.location.origin}${path}`;
@@ -103,11 +82,6 @@ export function ShopCard({
         </>
       ) : (
         <>
-          {!published && (
-            <Button size="lg" loading={publishing} icon={<Eye aria-hidden className="size-5" />} onClick={publish}>
-              {t("home.publish")}
-            </Button>
-          )}
           {/* Round action tiles, as in the big consumer apps (E-37). */}
           <div className="grid grid-cols-3 gap-2">
             <a href={path} target="_blank" rel="noopener" className={TILE}>

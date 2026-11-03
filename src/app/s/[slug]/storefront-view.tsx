@@ -1,16 +1,17 @@
 "use client";
 
-import { ChevronRight, CircleAlert, Heart, MapPin, Phone, ShoppingBag, Truck, UserRound, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleAlert, Clock, Heart, MapPin, Phone, ShoppingBag, Truck, UserRound, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { LogoMark } from "@/components/brand/logo";
 import { VoiceBars } from "@/components/shell/mic-button";
+import { LanguagePicker } from "@/components/shell/language-picker";
 import { OpenBadge } from "@/components/shell/open-badge";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Badge, Chip, Segmented } from "@/components/ui/controls";
-import { TextField } from "@/components/ui/field";
+import { SearchField, TextField } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/overlay";
 import { ProductThumb } from "@/components/ui/product-thumb";
 import { Stepper } from "@/components/ui/quantity";
@@ -19,14 +20,17 @@ import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { cartSnapshot, parseCart, rememberOrder, setCart, subscribeCart } from "@/lib/cart";
 import { formatRupees } from "@/lib/changes-view";
+import { categoryLabel } from "@/lib/categories";
 import { cn } from "@/lib/cn";
 import { deliveryFee } from "@/lib/delivery";
+import { dayName, formatTime, openStatus, shopClock } from "@/lib/hours";
 import { errorKey } from "@/lib/errors";
 import { useTurnstile } from "@/lib/turnstile";
 import type { Account } from "@/server/customer";
 import type { Storefront, StorefrontProduct } from "@/server/storefront";
 
 const serverCart = () => "{}";
+
 
 // The signed-in customer's account, or null when signed out (V-05). The shop
 // page itself is cached for everyone, so this is read in the browser.
@@ -48,6 +52,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
   const { lang, t } = useLang();
   const router = useRouter();
   const [category, setCategory] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const [checkout, setCheckout] = useState(false);
   const [account, setAccount] = useAccount();
   const signIn = `/me?next=${encodeURIComponent(`/s/${shop.slug}`)}`;
@@ -88,7 +93,11 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
 
   const other = t("stock.other");
   const categories = [...new Set(shop.products.map((p) => p.category ?? other))].sort();
-  const shown = shop.products.filter((p) => category === null || (p.category ?? other) === category);
+  // Search by name or category, as in the quick-commerce apps (V-10).
+  const q = query.trim().toLowerCase();
+  const shown = shop.products.filter(
+    (p) => (category === null || (p.category ?? other) === category) && (!q || `${p.name} ${p.category ?? ""}`.toLowerCase().includes(q)),
+  );
   const phoneDigits = shop.phone?.replace(/\D/g, "") ?? null;
 
   // Only products still in stock count; a cart can outlive a stock change.
@@ -109,10 +118,16 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
     <main className={cn("mx-auto flex min-h-dvh w-full max-w-2xl flex-col md:max-w-4xl lg:max-w-6xl lg:px-4", count > 0 && "pb-24")}>
       {/* The signboard: shop name, open now, where, and two ways to reach it. */}
       <header className="flex flex-col gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
-        <div className="flex justify-end">
-          <Link href="/me" className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-footnote font-semibold text-accent">
-            <UserRound aria-hidden className="size-5" />
-            {t("store.account")}
+        {/* Back to the shop list, the language, the account (testers, Nov 3). */}
+        <div className="flex items-center gap-2">
+          <Link href="/shops" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-body font-semibold text-accent">
+            <ChevronLeft aria-hidden className="size-5" />
+            {t("store.allShops")}
+          </Link>
+          <span className="flex-1" />
+          <LanguagePicker />
+          <Link href="/me" aria-label={t("store.account")} className="grid size-11 place-items-center rounded-full text-accent active:bg-fill">
+            <UserRound aria-hidden className="size-6" />
           </Link>
         </div>
         <div className="flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-card lg:flex-row lg:items-start lg:gap-6 lg:p-6">
@@ -122,7 +137,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
             </span>
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <h1 className="font-display text-title font-bold tracking-tight lg:text-large-title">{shop.name}</h1>
-              {shop.category && <p className="text-footnote text-ink-2">{shop.category}</p>}
+              {shop.category && <p className="text-footnote text-ink-2">{categoryLabel(shop.category, t)}</p>}
               <div className="pt-1">
                 <OpenBadge hours={shop.hours} timeZone={shop.timezone} />
               </div>
@@ -168,19 +183,25 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
         <p className="mx-4 rounded-lg bg-surface p-6 text-center text-body text-ink-2 shadow-card">{t("store.empty")}</p>
       ) : (
         <section aria-label={t("store.products")} className="flex flex-col gap-3">
-          {/* Doc 06: category chips stay at the top while scrolling. */}
-          {categories.length > 1 && (
-            <div className="sticky top-0 z-10 -mb-1 flex gap-2 overflow-x-auto bg-chrome px-4 py-3 backdrop-blur-xl [scrollbar-width:none] lg:rounded-b-lg">
-              <Chip selected={category === null} onClick={() => setCategory(null)}>
-                {t("stock.all")}
-              </Chip>
-              {categories.map((c) => (
-                <Chip key={c} selected={category === c} onClick={() => setCategory(category === c ? null : c)}>
-                  {c}
-                </Chip>
-              ))}
+          {/* Doc 06: search and the category chips stay at the top while scrolling. */}
+          <div className="sticky top-0 z-10 -mb-1 flex flex-col gap-2 bg-chrome pt-3 pb-2 backdrop-blur-xl lg:rounded-b-lg">
+            <div className="px-4">
+              <SearchField label={t("search.placeholder")} clearLabel={t("search.clear")} value={query} onValueChange={setQuery} />
             </div>
-          )}
+            {categories.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+                <Chip selected={category === null} onClick={() => setCategory(null)}>
+                  {t("stock.all")}
+                </Chip>
+                {categories.map((c) => (
+                  <Chip key={c} selected={category === c} onClick={() => setCategory(category === c ? null : c)}>
+                    {categoryLabel(c, t)}
+                  </Chip>
+                ))}
+              </div>
+            )}
+          </div>
+          {shown.length === 0 && <p className="mx-4 rounded-lg bg-surface p-6 text-center text-body text-ink-2 shadow-card">{t("stock.noMatch", { q: query })}</p>}
           <ul className="mx-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {shown.map((p) => (
               <ProductCard
@@ -231,7 +252,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
             <ShoppingBag aria-hidden className="size-6 shrink-0" />
             <span className="flex flex-1 flex-col leading-tight">
               <span className="text-footnote">{count === 1 ? t("cart.item1") : t("cart.items", { n: count })}</span>
-              {total > 0 && <span className="text-body font-semibold tabular-nums">{t("cart.total", { total: formatRupees(total) })}</span>}
+              {total > 0 && <span className="text-body font-semibold tabular-nums">{lines.some((l) => !l.product.pricePaise) ? t("cart.total", { total: formatRupees(total) }) : formatRupees(total)}</span>}
             </span>
             <span className="text-body font-semibold">{t("cart.view")}</span>
             <ChevronRight aria-hidden className="size-5 shrink-0" />
@@ -246,6 +267,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           lines={lines}
           total={total}
           whatsapp={whatsapp}
+          modes={modes}
           account={account ?? null}
           onQty={setQty}
           onClose={() => setCheckout(false)}
@@ -352,6 +374,7 @@ function CheckoutSheet({
   lines,
   total,
   whatsapp,
+  modes,
   account,
   onQty,
   onClose,
@@ -362,14 +385,29 @@ function CheckoutSheet({
   lines: Line[];
   total: number;
   whatsapp: string | null;
+  modes: string;
   account: Account | null;
   onQty: (id: string, qty: number) => void;
   onClose: () => void;
   onPlaced: () => void;
 }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const router = useRouter();
   const { containerRef, token: turnstileToken } = useTurnstile(siteKey);
+  // A closed shop still takes the order, but the customer knows when it will
+  // be seen (testers ordered at night and were told "soon").
+  const [now] = useState(() => new Date());
+  const status = openStatus(shop.hours, now, shop.timezone);
+  const closedNote = status.open
+    ? null
+    : status.opensAt === null || status.opensDay === null
+      ? t("cart.closedNoHours")
+      : t("cart.closed", {
+          when:
+            status.opensDay === shopClock(now, shop.timezone).day
+              ? formatTime(status.opensAt, lang)
+              : `${dayName(status.opensDay, lang)} ${formatTime(status.opensAt, lang)}`,
+        });
   const saved = account?.addresses ?? [];
   const [fulfilment, setFulfilment] = useState<"PICKUP" | "DELIVERY">("PICKUP");
   const [form, setForm] = useState({ name: account?.profile?.name ?? "", phone: account?.profile?.phone?.replace(/^\+91/, "") ?? "", address: "", note: "" });
@@ -398,9 +436,9 @@ function CheckoutSheet({
         setHere({ lat: Math.round(position.coords.latitude * 10_000) / 10_000, lng: Math.round(position.coords.longitude * 10_000) / 10_000 });
         setLocating(false);
       },
-      () => {
+      (failure) => {
         setLocating(false);
-        setError("cart.error.location");
+        setError(failure.code === failure.PERMISSION_DENIED ? "cart.error.locationBlocked" : "cart.error.location");
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
     );
@@ -440,7 +478,7 @@ function CheckoutSheet({
       open
       onClose={onClose}
       title={t("cart.title")}
-      doneLabel={t("action.cancel")}
+      doneLabel={t("action.close")}
       footer={
         <div className="flex flex-col gap-2">
           {error && (
@@ -462,6 +500,12 @@ function CheckoutSheet({
       }
     >
       <div className="flex flex-col gap-5">
+        {closedNote && (
+          <p role="status" className="flex items-start gap-2 rounded-md bg-warn-soft px-4 py-3 text-footnote text-ink">
+            <Clock aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {closedNote}
+          </p>
+        )}
         <ul aria-label={t("cart.title")} className="overflow-hidden rounded-md bg-surface shadow-card">
           {lines.map(({ product, qty }) => (
             <li key={product.id} className="flex items-center gap-3 border-separator px-4 py-2.5 not-first:border-t">
@@ -561,7 +605,7 @@ function CheckoutSheet({
             </p>
           )}
         </div>
-        <p className="-mt-3 px-1 text-footnote text-ink-2">{t("cart.pay")}</p>
+        <p className="-mt-3 px-1 text-footnote text-ink-2">{modes ? t("cart.payModes", { modes }) : t("cart.pay")}</p>
         <p className="px-1 text-footnote text-ink-2">{t("cart.privacy", { shop: shop.name })}</p>
         {/* Turnstile shows itself here only if Cloudflare needs a tap. */}
         <div ref={containerRef} />
