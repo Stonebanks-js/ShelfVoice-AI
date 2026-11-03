@@ -19,7 +19,7 @@ export function ListGroup({
   return (
     <section className={cn("flex flex-col gap-1.5", className)}>
       {header && <h2 className="px-4 text-footnote font-medium text-ink-2">{header}</h2>}
-      <ul className="overflow-hidden rounded-md bg-surface shadow-card">{children}</ul>
+      <ul className="overflow-hidden rounded-lg bg-surface shadow-card">{children}</ul>
       {footer && <p className="px-4 text-footnote text-ink-2">{footer}</p>}
     </section>
   );
@@ -49,6 +49,7 @@ interface ListRowProps {
   subtitle?: ReactNode;
   icon?: ReactNode;
   iconTone?: IconTone;
+  media?: ReactNode; // a product thumbnail or photo in place of the icon (E-37)
   value?: ReactNode; // trailing text or badge
   accessory?: ReactNode; // trailing control, e.g. a Switch
   href?: string;
@@ -59,11 +60,11 @@ interface ListRowProps {
 
 // One row. A link or button when it navigates or acts (with a chevron for
 // links); plain otherwise. The separator is inset past the icon, as on iOS.
-export function ListRow({ title, subtitle, icon, iconTone, value, accessory, href, onClick, titleId, wrap = false }: ListRowProps) {
+export function ListRow({ title, subtitle, icon, iconTone, media, value, accessory, href, onClick, titleId, wrap = false }: ListRowProps) {
   const interactive = Boolean(href || onClick);
   const body = (
     <>
-      {icon && <IconTile icon={icon} tone={iconTone} />}
+      {media ? <span className="my-2 shrink-0">{media}</span> : icon && <IconTile icon={icon} tone={iconTone} />}
       <span className="flex min-h-12 min-w-0 flex-1 items-center gap-3 border-separator py-2.5 pr-4 [li+li_&]:border-t">
         <span className="flex min-w-0 flex-1 flex-col">
           {/* Titles wrap rather than cut off: regional labels run longer (V-06). */}
@@ -80,7 +81,7 @@ export function ListRow({ title, subtitle, icon, iconTone, value, accessory, hre
   );
   const rowClass = cn(
     "flex w-full items-center gap-3 pl-4 text-left",
-    interactive && "transition-colors active:bg-fill",
+    interactive && "transition-colors active:bg-fill [@media(hover:hover)]:hover:bg-fill/60",
   );
   return (
     <li>

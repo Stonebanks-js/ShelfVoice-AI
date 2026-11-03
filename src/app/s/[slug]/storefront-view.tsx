@@ -12,6 +12,7 @@ import { Button, buttonClass } from "@/components/ui/button";
 import { Badge, Chip, Segmented } from "@/components/ui/controls";
 import { TextField } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/overlay";
+import { ProductThumb } from "@/components/ui/product-thumb";
 import { Stepper } from "@/components/ui/quantity";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
@@ -102,7 +103,10 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
   const whatsapp = phoneDigits ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}` : null;
 
   return (
-    <main className={cn("mx-auto flex min-h-dvh w-full max-w-2xl flex-col", count > 0 && "pb-24")}>
+    // E-37: the signboard as a card, then the shelf as a grid of product
+    // cards (two across on a phone, up to five on a desktop), as in the big
+    // quick-commerce apps.
+    <main className={cn("mx-auto flex min-h-dvh w-full max-w-2xl flex-col md:max-w-4xl lg:max-w-6xl lg:px-4", count > 0 && "pb-24")}>
       {/* The signboard: shop name, open now, where, and two ways to reach it. */}
       <header className="flex flex-col gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
         <div className="flex justify-end">
@@ -111,16 +115,21 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
             {t("store.account")}
           </Link>
         </div>
-        <div className="flex items-start gap-2">
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h1 className="font-display text-large-title font-bold tracking-tight">{shop.name}</h1>
-            {shop.category && <p className="text-body text-ink-2">{shop.category}</p>}
+        <div className="flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-card lg:flex-row lg:items-start lg:gap-6 lg:p-6">
+          <div className="flex items-start gap-3 lg:min-w-0 lg:flex-1">
+            <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-lg bg-accent-soft font-display text-large-title font-bold text-accent-fill lg:size-16">
+              {shop.name.trim().charAt(0).toUpperCase()}
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <h1 className="font-display text-title font-bold tracking-tight lg:text-large-title">{shop.name}</h1>
+              {shop.category && <p className="text-footnote text-ink-2">{shop.category}</p>}
+              <div className="pt-1">
+                <OpenBadge hours={shop.hours} timeZone={shop.timezone} />
+              </div>
+            </div>
+            <HeartButton on={favourite} label={t("store.favourite")} onClick={favouriteShop} disabled={account === undefined} />
           </div>
-          <HeartButton on={favourite} label={t("store.favourite")} onClick={favouriteShop} disabled={account === undefined} />
-        </div>
-        <div>
-          <OpenBadge hours={shop.hours} timeZone={shop.timezone} />
-        </div>
+          <div className="flex flex-col gap-3 lg:w-[26rem] lg:shrink-0">
         {shop.address && (
           <p className="flex items-start gap-2 text-body text-ink-2">
             <MapPin aria-hidden className="mt-0.5 size-5 shrink-0" />
@@ -151,6 +160,8 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
             </a>
           </div>
         )}
+          </div>
+        </div>
       </header>
 
       {shop.products.length === 0 ? (
@@ -159,7 +170,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
         <section aria-label={t("store.products")} className="flex flex-col gap-3">
           {/* Doc 06: category chips stay at the top while scrolling. */}
           {categories.length > 1 && (
-            <div className="sticky top-0 z-10 -mb-1 flex gap-2 overflow-x-auto border-b border-separator bg-chrome px-4 py-3 backdrop-blur-xl [scrollbar-width:none]">
+            <div className="sticky top-0 z-10 -mb-1 flex gap-2 overflow-x-auto bg-chrome px-4 py-3 backdrop-blur-xl [scrollbar-width:none] lg:rounded-b-lg">
               <Chip selected={category === null} onClick={() => setCategory(null)}>
                 {t("stock.all")}
               </Chip>
@@ -170,9 +181,9 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
               ))}
             </div>
           )}
-          <ul className="mx-4 overflow-hidden rounded-md bg-surface shadow-card">
+          <ul className="mx-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {shown.map((p) => (
-              <ProductRow
+              <ProductCard
                 key={p.id}
                 product={p}
                 qty={cart[p.id] ?? 0}
@@ -215,7 +226,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           <button
             type="button"
             onClick={() => setCheckout(true)}
-            className="mx-auto flex min-h-14 w-full max-w-2xl items-center gap-3 rounded-lg bg-accent-fill px-4 text-left text-on-accent shadow-float active:scale-[0.99]"
+            className="mx-auto flex min-h-14 w-full max-w-lg animate-rise-in items-center gap-3 rounded-xl bg-accent-fill px-4 text-left text-on-accent shadow-float active:scale-[0.99]"
           >
             <ShoppingBag aria-hidden className="size-6 shrink-0" />
             <span className="flex flex-1 flex-col leading-tight">
@@ -245,9 +256,11 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
   );
 }
 
-// One product, with ADD and then − n +, as on Instamart. Out-of-stock items
-// can't be added; prices only if the owner set them; never a stock count.
-function ProductRow({
+// One product as a card, with ADD and then the stepper, as on Instamart
+// (E-37: its face on top, the heart on the picture, the price in the display
+// face). Out-of-stock items cannot be added; prices only if the owner set
+// them; never a stock count.
+function ProductCard({
   product: p,
   qty,
   onQty,
@@ -264,24 +277,32 @@ function ProductRow({
 }) {
   const { t } = useLang();
   return (
-    <li className="flex items-center gap-2 border-separator py-3 pr-4 pl-1 not-first:border-t">
-      <HeartButton on={wished} label={t("store.wish", { name: p.name })} onClick={onWish} small disabled={!wishReady} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className={cn("text-body", !p.inStock && "text-ink-2")}>
-          {p.name}
-          {p.unit && <span className="text-ink-2"> · {p.unit}</span>}
-        </span>
-        <span className="flex items-center gap-2 text-footnote">
-          {p.pricePaise ? <span className="font-semibold tabular-nums">{formatRupees(p.pricePaise)}</span> : null}
-          {p.inStock ? <span className="text-success">{t("status.inStock")}</span> : <Badge>{t("status.outOfStock")}</Badge>}
-        </span>
+    <li className="flex min-w-0 flex-col gap-2 rounded-xl bg-surface p-2.5 shadow-card">
+      <div className="relative">
+        <ProductThumb name={p.name} category={p.category} size="lg" className={cn(!p.inStock && "opacity-45 grayscale")} />
+        <div className="absolute top-1 right-1 rounded-full bg-surface/90">
+          <HeartButton on={wished} label={t("store.wish", { name: p.name })} onClick={onWish} small disabled={!wishReady} />
+        </div>
+        {!p.inStock && (
+          <span className="absolute bottom-2 left-2">
+            <Badge>{t("status.outOfStock")}</Badge>
+          </span>
+        )}
       </div>
+      <span className={cn("line-clamp-2 min-h-10 text-footnote font-medium", !p.inStock && "text-ink-2")}>
+        {p.name}
+        {p.unit && <span className="font-normal text-ink-2"> · {p.unit}</span>}
+      </span>
+      <span className="flex min-h-6 items-center gap-2">
+        {p.pricePaise ? <span className="font-display text-body font-bold tabular-nums">{formatRupees(p.pricePaise)}</span> : null}
+        {p.inStock && <span className="sr-only">{t("status.inStock")}</span>}
+      </span>
       {p.inStock &&
         (qty === 0 ? (
           <button
             type="button"
             onClick={() => onQty(1)}
-            className="inline-flex h-11 min-w-24 shrink-0 items-center justify-center rounded-md border border-fill-strong bg-surface px-3 text-footnote font-bold tracking-wide text-ink uppercase active:scale-[0.98]"
+            className="inline-flex h-11 w-full items-center justify-center rounded-md border-2 border-voice bg-surface px-3 text-footnote font-bold tracking-wide text-voice uppercase transition-[background-color,transform] active:scale-[0.97] [@media(hover:hover)]:hover:bg-accent-soft"
           >
             {t("list.add")}
             <span className="sr-only"> {p.name}</span>
@@ -292,6 +313,8 @@ function ProductRow({
             min={1}
             max={99}
             clearable
+            filled
+            className="w-full"
             onChange={(next) => onQty(next ?? 0)}
             lessLabel={t("stock.less", { name: p.name })}
             moreLabel={t("stock.more", { name: p.name })}

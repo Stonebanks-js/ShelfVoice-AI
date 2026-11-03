@@ -131,7 +131,7 @@ export function VoiceCapture({
       {message && (
         <div
           role="alert"
-          className={`absolute bottom-full z-10 mb-3 flex w-[min(20rem,calc(100vw-2rem))] items-start gap-2 rounded-lg bg-surface p-3 text-footnote text-ink shadow-float ${size === "tab" ? "right-0" : ""}`}
+          className={`absolute bottom-full z-10 mb-3 flex w-[min(20rem,calc(100vw-2rem))] items-start gap-2 rounded-lg bg-surface p-3 text-footnote text-ink shadow-float ${size === "tab" ? "right-0 lg:right-auto lg:left-0" : ""}`}
         >
           <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-danger" />
           <div className="flex flex-1 flex-col items-start gap-1">

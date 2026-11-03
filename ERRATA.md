@@ -57,6 +57,7 @@ Each entry is one conflict between documents. It lists every place that has to c
 | [E-34](#e-34-festival-calendar-dates-windows-and-factors) | Festival calendar dates, windows and factors | Low | No | Applied |
 | [E-35](#e-35-bag-logo-in-black-white-and-the-logos-red) | Bag logo in black, white and the logo's red | Medium | Yes | Applied |
 | [E-36](#e-36-client-feedback-bulk-product-adding-two-sign-up-paths-customer-orders-and-regional-languages) | Client feedback: bulk product adding, two sign-up paths, customer orders and regional languages | High | Yes | Decided |
+| [E-37](#e-37-a-richer-ui-on-every-device-and-a-real-installed-app) | A richer UI on every device, and a real installed app | High | Yes | Decided |
 
 ---
 
@@ -766,3 +767,17 @@ The calendar ends in December 2027; a 2028 seed is needed before then.
 | 06 | — | O-1, O-3, U3 | Two sign-up paths, setup steps, Home and My shop tabs (E-36) |
 | 07 | — | products | Add `barcode` (unique per shop) and an Open Food Facts lookup cache (E-36) |
 | 07 | — | shops | `language` allows the nine regional codes as well as `hi` and `en` (E-36) |
+
+### E-37 A richer UI on every device, and a real installed app
+
+**Severity:** High · **Owner decision:** Yes · **Status:** Decided (Nov 3)
+
+**Gap.** E-35 kept the look to black, white and one red used only for voice, and every screen was a phone column. The owner reported on Nov 3 that on a desktop the app opens as a 9:16 column on a 16:9 screen, that installed from Chrome on a phone it opens as a browser tab, and that the phone UI looks static and plain next to Blinkit, Swiggy and Instagram.
+
+**Decision (Nov 3, owner).** Rework the UI end to end, keeping the logo, the type of the brand and the token system:
+
+1. **Colour with meaning.** The logo's red now carries primary actions as well as voice; green means money in and in stock; amber means running low; products without a photo get a category colour and a drawn mark (dairy blue, staples grain, snacks chilli and so on). Contrast stays 4.5:1 or better in light and dark.
+2. **Type.** Bricolage Grotesque for headings, figures and prices; body text stays on the phone's own font so all eleven scripts render natively.
+3. **Desktop and tablet.** The owner app's tab bar becomes a left sidebar from 1024 px (the same nav and the same Bolo button, so the landmark never moves); each owner screen uses the width (Home as a two-column dashboard, My shop with the shop pinned beside two columns of settings, card grids for Stock, Orders, Reviews and Restock). The first screen and owner sign-in split into a red brand panel and the choices; the shop page is a grid of product cards (two across on a phone, up to five on a desktop).
+4. **Installed app.** The service worker is registered on every page with an offline page; an Install the app row (My shop and Account) uses Chrome's install prompt instead of a home-screen shortcut, with Safari's steps on an iPhone; iOS gets its home-screen app tags; the portrait lock is gone so tablets and desktops can turn.
+5. **Google sign-in** stays on a near-black (white in dark mode) button, as Google's branding rules require.

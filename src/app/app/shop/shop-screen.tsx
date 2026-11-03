@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { drawLogo, LOGO } from "@/components/brand/logo";
 import { OrderAlerts } from "@/components/shell/order-alerts";
 import { Button, buttonClass } from "@/components/ui/button";
+import { InstallAppRow } from "@/components/shell/app-install";
 import { OpenBadge } from "@/components/shell/open-badge";
 import { Switch } from "@/components/ui/controls";
 import { PageHeader } from "@/components/ui/feedback";
@@ -168,137 +169,141 @@ export function ShopScreen({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6 lg:max-w-6xl lg:px-4">
       <PageHeader title={t("tab.shop")} />
 
-
-      {/* Doc 06: a live preview of what customers see. */}
-      <section aria-label={t("shop.page")} className="mx-4 flex flex-col gap-3 rounded-lg bg-surface p-4 shadow-card">
-        {/* The badge drops below a long name or a long regional label (V-06). */}
-        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
-          <div className="min-w-0">
-            <h2 className="font-display text-title font-bold tracking-tight">{shop.name}</h2>
-            {shop.category && <p className="text-footnote text-ink-2">{shop.category}</p>}
+      {/* From 1024 px: the shop preview pinned on the left, the settings in
+          two columns beside it (E-37). */}
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:gap-6">
+        {/* Doc 06: a live preview of what customers see. */}
+        <section aria-label={t("shop.page")} className="mx-4 flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-card lg:sticky lg:top-6 lg:mx-0">
+          {/* The badge drops below a long name or a long regional label (V-06). */}
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+            <div className="min-w-0">
+              <h2 className="font-display text-title font-bold tracking-tight">{shop.name}</h2>
+              {shop.category && <p className="text-footnote text-ink-2">{shop.category}</p>}
+            </div>
+            <OpenBadge hours={shop.hours} timeZone={shop.timezone} />
           </div>
-          <OpenBadge hours={shop.hours} timeZone={shop.timezone} />
-        </div>
-        {shop.address && (
-          <p className="flex items-start gap-2 text-footnote text-ink-2">
-            <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {shop.address}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-2">
-          <a href={shopUrl} target="_blank" rel="noopener" className={buttonClass("tinted", "md")}>
-            <ExternalLink aria-hidden className="size-5" />
-            {t("shop.view")}
-          </a>
-          <Button variant="gray" icon={<Share aria-hidden className="size-5" />} onClick={shareLink}>
-            {t("shop.shareLink")}
-          </Button>
-        </div>
-      </section>
-
-      <div className="flex flex-col gap-6 px-4">
-        {/* V-02: products and their stock live under My shop. */}
-        <ListGroup header={t("shop.products")}>
-          <ListRow icon={<Package />} title={t("shop.allProducts")} value={<span className="tabular-nums">{productCount}</span>} href="/app/stock" />
-          <ListRow icon={<ListPlus />} title={t("add.title")} href="/app/add" />
-          <ListRow icon={<Truck />} title={t("shop.restock")} href="/app/restock" />
-        </ListGroup>
-
-        <ListGroup header={t("shop.page")} footer={t("shop.publishedNote")}>
-          <ListRow
-            icon={<Store />}
-            title={t("shop.published")}
-            titleId="published-title"
-            accessory={<Switch checked={published} onCheckedChange={togglePublished} labelledBy="published-title" />}
-          />
-          <ListRow icon={<QrCode />} title={t("shop.qr")} onClick={() => setSheet("qr")} />
-          <ListRow icon={<QrCode />} title={t("shop.qrShop")} onClick={() => setSheet("qrShop")} />
-        </ListGroup>
-
-        {/* V-05: how customers pay. Money goes straight to the shop. */}
-        <ListGroup header={t("shop.payments")}>
-          <ListRow icon={<IndianRupee />} title={t("shop.upi")} value={<span className="line-clamp-1 max-w-44">{shop.upi_id ?? t("shop.notSet")}</span>} onClick={() => setSheet("upi")} />
-          <ListRow
-            icon={<Banknote />}
-            title={t("pay.CASH")}
-            titleId="cash-title"
-            accessory={<Switch checked={settings.accepts_cash} onCheckedChange={(on) => saveSetting({ accepts_cash: on })} labelledBy="cash-title" />}
-          />
-          <ListRow
-            icon={<Wallet />}
-            title={t("pay.cod")}
-            titleId="cod-title"
-            accessory={<Switch checked={settings.pay_on_delivery} onCheckedChange={(on) => saveSetting({ pay_on_delivery: on })} labelledBy="cod-title" />}
-          />
-        </ListGroup>
-
-        <ListGroup header={t("shop.delivery")}>
-          <ListRow
-            icon={<Truck />}
-            title={t("shop.delivers")}
-            titleId="delivers-title"
-            accessory={<Switch checked={delivers} onCheckedChange={toggleDelivers} labelledBy="delivers-title" />}
-          />
-          {delivers && <ListRow icon={<Settings2 />} title={t("shop.deliverySettings")} subtitle={deliverySummary} wrap onClick={() => setSheet("delivery")} />}
-        </ListGroup>
-
-        <ListGroup header={t("shop.details")}>
-          <ListRow icon={<Store />} title={t("field.name")} value={<span className="line-clamp-1 max-w-40">{shop.name}</span>} onClick={() => setSheet("details")} />
-          <ListRow icon={<Tag />} title={t("shop.type")} value={shop.category ?? t("shop.notSet")} onClick={() => setSheet("details")} />
-          <ListRow
-            icon={<Phone />}
-            title={t("shop.phone")}
-            value={shop.phone ? formatPhone(shop.phone) : t("shop.notSet")}
-            onClick={() => setSheet("details")}
-          />
-          <ListRow icon={<MapPin />} title={t("field.address")} subtitle={shop.address ?? t("shop.notSet")} wrap onClick={() => setSheet("details")} />
-        </ListGroup>
-
-        <ListGroup header={t("shop.hours")}>
-          {hasHours(shop.hours) ? (
-            hourRuns(shop.hours).map((run) => (
-              <ListRow
-                key={run.from}
-                icon={<Clock />}
-                iconTone={run.slots.length ? "accent" : "gray"}
-                title={run.from === run.to ? dayName(run.from, lang) : `${dayName(run.from, lang)} – ${dayName(run.to, lang)}`}
-                value={
-                  run.slots.length
-                    ? run.slots.map(([o, c]) => `${formatTime(o, lang)} – ${formatTime(c, lang)}`).join(", ")
-                    : t("shop.closed")
-                }
-                onClick={() => setSheet("hours")}
-              />
-            ))
-          ) : (
-            <ListRow icon={<Clock />} title={t("shop.noHours")} onClick={() => setSheet("hours")} />
+          {shop.address && (
+            <p className="flex items-start gap-2 text-footnote text-ink-2">
+              <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
+              {shop.address}
+            </p>
           )}
-        </ListGroup>
+          <div className="flex flex-wrap gap-2">
+            <a href={shopUrl} target="_blank" rel="noopener" className={buttonClass("tinted", "md")}>
+              <ExternalLink aria-hidden className="size-5" />
+              {t("shop.view")}
+            </a>
+            <Button variant="gray" icon={<Share aria-hidden className="size-5" />} onClick={shareLink}>
+              {t("shop.shareLink")}
+            </Button>
+          </div>
+        </section>
 
-        <ListGroup header={t("lang.label")}>
-          <li>
-            <LanguagePicker variant="row" onChange={saveLanguage} />
-          </li>
-        </ListGroup>
+        <div className="flex flex-col gap-6 px-4">
+          {/* V-02: products and their stock live under My shop. */}
+          <ListGroup header={t("shop.products")}>
+            <ListRow icon={<Package />} title={t("shop.allProducts")} value={<span className="tabular-nums">{productCount}</span>} href="/app/stock" />
+            <ListRow icon={<ListPlus />} title={t("add.title")} href="/app/add" />
+            <ListRow icon={<Truck />} title={t("shop.restock")} href="/app/restock" />
+          </ListGroup>
 
-        {vapidKey && (
-          <ListGroup header={t("shop.notifications")}>
+          <ListGroup header={t("shop.page")} footer={t("shop.publishedNote")}>
+            <ListRow
+              icon={<Store />}
+              title={t("shop.published")}
+              titleId="published-title"
+              accessory={<Switch checked={published} onCheckedChange={togglePublished} labelledBy="published-title" />}
+            />
+            <ListRow icon={<QrCode />} title={t("shop.qr")} onClick={() => setSheet("qr")} />
+            <ListRow icon={<QrCode />} title={t("shop.qrShop")} onClick={() => setSheet("qrShop")} />
+          </ListGroup>
+
+          {/* V-05: how customers pay. Money goes straight to the shop. */}
+          <ListGroup header={t("shop.payments")}>
+            <ListRow icon={<IndianRupee />} title={t("shop.upi")} value={<span className="line-clamp-1 max-w-44">{shop.upi_id ?? t("shop.notSet")}</span>} onClick={() => setSheet("upi")} />
+            <ListRow
+              icon={<Banknote />}
+              title={t("pay.CASH")}
+              titleId="cash-title"
+              accessory={<Switch checked={settings.accepts_cash} onCheckedChange={(on) => saveSetting({ accepts_cash: on })} labelledBy="cash-title" />}
+            />
+            <ListRow
+              icon={<Wallet />}
+              title={t("pay.cod")}
+              titleId="cod-title"
+              accessory={<Switch checked={settings.pay_on_delivery} onCheckedChange={(on) => saveSetting({ pay_on_delivery: on })} labelledBy="cod-title" />}
+            />
+          </ListGroup>
+
+          <ListGroup header={t("shop.delivery")}>
+            <ListRow
+              icon={<Truck />}
+              title={t("shop.delivers")}
+              titleId="delivers-title"
+              accessory={<Switch checked={delivers} onCheckedChange={toggleDelivers} labelledBy="delivers-title" />}
+            />
+            {delivers && <ListRow icon={<Settings2 />} title={t("shop.deliverySettings")} subtitle={deliverySummary} wrap onClick={() => setSheet("delivery")} />}
+          </ListGroup>
+
+          <ListGroup header={t("shop.details")}>
+            <ListRow icon={<Store />} title={t("field.name")} value={<span className="line-clamp-1 max-w-40">{shop.name}</span>} onClick={() => setSheet("details")} />
+            <ListRow icon={<Tag />} title={t("shop.type")} value={shop.category ?? t("shop.notSet")} onClick={() => setSheet("details")} />
+            <ListRow
+              icon={<Phone />}
+              title={t("shop.phone")}
+              value={shop.phone ? formatPhone(shop.phone) : t("shop.notSet")}
+              onClick={() => setSheet("details")}
+            />
+            <ListRow icon={<MapPin />} title={t("field.address")} subtitle={shop.address ?? t("shop.notSet")} wrap onClick={() => setSheet("details")} />
+          </ListGroup>
+
+          <ListGroup header={t("shop.hours")}>
+            {hasHours(shop.hours) ? (
+              hourRuns(shop.hours).map((run) => (
+                <ListRow
+                  key={run.from}
+                  icon={<Clock />}
+                  iconTone={run.slots.length ? "accent" : "gray"}
+                  title={run.from === run.to ? dayName(run.from, lang) : `${dayName(run.from, lang)} – ${dayName(run.to, lang)}`}
+                  value={
+                    run.slots.length
+                      ? run.slots.map(([o, c]) => `${formatTime(o, lang)} – ${formatTime(c, lang)}`).join(", ")
+                      : t("shop.closed")
+                  }
+                  onClick={() => setSheet("hours")}
+                />
+              ))
+            ) : (
+              <ListRow icon={<Clock />} title={t("shop.noHours")} onClick={() => setSheet("hours")} />
+            )}
+          </ListGroup>
+
+          <ListGroup header={t("lang.label")}>
             <li>
-              <OrderAlerts vapidKey={vapidKey} plain />
+              <LanguagePicker variant="row" onChange={saveLanguage} />
             </li>
           </ListGroup>
-        )}
 
-        <ListGroup header={t("shop.account")} footer={email ? t("shop.signedInAs", { email }) : undefined}>
-          <ListRow icon={<ShoppingBag />} title={t("shop.customerView")} href="/me" />
-          <ListRow icon={<LifeBuoy />} title={t("shop.help")} href="/help" />
-          <ListRow icon={<ShieldCheck />} iconTone="gray" title={t("privacy.link")} href={`/privacy?lang=${lang}`} />
-          <ListRow icon={<LogOut />} iconTone="gray" title={t("shop.signOut")} onClick={signOut} />
-          <ListRow icon={<Trash2 />} iconTone="danger" title={<span className="text-danger">{t("shop.delete")}</span>} onClick={() => setConfirmDelete(true)} />
-        </ListGroup>
+          {vapidKey && (
+            <ListGroup header={t("shop.notifications")}>
+              <li>
+                <OrderAlerts vapidKey={vapidKey} plain />
+              </li>
+            </ListGroup>
+          )}
+
+          <ListGroup header={t("shop.account")} footer={email ? t("shop.signedInAs", { email }) : undefined}>
+            <ListRow icon={<ShoppingBag />} title={t("shop.customerView")} href="/me" />
+            <ListRow icon={<LifeBuoy />} title={t("shop.help")} href="/help" />
+            <ListRow icon={<ShieldCheck />} iconTone="gray" title={t("privacy.link")} href={`/privacy?lang=${lang}`} />
+            <ListRow icon={<LogOut />} iconTone="gray" title={t("shop.signOut")} onClick={signOut} />
+            <InstallAppRow />
+            <ListRow icon={<Trash2 />} iconTone="danger" title={<span className="text-danger">{t("shop.delete")}</span>} onClick={() => setConfirmDelete(true)} />
+          </ListGroup>
+        </div>
       </div>
 
       {sheet === "qr" && <QrSheet url={reviewUrl} shopName={shop.name} kind="review" onClose={() => setSheet(null)} />}

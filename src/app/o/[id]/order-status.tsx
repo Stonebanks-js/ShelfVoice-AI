@@ -76,7 +76,7 @@ export function OrderStatusView({ initial, token }: { initial: OrderView | null;
   const time = new Intl.DateTimeFormat(localeFor(lang), { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }).format(checked);
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:max-w-xl lg:pt-16">
       <Link href={`/s/${order.shop.slug}`} className="-ml-2 inline-flex min-h-11 items-center gap-1 self-start px-2 text-body font-semibold text-accent">
         <ChevronLeft aria-hidden className="size-5" />
         {t("order.back", { shop: order.shop.name })}

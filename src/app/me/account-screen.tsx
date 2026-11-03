@@ -13,6 +13,7 @@ import { ListGroup, ListRow } from "@/components/ui/list";
 import { AlertDialog, Sheet } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
 import { localeFor, type MessageKey } from "@/i18n/dictionary";
+import { InstallAppRow } from "@/components/shell/app-install";
 import { LanguagePicker } from "@/components/shell/language-picker";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
@@ -39,14 +40,14 @@ function Header({ title }: { title: string }) {
 export function SignInToAccount({ next }: { next: string }) {
   const { lang, t } = useLang();
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-5 px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-5 px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:my-16 lg:min-h-0 lg:rounded-xl lg:bg-surface lg:p-10 lg:shadow-float">
       <Header title={t("acct.title")} />
       <section className="flex flex-col gap-3 rounded-lg bg-surface p-5 shadow-card">
         <UserRound aria-hidden className="size-8" />
         <h2 className="text-headline font-semibold">{t("acct.signin.title")}</h2>
         <p className="text-body text-ink-2">{t("acct.signin.body")}</p>
       </section>
-      <a href={`/api/v1/auth/google?next=${encodeURIComponent(next)}`} className={buttonClass("filled", "lg", "mt-auto")}>
+      <a href={`/api/v1/auth/google?next=${encodeURIComponent(next)}`} className={buttonClass("ink", "lg", "mt-auto")}>
         <GoogleMark />
         {t("signin.google")}
       </a>
@@ -117,8 +118,9 @@ export function AccountScreen({ account }: { account: Account }) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <div className="flex flex-col gap-1">
+    // Two columns of groups from 1024 px (E-37).
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:grid lg:max-w-6xl lg:grid-cols-2 lg:items-start lg:px-8">
+      <div className="flex flex-col gap-1 lg:col-span-2">
         <Header title={t("acct.title")} />
         {account.email && <p className="text-footnote text-ink-2">{account.email}</p>}
       </div>
@@ -231,6 +233,7 @@ export function AccountScreen({ account }: { account: Account }) {
 
       <ListGroup>
         <ListRow icon={<Store />} title={t("acct.ownShop")} href="/owner" />
+        <InstallAppRow />
         <ListRow icon={<ShieldCheck />} iconTone="gray" title={t("privacy.link")} href={`/privacy?lang=${lang}#customers`} />
         <ListRow icon={<LogOut />} iconTone="gray" title={t("shop.signOut")} onClick={signOut} />
         <ListRow icon={<Trash2 />} iconTone="danger" title={<span className="text-danger">{t("acct.delete")}</span>} onClick={() => setConfirmDelete(true)} />

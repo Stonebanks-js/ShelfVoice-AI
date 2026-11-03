@@ -44,7 +44,7 @@ export function RestockScreen({ items, shopName }: { items: RestockItem[]; shopN
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-4">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-4 lg:max-w-6xl lg:px-4">
       <PageHeader
         title={t("orders.restock")}
         subtitle={items.length ? t("orders.count", { n: items.length }) : undefined}
@@ -75,7 +75,7 @@ export function RestockScreen({ items, shopName }: { items: RestockItem[]; shopN
           <EmptyState icon={<CircleCheck />} title={t("orders.empty.title")} body={t("orders.empty.body")} />
         </div>
       ) : (
-        <ul className="flex flex-col gap-3 px-4">
+        <ul className="flex flex-col gap-3 px-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
           {items.map((item) => (
             <ReorderRow key={item.productId} item={item} onDelivered={() => setDelivering(item)} />
           ))}
