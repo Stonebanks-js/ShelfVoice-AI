@@ -6,6 +6,10 @@ create extension if not exists pgtap with schema extensions;
 
 select plan(29);
 
+-- The sample shops (V-10) are published too; inside this transaction only,
+-- they are taken away so the anonymous checks see just the fixture.
+delete from auth.users where email like '%@shelfvoice.invalid';
+
 -- Fixture: owner A has a published shop, owner B an unpublished one.
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-00000000000a', 'owner-a@test.local', 'authenticated', 'authenticated'),
