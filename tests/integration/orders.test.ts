@@ -84,7 +84,9 @@ describe("the customer's link", () => {
     const placed = await placeOrder(owner.shop.slug, order([{ productId: maggi, qty: 2 }]), "ip", "req");
     const view = await orderForCustomer(placed.id, placed.token);
     expect(view).toMatchObject({ code: placed.code, status: "NEW", shop: { slug: owner.shop.slug }, items: [{ name: "Maggi", qty: 2 }] });
-    expect(await orderForCustomer(placed.id, `${placed.token.slice(0, -1)}x`)).toBeNull();
+    // One character off; a token that already ends in "x" gets a "y".
+    const wrong = `${placed.token.slice(0, -1)}${placed.token.endsWith("x") ? "y" : "x"}`;
+    expect(await orderForCustomer(placed.id, wrong)).toBeNull();
     expect(await orderForCustomer(randomUUID(), placed.token)).toBeNull();
     expect(await orderForCustomer("not-an-id", placed.token)).toBeNull();
   });
