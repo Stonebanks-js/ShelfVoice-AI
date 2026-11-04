@@ -17,6 +17,7 @@ import { api } from "@/lib/api";
 import { formatPhone, formatRupees } from "@/lib/changes-view";
 import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
+import { ProductName } from "@/i18n/products";
 
 type Status = "NEW" | "ACCEPTED" | "READY" | "COMPLETED" | "CANCELLED";
 
@@ -162,7 +163,7 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
           <li key={item.id} className="flex items-center gap-2 py-2">
             <span className={cn("flex min-w-0 flex-1 flex-col", item.status === "UNAVAILABLE" && "text-ink-2 line-through")}>
               <span className="text-body">
-                {item.name} × {item.qty}
+                <ProductName name={item.name} /> × {item.qty}
               </span>
               <span className="text-footnote text-ink-2 no-underline">
                 {[item.unit, item.price_paise ? formatRupees(item.price_paise * item.qty) : null].filter(Boolean).join(" · ")}

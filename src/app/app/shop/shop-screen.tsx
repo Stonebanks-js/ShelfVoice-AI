@@ -23,6 +23,7 @@ import { UPI_ID } from "@/lib/delivery";
 import { api } from "@/lib/api";
 import { formatPhone, formatRupees } from "@/lib/changes-view";
 import { errorKey } from "@/lib/errors";
+import { placeFor } from "@/lib/place";
 import { dayName, DAYS, formatTime, hasHours, hourRuns, type Day, type Hours } from "@/lib/hours";
 import { toE164 } from "@/server/changes";
 
@@ -479,8 +480,18 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const round = (n: number) => Math.round(n * 100_000) / 100_000;
-        setWhere({ lat: round(position.coords.latitude), lng: round(position.coords.longitude) });
-        setLocating(false);
+        const here = { lat: round(position.coords.latitude), lng: round(position.coords.longitude) };
+        setWhere(here);
+        // The address and pincode there fill whatever is still empty.
+        void placeFor(here).then((place) => {
+          setLocating(false);
+          if (!place) return;
+          setForm((now) => ({
+            ...now,
+            address: now.address.trim() ? now.address : (place.address ?? now.address),
+            pincode: now.pincode.trim() ? now.pincode : (place.pincode ?? now.pincode),
+          }));
+        });
       },
       () => {
         setLocating(false);

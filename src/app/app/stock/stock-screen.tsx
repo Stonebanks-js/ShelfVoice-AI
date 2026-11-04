@@ -19,6 +19,8 @@ import { formatRupees } from "@/lib/changes-view";
 import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
 import { categories, matches, type StockProduct } from "@/lib/stock";
+import { categoryLabel } from "@/lib/categories";
+import { ProductName } from "@/i18n/products";
 
 const OUT = "__out__"; // the "Out of stock" chip
 
@@ -139,7 +141,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
           </Chip>
           {chips.map((name) => (
             <Chip key={name} selected={chip === name} onClick={() => setChip(chip === name ? null : name)}>
-              {name}
+              {categoryLabel(name, t)}
             </Chip>
           ))}
         </div>
@@ -154,7 +156,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
         <div className="flex flex-col gap-6 px-4 pb-4 lg:block lg:columns-2 lg:gap-6 lg:[&>*]:mb-6 lg:[&>*]:break-inside-avoid">
           {groups.map((group) => (
             <section key={group.name} className="flex flex-col gap-1.5">
-              <h2 className="px-4 text-footnote font-medium text-ink-2">{group.name}</h2>
+              <h2 className="px-4 text-footnote font-medium text-ink-2">{categoryLabel(group.name, t)}</h2>
               <ul className="overflow-hidden rounded-lg bg-surface shadow-card">
                 {group.items.map((p) => (
                   <StockRow key={p.id} product={p} onEdit={() => setEditing(p)} onInStock={(on) => setInStock(p, on)} onStep={(by) => bump(p, by)} />
@@ -234,7 +236,7 @@ function StockRow({
           <span className="flex min-h-14 min-w-0 flex-1 items-center gap-2 py-2">
             <span className="flex min-w-0 flex-1 flex-col">
               <span id={titleId} className={cn("line-clamp-2 text-body", !product.is_in_stock && "text-ink-2")}>
-                {product.name}
+                <ProductName name={product.name} />
               </span>
               {meta && <span className="truncate text-footnote text-ink-2">{meta}</span>}
             </span>

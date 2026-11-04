@@ -15,6 +15,7 @@ import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { haveKey, SHOP_TYPES, STARTER_ITEMS, starterFor, type ShopType, type StarterItem } from "@/lib/catalog/starter";
 import { errorKey } from "@/lib/errors";
+import { ProductName } from "@/i18n/products";
 
 // V-01 ready-made list: pick the shop type, tick what the shop sells (ADD,
 // as on Instamart), fix any price, add them all in one go. Ticks and prices
@@ -123,7 +124,7 @@ export function ListPicker({ initialType, have }: { initialType: ShopType; have:
                   return (
                     <li key={item.key} className="flex items-center gap-3 border-separator py-2.5 pr-3 pl-4 not-first:border-t">
                       <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="text-body text-ink">{item.name}</span>
+                        <span className="text-body text-ink"><ProductName name={item.name} /></span>
                         <span className="text-footnote text-ink-2">{ownedHere ? `${item.unit} · ${t("list.have")}` : item.unit}</span>
                       </div>
                       {!ownedHere && (

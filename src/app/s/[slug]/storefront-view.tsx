@@ -17,6 +17,7 @@ import { ProductThumb } from "@/components/ui/product-thumb";
 import { Stepper } from "@/components/ui/quantity";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
+import { useProductName } from "@/i18n/products";
 import { api } from "@/lib/api";
 import { cartSnapshot, parseCart, rememberOrder, setCart, subscribeCart } from "@/lib/cart";
 import { formatRupees } from "@/lib/changes-view";
@@ -25,6 +26,7 @@ import { cn } from "@/lib/cn";
 import { deliveryFee } from "@/lib/delivery";
 import { dayName, formatTime, openStatus, shopClock } from "@/lib/hours";
 import { errorKey } from "@/lib/errors";
+import { placeFor } from "@/lib/place";
 import { useTurnstile } from "@/lib/turnstile";
 import type { Account } from "@/server/customer";
 import type { Storefront, StorefrontProduct } from "@/server/storefront";
@@ -91,12 +93,13 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
   const raw = useSyncExternalStore(subscribeCart, () => cartSnapshot(shop.slug), serverCart);
   const cart = useMemo(() => parseCart(raw), [raw]);
 
+  const productName = useProductName();
   const other = t("stock.other");
   const categories = [...new Set(shop.products.map((p) => p.category ?? other))].sort();
   // Search by name or category, as in the quick-commerce apps (V-10).
   const q = query.trim().toLowerCase();
   const shown = shop.products.filter(
-    (p) => (category === null || (p.category ?? other) === category) && (!q || `${p.name} ${p.category ?? ""}`.toLowerCase().includes(q)),
+    (p) => (category === null || (p.category ?? other) === category) && (!q || `${p.name} ${productName(p.name)} ${p.category ?? ""}`.toLowerCase().includes(q)),
   );
   const phoneDigits = shop.phone?.replace(/\D/g, "") ?? null;
 
@@ -298,12 +301,13 @@ function ProductCard({
   wishReady: boolean;
 }) {
   const { t } = useLang();
+  const name = useProductName()(p.name);
   return (
     <li className="flex min-w-0 flex-col gap-2 rounded-xl bg-surface p-2.5 shadow-card">
       <div className="relative">
         <ProductThumb name={p.name} category={p.category} size="lg" className={cn(!p.inStock && "opacity-45 grayscale")} />
         <div className="absolute top-1 right-1 rounded-full bg-surface/90">
-          <HeartButton on={wished} label={t("store.wish", { name: p.name })} onClick={onWish} small disabled={!wishReady} />
+          <HeartButton on={wished} label={t("store.wish", { name })} onClick={onWish} small disabled={!wishReady} />
         </div>
         {!p.inStock && (
           <span className="absolute bottom-2 left-2">
@@ -312,7 +316,7 @@ function ProductCard({
         )}
       </div>
       <span className={cn("line-clamp-2 min-h-10 text-footnote font-medium", !p.inStock && "text-ink-2")}>
-        {p.name}
+        {name}
         {p.unit && <span className="font-normal text-ink-2"> · {p.unit}</span>}
       </span>
       <span className="flex min-h-6 items-center gap-2">
@@ -327,7 +331,7 @@ function ProductCard({
             className="inline-flex h-11 w-full items-center justify-center rounded-md border-2 border-voice bg-surface px-3 text-footnote font-bold tracking-wide text-voice uppercase transition-[background-color,transform] active:scale-[0.97] [@media(hover:hover)]:hover:bg-accent-soft"
           >
             {t("list.add")}
-            <span className="sr-only"> {p.name}</span>
+            <span className="sr-only"> {name}</span>
           </button>
         ) : (
           <Stepper
@@ -338,8 +342,8 @@ function ProductCard({
             filled
             className="w-full"
             onChange={(next) => onQty(next ?? 0)}
-            lessLabel={t("stock.less", { name: p.name })}
-            moreLabel={t("stock.more", { name: p.name })}
+            lessLabel={t("stock.less", { name })}
+            moreLabel={t("stock.more", { name })}
           />
         ))}
     </li>
@@ -392,6 +396,7 @@ function CheckoutSheet({
   onPlaced: () => void;
 }) {
   const { lang, t } = useLang();
+  const productName = useProductName();
   const router = useRouter();
   const { containerRef, token: turnstileToken } = useTurnstile(siteKey);
   // A closed shop still takes the order, but the customer knows when it will
@@ -433,8 +438,15 @@ function CheckoutSheet({
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setHere({ lat: Math.round(position.coords.latitude * 10_000) / 10_000, lng: Math.round(position.coords.longitude * 10_000) / 10_000 });
-        setLocating(false);
+        const at = { lat: Math.round(position.coords.latitude * 10_000) / 10_000, lng: Math.round(position.coords.longitude * 10_000) / 10_000 };
+        setHere(at);
+        // The address there, with its pincode, fills an empty address box.
+        void placeFor(at).then((place) => {
+          setLocating(false);
+          if (!place?.address) return;
+          const found = [place.address, place.pincode].filter(Boolean).join(", ");
+          setForm((now) => ({ ...now, address: now.address.trim() ? now.address : found }));
+        });
       },
       (failure) => {
         setLocating(false);
@@ -510,7 +522,7 @@ function CheckoutSheet({
           {lines.map(({ product, qty }) => (
             <li key={product.id} className="flex items-center gap-3 border-separator px-4 py-2.5 not-first:border-t">
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="text-body">{product.name}</span>
+                <span className="text-body">{productName(product.name)}</span>
                 <span className="text-footnote text-ink-2 tabular-nums">
                   {product.pricePaise ? formatRupees(product.pricePaise * qty) : t("cart.priceAtShop")}
                   {product.unit && ` · ${product.unit}`}
@@ -522,8 +534,8 @@ function CheckoutSheet({
                 max={99}
                 clearable
                 onChange={(next) => onQty(product.id, next ?? 0)}
-                lessLabel={t("stock.less", { name: product.name })}
-                moreLabel={t("stock.more", { name: product.name })}
+                lessLabel={t("stock.less", { name: productName(product.name) })}
+                moreLabel={t("stock.more", { name: productName(product.name) })}
               />
             </li>
           ))}

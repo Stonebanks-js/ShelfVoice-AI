@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const base = {
   NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "publishable",
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: "site",
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
   SUPABASE_SERVICE_ROLE_KEY: "service-role",
   TURNSTILE_SECRET_KEY: "turnstile-secret",
 };
@@ -78,6 +78,12 @@ describe("server env schema", () => {
   it("normalises the admin allow-list on Vercel", async () => {
     const { parseServerEnv } = await load({ ...base, ...deployedExtras, VERCEL_ENV: "production" });
     expect(parseServerEnv().ADMIN_EMAILS).toEqual(["a@example.com", "b@example.com"]);
+  });
+
+  it("refuses anything but a Turnstile site key on Vercel (V-10)", async () => {
+    const { parseClientEnv } = await load({ ...base, NEXT_PUBLIC_TURNSTILE_SITE_KEY: "LLM_not-a-site-key-at-all-000000", VERCEL_ENV: "production" });
+    expect(parseClientEnv).toThrow(/NEXT_PUBLIC_TURNSTILE_SITE_KEY/);
+    expect(parseClientEnv).not.toThrow(/LLM_/);
   });
 
   it("rejects a short CRON_SECRET on Vercel", async () => {

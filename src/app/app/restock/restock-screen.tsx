@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
 import type { RestockItem } from "@/server/restock";
+import { ProductName } from "@/i18n/products";
 
 export function RestockScreen({ items, shopName }: { items: RestockItem[]; shopName: string }) {
   const { t } = useLang();
@@ -118,7 +119,7 @@ function ReorderRow({ item, onDelivered }: { item: RestockItem; onDelivered: () 
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h2 className="text-headline font-semibold">
-            {item.name}
+            <ProductName name={item.name} />
             {item.unit && <span className="font-normal text-ink-2"> · {item.unit}</span>}
           </h2>
           {item.customerFlagged && (

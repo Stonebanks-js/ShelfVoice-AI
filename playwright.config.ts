@@ -41,7 +41,7 @@ export default defineConfig({
     // fast on a missing recording instead of reaching the live API. Nor do
     // they load map tiles from the internet (V-09).
     // One admin address per project, so the two never share a session.
-    env: { META_MODE: "recorded", OPEN_FOOD_FACTS_URL: "off", NEXT_PUBLIC_MAP_TILES: "off", E2E_TEST_ROUTES: "1", ADMIN_EMAILS: "admin-phone-360@example.test,admin-desktop-1280@example.test" },
+    env: { META_MODE: "recorded", OPEN_FOOD_FACTS_URL: "off", REVERSE_GEOCODE_URL: "off", NEXT_PUBLIC_MAP_TILES: "off", E2E_TEST_ROUTES: "1", ADMIN_EMAILS: "admin-phone-360@example.test,admin-desktop-1280@example.test" },
     url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

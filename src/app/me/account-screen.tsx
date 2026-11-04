@@ -20,6 +20,7 @@ import { api } from "@/lib/api";
 import { setCart } from "@/lib/cart";
 import { formatPhone, formatRupees } from "@/lib/changes-view";
 import { errorKey } from "@/lib/errors";
+import { placeFor } from "@/lib/place";
 import type { Account } from "@/server/customer";
 
 
@@ -326,12 +327,22 @@ function AddressSheet({ address, onClose }: { address: Address | null; onClose: 
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setWhere({ lat: Math.round(position.coords.latitude * 10_000) / 10_000, lng: Math.round(position.coords.longitude * 10_000) / 10_000 });
-        setLocating(false);
+        const here = { lat: Math.round(position.coords.latitude * 10_000) / 10_000, lng: Math.round(position.coords.longitude * 10_000) / 10_000 };
+        setWhere(here);
+        // The address and pincode there fill whatever is still empty.
+        void placeFor(here).then((place) => {
+          setLocating(false);
+          if (!place) return;
+          setForm((now) => ({
+            ...now,
+            address: now.address.trim() ? now.address : (place.address ?? now.address),
+            pincode: now.pincode.trim() ? now.pincode : (place.pincode ?? now.pincode),
+          }));
+        });
       },
-      () => {
+      (failure) => {
         setLocating(false);
-        setError("cart.error.location");
+        setError(failure.code === failure.PERMISSION_DENIED ? "cart.error.locationBlocked" : "cart.error.location");
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
     );
