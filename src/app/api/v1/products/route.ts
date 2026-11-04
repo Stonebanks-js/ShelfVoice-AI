@@ -1,6 +1,7 @@
 import { addProduct, ProductInput } from "@/server/catalog";
 import { fromPostgres, readJson, route } from "@/server/http";
 import { requireShop } from "@/server/owner";
+import { withPhotos } from "@/server/stock-photos";
 
 // Owner catalog with stock and forecast (Stock tab, doc 06 O-6).
 export const GET = route(async () => {
@@ -13,7 +14,7 @@ export const GET = route(async () => {
     .order("category", { nullsFirst: false })
     .order("name");
   if (error) throw fromPostgres(error);
-  return Response.json({ products: data });
+  return Response.json({ products: withPhotos(data) });
 });
 
 // Add a product by tap (doc 02: direct catalog edits by tap). Its forecast

@@ -27,7 +27,9 @@ import { PhotoPicker } from "./photo-picker";
 
 // A product's photo as customers see it (V-11).
 const photoOf = (p: StockProduct) =>
-  productPhoto({ imagePath: p.image_path, imageCredit: p.image_credit, name: p.name, unit: p.unit }, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "")?.url ?? null;
+  p.photo_url !== undefined
+    ? p.photo_url
+    : productPhoto({ imagePath: p.image_path, imageCredit: p.image_credit, name: p.name, unit: p.unit }, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "")?.url ?? null;
 
 const OUT = "__out__"; // the "Out of stock" chip
 

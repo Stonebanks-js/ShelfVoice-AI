@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { PRODUCT_COLUMNS, type StockProduct } from "@/lib/stock";
+import { withPhotos } from "@/server/stock-photos";
 import { ownerState } from "@/server/session";
 import { ownerClient } from "@/server/supabase";
 
@@ -30,5 +31,5 @@ async function Stock() {
     .is("archived_at", null)
     .order("name");
   if (error) throw error; // the app's error screen offers Retry
-  return <StockScreen initial={data as unknown as StockProduct[]} />;
+  return <StockScreen initial={withPhotos(data as unknown as StockProduct[])} />;
 }
