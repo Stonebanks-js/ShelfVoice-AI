@@ -6,6 +6,7 @@ import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 import { env } from "@/env/server";
 import { isLang, type Lang } from "@/i18n/dictionary";
 import { productPhoto } from "@/lib/catalog/photo-url";
+import { englishName } from "@/server/product-names";
 import { asHours, type Hours } from "@/lib/hours";
 import type { Database } from "@/types/database";
 
@@ -88,7 +89,7 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
         pricePaise: row.price_paise,
         inStock: row.in_stock ?? false,
         mrpPaise: row.mrp_paise,
-        photo: productPhoto({ imagePath: row.image_path, imageCredit: row.image_credit, name: row.product_name!, unit: row.unit }, env.NEXT_PUBLIC_SUPABASE_URL),
+        photo: productPhoto({ imagePath: row.image_path, imageCredit: row.image_credit, name: englishName(row.product_name!), unit: row.unit }, env.NEXT_PUBLIC_SUPABASE_URL),
       }))
       .sort((a, b) => a.name.localeCompare(b.name)),
   };

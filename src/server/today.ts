@@ -1,6 +1,10 @@
 import "server-only";
 
+import { env } from "@/env/server";
+import { productPhoto } from "@/lib/catalog/photo-url";
+
 import { isRunningLow } from "./forecast/low";
+import { englishName } from "./product-names";
 import type { Db } from "./supabase";
 
 const DAY_MS = 86_400_000;
@@ -12,7 +16,7 @@ export interface TodaySummary {
   unitsSold: number;
   // The same stretch of the same weekday last week, for a fair comparison.
   lastWeekPaise: number;
-  low: Array<{ id: string; name: string; daysLeft: number | null; orderQty: number | null; flagged: boolean }>;
+  low: Array<{ id: string; name: string; photoUrl: string | null; daysLeft: number | null; orderQty: number | null; flagged: boolean }>;
   lowCount: number;
   reviews: Array<{ id: string; sentiment: "POSITIVE" | "NEUTRAL" | "NEGATIVE" | null; summary: string | null; createdAt: string }>;
   newReviews: number;
@@ -54,7 +58,7 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
     sales(lastWeekStart, lastWeekNow),
     db
       .from("products")
-      .select("id, name, stock_qty, low_stock_level, product_forecasts(days_left, order_qty, reorder_point, stockout_boost_until)")
+      .select("id, name, unit, image_path, image_credit, stock_qty, low_stock_level, product_forecasts(days_left, order_qty, reorder_point, stockout_boost_until)")
       .eq("shop_id", shopId)
       .is("archived_at", null),
     db
@@ -92,6 +96,7 @@ export async function todaySummary(db: Db, shopId: string, now = new Date()): Pr
     .map(({ p, f }) => ({
       id: p.id,
       name: p.name,
+      photoUrl: productPhoto({ imagePath: p.image_path, imageCredit: p.image_credit, name: englishName(p.name), unit: p.unit }, env.NEXT_PUBLIC_SUPABASE_URL)?.url ?? null,
       daysLeft: f!.days_left === null ? null : Number(f!.days_left),
       orderQty: f!.order_qty,
       flagged: f!.stockout_boost_until !== null,

@@ -148,3 +148,51 @@ test("+ on an uncounted stock row starts counting it", async ({ page }) => {
   await page.reload();
   await expect(page.getByRole("listitem").filter({ has: page.getByRole("button", { name: /^Jaggery/ }) }).getByRole("status")).toHaveText("2");
 });
+
+// TEMPORARY for the demo recording (V-12, lib/live-orders): when the order
+// can't reach the shop, the customer still sees it placed, with a 15-minute
+// live tracker, and it shows under "Your current orders"; a mistake they can
+// fix still shows its reason.
+test("an order that can't reach the shop still shows as placed, with live delivery", async ({ page, browser }) => {
+  const { shop, customer, close } = await ownerAndCustomer(page, browser);
+  try {
+    await customer.goto(`/s/${shop.slug}`);
+    await customer.getByRole("button", { name: /^Add Maggi/ }).click();
+    await customer.getByRole("button", { name: /View cart/ }).click();
+    const sheet = customer.getByRole("dialog", { name: "Your order" });
+    await sheet.getByRole("textbox", { name: "Your name" }).fill("Ramesh");
+    await sheet.getByRole("textbox", { name: "Mobile number" }).fill("98765 43210");
+
+    await customer.route(`**/api/v1/public/shops/${shop.slug}/orders`, (route) =>
+      route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: { code: "TURNSTILE_FAILED", message: "Bot check failed" } }) }),
+    );
+    await sheet.getByRole("button", { name: /^Place order/ }).click();
+    await expect(customer).toHaveURL(/\/orders\/live\?ref=demo-/);
+    await expect(customer.getByRole("heading", { level: 1, name: "Order placed" })).toBeVisible();
+    await expect(customer.getByRole("status")).toHaveText(/Ready in (9|10) min/); // pickup: ready at the shop
+    await expect(customer.getByText("Maggi 2-Minute Noodles × 1")).toBeVisible();
+    expect(await blockingViolations(customer)).toEqual([]);
+    await darkMode(customer);
+    expect(await blockingViolations(customer)).toEqual([]);
+
+    await customer.goto("/shops");
+    const current = customer.getByRole("region", { name: "Your current orders" });
+    await expect(current).toContainText("Sharma Kirana Store");
+    await current.getByRole("link").first().click();
+    await expect(customer.getByRole("heading", { level: 1, name: "Order placed" })).toBeVisible();
+
+    // A mistake the customer can fix still says what it is.
+    await customer.goto(`/s/${shop.slug}`);
+    await customer.getByRole("button", { name: /^Add Parle-G/ }).click();
+    await customer.getByRole("button", { name: /View cart/ }).click();
+    await customer.route(`**/api/v1/public/shops/${shop.slug}/orders`, (route) =>
+      route.fulfill({ status: 422, contentType: "application/json", body: JSON.stringify({ error: { code: "BAD_PHONE", message: "Check the phone" } }) }),
+    );
+    await sheet.getByRole("textbox", { name: "Your name" }).fill("Ramesh");
+    await sheet.getByRole("textbox", { name: "Mobile number" }).fill("98765 43210");
+    await sheet.getByRole("button", { name: /^Place order/ }).click();
+    await expect(sheet.getByRole("alert")).toHaveText("Please check the mobile number.");
+  } finally {
+    await close();
+  }
+});

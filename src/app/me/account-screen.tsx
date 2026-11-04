@@ -22,6 +22,7 @@ import { formatPhone, formatRupees } from "@/lib/changes-view";
 import { errorKey } from "@/lib/errors";
 import { placeFor } from "@/lib/place";
 import type { Account } from "@/server/customer";
+import { CurrentOrders } from "@/components/shell/current-orders";
 
 
 function Header({ title }: { title: string }) {
@@ -43,6 +44,7 @@ export function SignInToAccount({ next }: { next: string }) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-5 px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:my-16 lg:min-h-0 lg:rounded-xl lg:bg-surface lg:p-10 lg:shadow-float">
       <Header title={t("acct.title")} />
+      <CurrentOrders />
       <section className="flex flex-col gap-3 rounded-lg bg-surface p-5 shadow-card">
         <UserRound aria-hidden className="size-8" />
         <h2 className="text-headline font-semibold">{t("acct.signin.title")}</h2>
@@ -125,6 +127,7 @@ export function AccountScreen({ account }: { account: Account }) {
         <Header title={t("acct.title")} />
         {account.email && <p className="text-footnote text-ink-2">{account.email}</p>}
       </div>
+      <CurrentOrders className="lg:col-span-2" />
 
       <ListGroup header={t("acct.profile")}>
         <ListRow

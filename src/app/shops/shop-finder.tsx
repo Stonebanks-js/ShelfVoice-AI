@@ -16,6 +16,7 @@ import { errorKey } from "@/lib/errors";
 import { categoryLabel } from "@/lib/categories";
 import { asHours } from "@/lib/hours";
 import { placeFor } from "@/lib/place";
+import { CurrentOrders } from "@/components/shell/current-orders";
 
 import { ShopMap } from "./shop-map";
 
@@ -144,6 +145,7 @@ export function ShopFinder() {
           {t("store.account")}
         </Link>
       </div>
+      <CurrentOrders />
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-large-title font-bold tracking-tight">{t("shops.title")}</h1>
         <p className="text-body text-ink-2">{t("shops.body")}</p>

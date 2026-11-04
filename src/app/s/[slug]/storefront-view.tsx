@@ -24,6 +24,9 @@ import { formatRupees } from "@/lib/changes-view";
 import { categoryLabel } from "@/lib/categories";
 import { cn } from "@/lib/cn";
 import { deliveryFee } from "@/lib/delivery";
+import { canStandIn, demoCode, demoOrdersOn, saveLiveOrder } from "@/lib/live-orders";
+import { GENERATED_CREDIT } from "@/lib/catalog/photo-url";
+import { OFF_CREDIT } from "@/lib/catalog/off";
 import { discountPercent } from "@/lib/price";
 import { dayName, formatTime, openStatus, shopClock } from "@/lib/hours";
 import { errorKey } from "@/lib/errors";
@@ -31,6 +34,7 @@ import { placeFor } from "@/lib/place";
 import { useTurnstile } from "@/lib/turnstile";
 import type { Account } from "@/server/customer";
 import type { Storefront, StorefrontProduct } from "@/server/storefront";
+import { CurrentOrders } from "@/components/shell/current-orders";
 
 const serverCart = () => "{}";
 
@@ -134,6 +138,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
             <UserRound aria-hidden className="size-6" />
           </Link>
         </div>
+        <CurrentOrders />
         <div className="flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-card lg:flex-row lg:items-start lg:gap-6 lg:p-6">
           <div className="flex items-start gap-3 lg:min-w-0 lg:flex-1">
             <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-lg bg-accent-soft font-display text-large-title font-bold text-accent-fill lg:size-16">
@@ -234,13 +239,15 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           <ChevronRight aria-hidden className="size-5 text-ink-3" />
         </Link>
         {/* Open Food Facts photos are CC BY-SA: credited wherever they show (V-11). */}
-        {shop.products.some((p) => p.photo?.credit) && (
+        {shop.products.some((p) => p.photo?.credit === OFF_CREDIT) && (
           <p className="text-center text-footnote text-ink-2">
             <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
               {t("store.photoCredit")}
             </a>
           </p>
         )}
+        {/* Drawn images say so (V-12). */}
+        {shop.products.some((p) => p.photo?.credit === GENERATED_CREDIT) && <p className="text-center text-footnote text-ink-2">{t("store.drawnCredit")}</p>}
         <p className="flex items-center justify-center gap-2 text-footnote text-ink-2">
           <Link href="/" className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:underline">
             <LogoMark orbit={false} className="h-4 w-auto text-ink-2" />
@@ -495,15 +502,37 @@ function CheckoutSheet({
         },
       });
       rememberOrder({ id: placed.id, token: placed.token, code: placed.code, shop: shop.name, slug: shop.slug, at: new Date().toISOString() });
+      saveLiveOrder({ ...liveOrder(placed.id, placed.code), link: `/o/${placed.id}?t=${placed.token}` });
       onPlaced();
       router.push(`/o/${placed.id}?t=${placed.token}`);
     } catch (failure) {
+      // TEMPORARY for the demo recording (lib/live-orders): a failure the
+      // customer can't fix still shows the order as placed, kept on this
+      // phone only. Mistakes they can fix (phone, address, minimum) don't.
+      if (demoOrdersOn() && canStandIn(failure)) {
+        const ref = `demo-${crypto.randomUUID()}`;
+        saveLiveOrder({ ...liveOrder(ref, demoCode()), link: null });
+        onPlaced();
+        router.push(`/orders/live?ref=${ref}`);
+        return;
+      }
       setError(errorKey(failure) === "error.generic" ? "cart.error.check" : errorKey(failure));
       setBusy(false);
     }
   }
 
   const grand = total + (typeof fee === "number" ? fee : 0);
+  const liveOrder = (ref: string, code: string) => ({
+    ref,
+    code,
+    shop: shop.name,
+    slug: shop.slug,
+    phone: shop.phone,
+    items: lines.map((l) => ({ name: l.product.name, qty: l.qty, pricePaise: l.product.pricePaise })),
+    totalPaise: grand,
+    fulfilment,
+    placedAt: new Date().toISOString(),
+  });
   return (
     <Sheet
       open

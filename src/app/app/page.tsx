@@ -162,7 +162,7 @@ function LowList({ summary, t }: { summary: TodaySummary; t: T }) {
               key={item.id}
               wrap
               href="/app/restock"
-              media={<ProductThumb name={item.name} size="sm" />}
+              media={<ProductThumb name={item.name} imageUrl={item.photoUrl} size="sm" />}
               title={<ProductName name={item.name} />}
               subtitle={
                 item.flagged ? (
