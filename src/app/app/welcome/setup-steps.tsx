@@ -12,6 +12,7 @@ import { useLang } from "@/i18n/lang";
 import { api, ApiFailure } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
+import { placeFor } from "@/lib/place";
 
 // Saved as the shop's category, which the storefront shows and the
 // ready-made lists read (typeForCategory).
@@ -55,8 +56,15 @@ export function SetupSteps({ initial, suggestion }: { initial: Lang; suggestion:
       (position) => {
         // About a metre is plenty for a shop.
         const round = (n: number) => Math.round(n * 100_000) / 100_000;
-        setWhere({ lat: round(position.coords.latitude), lng: round(position.coords.longitude) });
-        setLocating(false);
+        const here = { lat: round(position.coords.latitude), lng: round(position.coords.longitude) };
+        setWhere(here);
+        // The address and pincode there fill whatever is still empty.
+        void placeFor(here).then((place) => {
+          setLocating(false);
+          if (!place) return;
+          setAddress((now) => (now.trim() ? now : (place.address ?? now)));
+          setPincode((now) => (now.trim() ? now : (place.pincode ?? now)));
+        });
       },
       () => {
         setLocating(false);

@@ -15,10 +15,18 @@ const deployedOnly = <T extends z.ZodType>(schema: T) =>
 
 const emptyAsUndefined = (value: unknown) => (value === "" ? undefined : value);
 
+// A Turnstile site key ("0x4…", or one of Cloudflare's "1x0000…" test keys).
+// Production once shipped the Meta API key in this variable, so every page
+// showed it and every order failed the bot check (V-10): on Vercel the build
+// now stops instead. The message never repeats the value.
+const TURNSTILE_SITE_KEY = /^(0x4|[123]x0000)[A-Za-z0-9_-]{16,}$/;
+
 export const clientSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1),
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: deployed
+    ? z.string().regex(TURNSTILE_SITE_KEY, "is not a Cloudflare Turnstile site key (it should start with 0x4)")
+    : z.string().min(1),
 });
 
 export const serverSchema = clientSchema
@@ -52,6 +60,10 @@ export const serverSchema = clientSchema
     // Open Food Facts names scanned barcodes (V-01, E-36): free, public, no
     // key. "off" skips it, so tests never reach the internet.
     OPEN_FOOD_FACTS_URL: z.union([z.literal("off"), z.url()]).default("https://world.openfoodfacts.org"),
+
+    // Address and pincode from the phone's position (V-10): OpenStreetMap's
+    // Nominatim, free with no key. "off" skips it, so tests never reach it.
+    REVERSE_GEOCODE_URL: z.union([z.literal("off"), z.url()]).default("https://nominatim.openstreetmap.org"),
 
     RELEASE: z.string().default("dev"),
 

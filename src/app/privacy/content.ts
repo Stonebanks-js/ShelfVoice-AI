@@ -75,6 +75,7 @@ const en: PrivacyContent = {
       { what: "Axiom", detail: "Error and speed logs. They hold the page and the error, never voice, words, names or phone numbers, and are kept up to 30 days." },
       { what: "Open Food Facts", detail: "A free public product database. When an owner scans a barcode, only the barcode number is sent, to look up the product's name." },
       { what: "OpenFreeMap", detail: "Draws the map on Shops near you, from OpenStreetMap. Your phone asks it for the map of the area on screen; it never gets your name or account, and Shelf Voice keeps your position only for that search, rounded to about 100 m." },
+      { what: "OpenStreetMap Nominatim", detail: "When you tap Use my location on a form, our server sends it your position, rounded to about 100 m, and fills in the street, area and pincode it returns. It never gets your name, number or account." },
     ],
   },
   cookies: {
@@ -146,6 +147,7 @@ const hi: PrivacyContent = {
       { what: "Axiom", detail: "गड़बड़ी और स्पीड के लॉग। इनमें पेज और गड़बड़ी होती है, कभी आवाज़, शब्द, नाम या फ़ोन नंबर नहीं, और ये ज़्यादा से ज़्यादा 30 दिन रखे जाते हैं।" },
       { what: "Open Food Facts", detail: "सामान की एक मुफ़्त सार्वजनिक सूची। दुकानदार बारकोड स्कैन करे तो सिर्फ़ बारकोड का नंबर भेजा जाता है, सामान का नाम जानने के लिए।" },
       { what: "OpenFreeMap", detail: "आस-पास की दुकानें वाले पेज पर OpenStreetMap से नक्शा दिखाता है। आपका फ़ोन स्क्रीन पर दिख रहे इलाके का नक्शा माँगता है; इसे आपका नाम या खाता कभी नहीं मिलता, और Shelf Voice आपकी जगह सिर्फ़ उसी खोज के लिए, लगभग 100 मीटर तक गोल करके, इस्तेमाल करता है।" },
+      { what: "OpenStreetMap Nominatim", detail: "किसी फ़ॉर्म पर 'मेरी लोकेशन' दबाने पर हमारा सर्वर आपकी जगह, लगभग 100 मीटर तक गोल करके, इसे भेजता है और जो गली, इलाका और पिनकोड मिलता है वह भर देता है। इसे आपका नाम, नंबर या खाता कभी नहीं मिलता।" },
     ],
   },
   cookies: {

@@ -11,6 +11,7 @@ import { formatRupees } from "@/lib/changes-view";
 import { ownerState, requestLang } from "@/server/session";
 import { ownerClient } from "@/server/supabase";
 import { todaySummary, type TodaySummary } from "@/server/today";
+import { ProductName } from "@/i18n/products";
 
 import Loading from "./loading";
 import { ShopAlerts } from "./shop-alerts";
@@ -162,7 +163,7 @@ function LowList({ summary, t }: { summary: TodaySummary; t: T }) {
               wrap
               href="/app/restock"
               media={<ProductThumb name={item.name} size="sm" />}
-              title={item.name}
+              title={<ProductName name={item.name} />}
               subtitle={
                 item.flagged ? (
                   <span className="inline-flex items-center gap-1 text-danger">

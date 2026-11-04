@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+import { parseClientEnv } from "./src/env/schema";
+
+// On Vercel the browser's variables are checked before anything is built, so
+// a key in the wrong variable stops the deploy instead of shipping (V-10).
+if (process.env.VERCEL_ENV) parseClientEnv();
+
 // Security headers on every response (doc 03, W-03c; errata E-33). Partial
 // prerendering can't carry per-request nonces, so scripts are limited to our
 // own origin (inline allowed, for Next's bootstrap) and Turnstile; network,

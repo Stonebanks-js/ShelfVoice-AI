@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/feedback";
 import { QrCode } from "@/components/ui/qr-code";
 import { localeFor, type MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
+import { useProductName } from "@/i18n/products";
 import { api } from "@/lib/api";
 import { formatRupees } from "@/lib/changes-view";
 import { cn } from "@/lib/cn";
@@ -39,6 +40,7 @@ function headline(order: OrderView): { key: MessageKey; icon: ReactNode; tone: s
 // much, and a way to call. Checks again every 20 seconds while it's open.
 export function OrderStatusView({ initial, token }: { initial: OrderView | null; token: string }) {
   const { lang, t } = useLang();
+  const productName = useProductName();
   const [order, setOrder] = useState(initial);
   const [checked, setChecked] = useState(() => new Date());
 
@@ -102,7 +104,7 @@ export function OrderStatusView({ initial, token }: { initial: OrderView | null;
           <li key={index} className="flex items-center gap-3 border-separator px-4 py-3 not-first:border-t">
             <span className={cn("flex min-w-0 flex-1 flex-col", item.status === "UNAVAILABLE" && "text-ink-2")}>
               <span className="text-body">
-                {item.name} × {item.qty}
+                {productName(item.name)} × {item.qty}
               </span>
               {item.unit && <span className="text-footnote text-ink-2">{item.unit}</span>}
             </span>

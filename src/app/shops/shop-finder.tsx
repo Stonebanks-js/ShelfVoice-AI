@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import { errorKey } from "@/lib/errors";
 import { categoryLabel } from "@/lib/categories";
 import { asHours } from "@/lib/hours";
+import { placeFor } from "@/lib/place";
 
 import { ShopMap } from "./shop-map";
 
@@ -77,6 +78,8 @@ export function ShopFinder() {
         setMe(here);
         setFrom(null);
         void search(`lat=${here.lat}&lng=${here.lng}`, "locate");
+        // The pincode box shows where the phone is, for a search next time.
+        void placeFor(here).then((place) => place?.pincode && setPincode((now) => now || place.pincode!));
       },
       () => {
         setBusy(null);
