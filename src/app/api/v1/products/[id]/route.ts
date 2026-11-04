@@ -14,6 +14,8 @@ const Patch = z
     unit: z.string().trim().max(40).nullable().optional(),
     category: z.string().trim().max(80).nullable().optional(),
     price_paise: z.number().int().positive().max(10_000_000).nullable().optional(),
+    // The MRP printed on the pack, as the owner reads it (V-11).
+    mrp_paise: z.number().int().positive().max(10_000_000).nullable().optional(),
     aliases: z.array(z.string().trim().min(1).max(80)).max(10).optional(),
     is_in_stock: z.boolean().optional(),
     is_published: z.boolean().optional(),

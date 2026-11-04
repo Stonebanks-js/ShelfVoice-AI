@@ -24,6 +24,7 @@ import { formatRupees } from "@/lib/changes-view";
 import { categoryLabel } from "@/lib/categories";
 import { cn } from "@/lib/cn";
 import { deliveryFee } from "@/lib/delivery";
+import { discountPercent } from "@/lib/price";
 import { dayName, formatTime, openStatus, shopClock } from "@/lib/hours";
 import { errorKey } from "@/lib/errors";
 import { placeFor } from "@/lib/place";
@@ -232,6 +233,14 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           </span>
           <ChevronRight aria-hidden className="size-5 text-ink-3" />
         </Link>
+        {/* Open Food Facts photos are CC BY-SA: credited wherever they show (V-11). */}
+        {shop.products.some((p) => p.photo?.credit) && (
+          <p className="text-center text-footnote text-ink-2">
+            <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+              {t("store.photoCredit")}
+            </a>
+          </p>
+        )}
         <p className="flex items-center justify-center gap-2 text-footnote text-ink-2">
           <Link href="/" className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:underline">
             <LogoMark orbit={false} className="h-4 w-auto text-ink-2" />
@@ -302,10 +311,14 @@ function ProductCard({
 }) {
   const { t } = useLang();
   const name = useProductName()(p.name);
+  const off = discountPercent(p.pricePaise, p.mrpPaise);
   return (
     <li className="flex min-w-0 flex-col gap-2 rounded-xl bg-surface p-2.5 shadow-card">
       <div className="relative">
-        <ProductThumb name={p.name} category={p.category} size="lg" className={cn(!p.inStock && "opacity-45 grayscale")} />
+        <ProductThumb name={p.name} category={p.category} imageUrl={p.photo?.url} size="lg" className={cn(!p.inStock && "opacity-45 grayscale")} />
+        {off !== null && p.inStock && (
+          <span className="absolute top-1 left-1 rounded-md bg-success-soft px-1.5 py-0.5 text-footnote font-bold text-success tabular-nums">{t("store.off", { n: off })}</span>
+        )}
         <div className="absolute top-1 right-1 rounded-full bg-surface/90">
           <HeartButton on={wished} label={t("store.wish", { name })} onClick={onWish} small disabled={!wishReady} />
         </div>
@@ -321,6 +334,12 @@ function ProductCard({
       </span>
       <span className="flex min-h-6 items-center gap-2">
         {p.pricePaise ? <span className="font-display text-body font-bold tabular-nums">{formatRupees(p.pricePaise)}</span> : null}
+        {off !== null && (
+          <span className="text-footnote text-ink-2 tabular-nums">
+            <span className="sr-only">{t("store.mrpLabel")} </span>
+            <s>{formatRupees(p.mrpPaise!)}</s>
+          </span>
+        )}
         {p.inStock && <span className="sr-only">{t("status.inStock")}</span>}
       </span>
       {p.inStock &&

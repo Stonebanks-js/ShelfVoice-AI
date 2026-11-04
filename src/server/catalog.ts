@@ -23,6 +23,7 @@ export const ProductInput = z
     unit: z.string().trim().max(40).nullable().optional(),
     category: z.string().trim().max(80).nullable().optional(),
     price_paise: z.number().int().positive().max(10_000_000).nullable().optional(),
+    mrp_paise: z.number().int().positive().max(10_000_000).nullable().optional(),
     aliases: z.array(z.string().trim().min(1).max(80)).max(10).optional(),
     stock_qty: z.number().int().min(0).max(10_000).nullable().optional(),
     low_stock_level: z.number().int().min(0).max(10_000).optional(),

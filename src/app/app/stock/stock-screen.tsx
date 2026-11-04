@@ -20,7 +20,14 @@ import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
 import { categories, matches, type StockProduct } from "@/lib/stock";
 import { categoryLabel } from "@/lib/categories";
+import { productPhoto } from "@/lib/catalog/photo-url";
 import { ProductName } from "@/i18n/products";
+
+import { PhotoPicker } from "./photo-picker";
+
+// A product's photo as customers see it (V-11).
+const photoOf = (p: StockProduct) =>
+  productPhoto({ imagePath: p.image_path, imageCredit: p.image_credit, name: p.name, unit: p.unit }, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "")?.url ?? null;
 
 const OUT = "__out__"; // the "Out of stock" chip
 
@@ -232,7 +239,7 @@ function StockRow({
     <li className="flex flex-col border-separator pr-3 not-first:border-t">
       <div className="flex items-center gap-1">
         <button type="button" onClick={onEdit} className="flex min-w-0 flex-1 items-center gap-3 pl-4 text-left active:bg-fill">
-          <ProductThumb name={product.name} category={product.category} size="sm" className={cn("my-2", !product.is_in_stock && "opacity-45 grayscale")} />
+          <ProductThumb name={product.name} category={product.category} imageUrl={photoOf(product)} size="sm" className={cn("my-2", !product.is_in_stock && "opacity-45 grayscale")} />
           <span className="flex min-h-14 min-w-0 flex-1 items-center gap-2 py-2">
             <span className="flex min-w-0 flex-1 flex-col">
               <span id={titleId} className={cn("line-clamp-2 text-body", !product.is_in_stock && "text-ink-2")}>
@@ -282,6 +289,7 @@ function ProductSheet({
   const [form, setForm] = useState({
     name: isNew ? "" : product.name,
     price: isNew ? "" : rupees(product.price_paise),
+    mrp: isNew ? "" : rupees(product.mrp_paise),
     unit: isNew ? "" : (product.unit ?? ""),
     category: isNew ? "" : (product.category ?? ""),
     count: isNew ? "" : product.stock_qty === null ? "" : String(product.stock_qty),
@@ -302,6 +310,8 @@ function ProductSheet({
     if (!name) return setInvalid("name");
     const priceValue = form.price.trim() ? Number.parseFloat(form.price) : null;
     if (priceValue !== null && !(priceValue > 0)) return setInvalid("price");
+    const mrpValue = form.mrp.trim() ? Number.parseFloat(form.mrp) : null;
+    if (mrpValue !== null && !(mrpValue > 0)) return setInvalid("mrp");
     const count = form.count.trim() ? Number.parseInt(form.count, 10) : null;
     if (count !== null && !(count >= 0)) return setInvalid("count");
     const low = Number.parseInt(form.low, 10);
@@ -310,6 +320,7 @@ function ProductSheet({
     const fields = {
       name,
       price_paise: priceValue === null ? null : Math.round(priceValue * 100),
+      mrp_paise: mrpValue === null ? null : Math.round(mrpValue * 100),
       unit: form.unit.trim() || null,
       category: form.category.trim() || null,
       low_stock_level: low,
@@ -386,8 +397,10 @@ function ProductSheet({
         {field("name", "field.name")}
         <div className="grid grid-cols-2 gap-3">
           {field("price", "field.price", "decimal")}
-          {field("unit", "field.unit")}
+          {field("mrp", "field.mrp", "decimal")}
         </div>
+        <p className="-mt-2 px-1 text-footnote text-ink-2">{t("field.mrpHint")}</p>
+        {field("unit", "field.unit")}
         {field("category", "field.category")}
 
         <div className="flex flex-col gap-1.5">
@@ -412,6 +425,17 @@ function ProductSheet({
           {!isNew && <p className="px-1 text-footnote text-ink-2">{t("stock.countHint")}</p>}
         </div>
         {field("low", "stock.lowLevel", "numeric")}
+
+        {!isNew && (
+          <PhotoPicker
+            productId={product.id}
+            name={product.name}
+            category={product.category}
+            photoUrl={photoOf(product)}
+            ownPhoto={Boolean(product.image_path)}
+            onChanged={() => onSaved(t("photo.saved"))}
+          />
+        )}
 
         {!isNew && (
           <Button variant="destructive" icon={<Trash2 aria-hidden className="size-5" />} onClick={() => setConfirmRemove(true)}>

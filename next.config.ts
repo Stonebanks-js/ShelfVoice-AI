@@ -17,12 +17,14 @@ const dev = process.env.NODE_ENV === "development";
 const turnstile = "https://challenges.cloudflare.com";
 // Map tiles, fonts and icons for Shops near you (V-09), OpenStreetMap data.
 const mapTiles = "https://tiles.openfreemap.org";
+// Product photos an owner chooses from (V-11): Open Food Facts' image host only.
+const productPhotos = "https://images.openfoodfacts.org";
 
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' ${turnstile}${dev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' blob: data: ${supabase} ${mapTiles}`,
+  `img-src 'self' blob: data: ${supabase} ${mapTiles} ${productPhotos}`,
   "font-src 'self'",
   `connect-src 'self' ${supabase} ${mapTiles}`,
   `media-src 'self' blob: ${supabase}`,

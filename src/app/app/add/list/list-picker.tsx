@@ -7,12 +7,14 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/controls";
 import { EmptyState } from "@/components/ui/feedback";
+import { ProductThumb } from "@/components/ui/product-thumb";
 import { SearchField } from "@/components/ui/field";
 import { AddToggle, PriceInput, paiseText, rupeesInput } from "@/components/ui/quantity";
 import { useToast } from "@/components/ui/toast";
 import type { MessageKey } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
+import { productPhoto } from "@/lib/catalog/photo-url";
 import { haveKey, SHOP_TYPES, STARTER_ITEMS, starterFor, type ShopType, type StarterItem } from "@/lib/catalog/starter";
 import { errorKey } from "@/lib/errors";
 import { ProductName } from "@/i18n/products";
@@ -123,6 +125,8 @@ export function ListPicker({ initialType, have }: { initialType: ShopType; have:
                   const price = priceOf(item);
                   return (
                     <li key={item.key} className="flex items-center gap-3 border-separator py-2.5 pr-3 pl-4 not-first:border-t">
+                      {/* The checked packshot, so the owner ticks the right pack (V-11). */}
+                      <ProductThumb name={item.name} category={item.category} imageUrl={productPhoto(item, "")?.url} size="sm" />
                       <div className="flex min-w-0 flex-1 flex-col">
                         <span className="text-body text-ink"><ProductName name={item.name} /></span>
                         <span className="text-footnote text-ink-2">{ownedHere ? `${item.unit} · ${t("list.have")}` : item.unit}</span>
