@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Apple,
   Candy,
@@ -13,11 +15,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { useEffect, useRef, useState } from "react";
+
 import { cn } from "@/lib/cn";
 
 // A product's face (E-37): its photo when the shop has one, otherwise a tile
 // in its category's colour with a drawn mark, so a list of products reads
-// like a shelf instead of a column of identical icons.
+// like a shelf instead of a column of identical icons. A packshot (V-11)
+// sits whole on a white tile in both themes, never cropped or stretched,
+// and a photo that fails to load falls back to the drawn tile.
 
 type Look = { tone: number; icon: LucideIcon };
 
@@ -69,10 +75,20 @@ export function ProductThumb({
   size?: keyof typeof SIZE;
   className?: string;
 }) {
-  if (imageUrl) {
+  const [broken, setBroken] = useState<string | null>(null);
+  const img = useRef<HTMLImageElement>(null);
+  // A photo that failed before the page came alive fired its error with no
+  // one listening: check once it's on screen.
+  useEffect(() => {
+    const el = img.current;
+    if (el && imageUrl && el.complete && el.naturalWidth === 0) setBroken(imageUrl);
+  }, [imageUrl]);
+  if (imageUrl && broken !== imageUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element -- shop photos come from Storage at their own size
-      <img src={imageUrl} alt="" loading="lazy" className={cn("shrink-0 bg-surface-2 object-cover", SIZE[size], className)} />
+      <span className={cn("grid shrink-0 place-items-center overflow-hidden bg-white", SIZE[size], className)}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- our own small WebP files and Storage photos, already sized */}
+        <img ref={img} src={imageUrl} alt="" loading="lazy" decoding="async" onError={() => setBroken(imageUrl)} className="size-full object-contain p-[8%]" />
+      </span>
     );
   }
   const { tone, icon: Icon } = lookFor(name, category);

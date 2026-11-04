@@ -275,14 +275,14 @@ isOneToOne: false
                   ]
                 },"products": {
                   Row: {
-                    "aliases": (string)[],"archived_at": string | null,"barcode": string | null,"category": string | null,"created_at": string,"id": string,"image_path": string | null,"is_in_stock": boolean,"is_published": boolean,"low_stock_level": number,"name": string,"pack_size": number,"price_paise": number | null,"shop_id": string,"stock_qty": number | null,"unit": string | null,"updated_at": string
+                    "aliases": (string)[],"archived_at": string | null,"barcode": string | null,"category": string | null,"created_at": string,"id": string,"image_checked_at": string | null,"image_credit": string | null,"image_path": string | null,"image_source": string | null,"image_source_id": string | null,"image_verified": boolean,"is_in_stock": boolean,"is_published": boolean,"low_stock_level": number,"mrp_paise": number | null,"name": string,"pack_size": number,"price_paise": number | null,"shop_id": string,"stock_qty": number | null,"unit": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "aliases"?: (string)[],"archived_at"?: string | null,"barcode"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"name": string,"pack_size"?: number,"price_paise"?: number | null,"shop_id": string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
+                    "aliases"?: (string)[],"archived_at"?: string | null,"barcode"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_checked_at"?: string | null,"image_credit"?: string | null,"image_path"?: string | null,"image_source"?: string | null,"image_source_id"?: string | null,"image_verified"?: boolean,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"mrp_paise"?: number | null,"name": string,"pack_size"?: number,"price_paise"?: number | null,"shop_id": string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "aliases"?: (string)[],"archived_at"?: string | null,"barcode"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_path"?: string | null,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"name"?: string,"pack_size"?: number,"price_paise"?: number | null,"shop_id"?: string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
+                    "aliases"?: (string)[],"archived_at"?: string | null,"barcode"?: string | null,"category"?: string | null,"created_at"?: string,"id"?: string,"image_checked_at"?: string | null,"image_credit"?: string | null,"image_path"?: string | null,"image_source"?: string | null,"image_source_id"?: string | null,"image_verified"?: boolean,"is_in_stock"?: boolean,"is_published"?: boolean,"low_stock_level"?: number,"mrp_paise"?: number | null,"name"?: string,"pack_size"?: number,"price_paise"?: number | null,"shop_id"?: string,"stock_qty"?: number | null,"unit"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -488,7 +488,7 @@ isOneToOne: false
                   ]
                 },"public_storefront": {
                   Row: {
-                    "accepts_cash": boolean,"address": string | null,"delivers": boolean,"delivery_fee_paise": number | null,"delivery_min_paise": number | null,"delivery_radius_km": number | null,"free_delivery_above_paise": number | null,"hours": Json | null,"image_path": string | null,"in_stock": boolean | null,"language": string,"pay_on_delivery": boolean,"phone": string | null,"price_paise": number | null,"product_category": string | null,"product_id": string | null,"product_name": string | null,"shop_category": string | null,"shop_description": string | null,"shop_id": string,"shop_name": string,"slug": string,"timezone": string,"unit": string | null,"upi_id": string | null
+                    "accepts_cash": boolean,"address": string | null,"delivers": boolean,"delivery_fee_paise": number | null,"delivery_min_paise": number | null,"delivery_radius_km": number | null,"free_delivery_above_paise": number | null,"hours": Json | null,"image_credit": string | null,"image_path": string | null,"in_stock": boolean | null,"language": string,"mrp_paise": number | null,"pay_on_delivery": boolean,"phone": string | null,"price_paise": number | null,"product_category": string | null,"product_id": string | null,"product_name": string | null,"shop_category": string | null,"shop_description": string | null,"shop_id": string,"shop_name": string,"slug": string,"timezone": string,"unit": string | null,"upi_id": string | null
                   }
                   ComputedFields: never
                   Relationships: [

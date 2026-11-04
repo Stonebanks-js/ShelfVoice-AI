@@ -5,6 +5,7 @@ import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 
 import { env } from "@/env/server";
 import { isLang, type Lang } from "@/i18n/dictionary";
+import { productPhoto } from "@/lib/catalog/photo-url";
 import { asHours, type Hours } from "@/lib/hours";
 import type { Database } from "@/types/database";
 
@@ -15,6 +16,9 @@ export interface StorefrontProduct {
   unit: string | null;
   pricePaise: number | null;
   inStock: boolean;
+  // The MRP the owner entered, and the product's photo with its credit (V-11).
+  mrpPaise: number | null;
+  photo: { url: string; credit: string | null } | null;
 }
 
 export interface Storefront {
@@ -83,6 +87,8 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
         unit: row.unit,
         pricePaise: row.price_paise,
         inStock: row.in_stock ?? false,
+        mrpPaise: row.mrp_paise,
+        photo: productPhoto({ imagePath: row.image_path, imageCredit: row.image_credit, name: row.product_name!, unit: row.unit }, env.NEXT_PUBLIC_SUPABASE_URL),
       }))
       .sort((a, b) => a.name.localeCompare(b.name)),
   };

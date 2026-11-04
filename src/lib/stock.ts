@@ -1,7 +1,7 @@
 // The Stock tab's view of a product, shared by the server page and the
 // client screen (a "use client" module can't export plain values to the server).
 export const PRODUCT_COLUMNS =
-  "id, name, unit, category, aliases, price_paise, stock_qty, is_in_stock, low_stock_level, product_forecasts(days_left, order_qty, reorder_point)";
+  "id, name, unit, category, aliases, price_paise, mrp_paise, image_path, image_credit, stock_qty, is_in_stock, low_stock_level, product_forecasts(days_left, order_qty, reorder_point)";
 
 export interface StockProduct {
   id: string;
@@ -10,6 +10,9 @@ export interface StockProduct {
   category: string | null;
   aliases: string[];
   price_paise: number | null;
+  mrp_paise: number | null;
+  image_path: string | null;
+  image_credit: string | null;
   stock_qty: number | null;
   is_in_stock: boolean;
   low_stock_level: number;
