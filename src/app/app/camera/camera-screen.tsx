@@ -17,8 +17,8 @@ import { prepareJpeg } from "@/lib/image";
 type Step = "pick" | "preview" | "reading";
 export type CameraMode = "bill" | "shelf";
 
-// The words and tips for each kind of photo: a supplier's bill (O-10), or a
-// shelf whose products become new ones to add (V-01).
+// The words and tips for each kind of photo: a supplier's bill, or a
+// shelf whose products become new ones to add.
 const COPY = {
   bill: {
     title: "camera.title",
@@ -97,7 +97,7 @@ export function CameraScreen({ mode = "bill" }: { mode?: CameraMode }) {
       {step === "pick" ? (
         <>
           <p className="mt-2 text-body text-ink-2">{t(copy.body)}</p>
-          {/* Doc 06 viewfinder guide: how the bill should sit in the photo. */}
+          {/* How the bill should sit in the photo. */}
           <div aria-hidden className="mt-6 grid aspect-[4/3] max-h-[34dvh] w-full place-items-center rounded-xl border-2 border-dashed border-ink-3 bg-surface">
             <ScanLine className="size-16 text-ink-3" />
           </div>

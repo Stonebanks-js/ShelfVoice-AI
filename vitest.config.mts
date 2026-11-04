@@ -47,7 +47,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       // Coverage gate where bugs cost most: server services and the forecast
-      // module, which lives under src/server (doc 04, V4). UI is covered by E2E.
+      // module, which lives under src/server. UI is covered by E2E.
       include: ["src/server/**/*.ts"],
       // Request-scoped glue that needs a live Next request (cookies) is
       // exercised by scripts/smoke-api.mjs instead.

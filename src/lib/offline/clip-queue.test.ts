@@ -4,7 +4,7 @@ import { ApiFailure } from "@/lib/api";
 
 import { isConnectionProblem, isRetryable, retryDelayMs } from "./clip-queue";
 
-describe("offline clip queue rules (F-03b)", () => {
+describe("offline clip queue rules", () => {
   it("backs off from 5 seconds to at most 5 minutes", () => {
     expect([1, 2, 3, 4].map(retryDelayMs)).toEqual([5_000, 10_000, 20_000, 40_000]);
     expect(retryDelayMs(20)).toBe(300_000);

@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 interface ToastOptions {
   message: string;
   action?: { label: string; onAction: () => void };
-  durationMs?: number; // doc 06: the undo toast stays 10 s
+  durationMs?: number; // The undo toast stays 10 s
 }
 
 interface ToastState extends ToastOptions {

@@ -1,4 +1,4 @@
--- W-19 (FR-12, doc 07 K6): the festivals that move kirana stock, November
+-- The festivals that move kirana stock, November
 -- 2026 to December 2027, so forecasts rise in the 7 days before each one.
 --
 -- Dates checked Oct 31, 2026 against:
@@ -20,7 +20,7 @@
 -- and Ganesh Chaturthi (a day either side for the last, a ten-day festival
 -- whose first days sell most).
 --
--- Factors are configuration values (doc 02 p12), set here by hand: 1.5 for
+-- Factors are configuration values, set here by hand: 1.5 for
 -- Diwali across the shop, 1.4 for Holi and Eid-ul-Fitr on what they're
 -- cooked and served with, 1.2 to 1.3 for the rest. Categories match the
 -- names the app suggests (Snacks, Dairy, Staples, Atta and rice, ...),

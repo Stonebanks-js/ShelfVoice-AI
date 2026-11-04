@@ -45,14 +45,14 @@ export function localAnon() {
   return createClient(localSupabase!.API_URL, localSupabase!.PUBLISHABLE_KEY, { auth: { persistSession: false } });
 }
 
-// The demo sign-in allows 10 per IP per hour (doc 03). Each journey gets its
+// The demo sign-in allows 10 per IP per hour. Each journey gets its
 // own test address, so parallel journeys don't share one limit.
 export async function ownTestAddress(page: Page) {
   const octet = () => Math.floor(Math.random() * 254) + 1;
   await page.setExtraHTTPHeaders({ "x-forwarded-for": `10.${octet()}.${octet()}.${octet()}` });
 }
 
-// Switches the screen's language through the picker (V-06). `name` is how
+// Switches the screen's language through the picker. `name` is how
 // the language is written in its own script, e.g. "English" or "हिन्दी".
 export async function chooseLanguage(page: Page, name: string) {
   await page.getByTestId("language-picker").click();
@@ -61,7 +61,7 @@ export async function chooseLanguage(page: Page, name: string) {
 }
 
 // A new owner with the seeded sample shop (15 products, 90 days of sales,
-// two reviews), opened on Home. Replaces the demo sign-in removed by E-36.
+// two reviews), opened on Home.
 export async function signInToSampleShop(page: Page, language: "en" | "hi" = "en") {
   await ownTestAddress(page);
   const userId = await signInAsNewOwner(page, { withShop: false });

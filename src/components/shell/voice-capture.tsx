@@ -26,13 +26,13 @@ function primed(): boolean {
   }
 }
 
-// The mic, wired up (doc 06 "Mic button behaviour"): the first tap explains
+// The mic, wired up: the first tap explains
 // why the microphone is needed and what to say, before the browser asks;
 // then tap to record, tap to stop, upload ("Listening…"), and hand the
 // stored path to `onUploaded` ("Understanding…" while it runs). Failures
 // appear above the button with what to do next; a retry reuses the clip.
 // With `queueAs`, a clip that can't reach the server waits on the phone and
-// is sent when the connection is back (F-03b).
+// is sent when the connection is back.
 export function VoiceCapture({
   maxSeconds,
   onUploaded,
@@ -95,7 +95,7 @@ export function VoiceCapture({
     onRecorded: (recording) => {
       onRecorded?.(recording);
       if (!onUploaded) return;
-      // Same client ID on every retry, so Storage keeps one copy (doc 07).
+      // Same client ID on every retry, so Storage keeps one copy.
       pending.current = { wav: recording.wav, clientId: crypto.randomUUID() };
       void send();
     },

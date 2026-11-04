@@ -8,7 +8,7 @@ import { ownerState, requestLang } from "@/server/session";
 
 import Loading from "./loading";
 
-// Holds a tab's place until its screen is built (F-05 to F-08), so the tab
+// Holds a tab's place until its screen is built, so the tab
 // bar never leads to a 404. The session read streams behind the page's own
 // boundary, so a tab tap shows the skeleton at once.
 export function ComingSoon({ title }: { title: MessageKey }) {

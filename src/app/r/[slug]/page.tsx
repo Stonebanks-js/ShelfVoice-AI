@@ -7,10 +7,10 @@ import { getStorefront } from "@/server/storefront";
 
 import { ReviewFlow } from "./review-flow";
 
-// P-2 Leave a voice review (doc 06): shop name, consent, a 15-second mic,
+// Shop name, consent, a 15-second mic,
 // thank you. No name, phone or stars; the voice is the whole review.
 // Renders once the cached read is back, so customers never see a spinner
-// (doc 06: server-rendered, no spinner). The root shell has already gone
+// (server-rendered, no spinner). The root shell has already gone
 // out by then, so a missing shop shows the not-found page with status 200
 // and a noindex tag; a true 404 would need a database check in the proxy
 // on every visit.

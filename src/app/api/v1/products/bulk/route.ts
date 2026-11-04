@@ -7,7 +7,7 @@ import { requireShop } from "@/server/owner";
 
 const Body = z.object({ products: z.array(ProductInput).min(1).max(MAX_BULK) }).strict();
 
-// Many products at once, from a ready-made list or a spreadsheet (V-01).
+// Many products at once, from a ready-made list or a spreadsheet.
 // Products the shop already has are skipped, not doubled.
 export const POST = route(async (request, _ctx, { requestId }) => {
   const owner = await requireShop();

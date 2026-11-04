@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { placeFrom } from "./place";
 
-describe("address from a position (V-10)", () => {
+describe("address from a position", () => {
   it("writes street, area and town once each, with a 6-digit pincode", () => {
     expect(placeFrom({ house_number: "12", road: "Station Road", suburb: "Govind Nagar", city: "Kanpur", postcode: "208006" })).toEqual({
       address: "12, Station Road, Govind Nagar, Kanpur",

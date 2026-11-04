@@ -8,7 +8,7 @@ import { Latitude, Longitude, Pincode } from "@/server/location";
 import type { Owner } from "@/server/owner";
 import { adminClient } from "@/server/supabase";
 
-// A customer's account (V-05, E-36): their details, saved addresses,
+// A customer's account: their details, saved addresses,
 // wishlist, favourite shops, orders and refunds. Their own rows are read
 // under RLS; what shops publish (product and shop names) is read with the
 // service role, only for products and shops that are published.

@@ -21,7 +21,7 @@ export function VoiceBars({ className }: { className?: string }) {
   );
 }
 
-// The one memorable element (doc 06), drawn from the logo (E-35): a red
+// The one memorable element, drawn from the logo: a red
 // circle with the logo's five voice bars, the same everywhere. While
 // recording, a ring fills clockwise toward the time limit and the bars move
 // with the voice; while sending and thinking the ring spins slowly. In the

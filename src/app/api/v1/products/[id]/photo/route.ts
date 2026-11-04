@@ -5,7 +5,7 @@ import { readJson, route } from "@/server/http";
 import { requireShop } from "@/server/owner";
 import { choosePhoto, photoCandidates, removePhoto } from "@/server/product-photos";
 
-// A product's photo (V-11): the candidates to choose from, the owner's
+// A product's photo: the candidates to choose from, the owner's
 // choice, or none. Only the shop's own products; 30 searches a minute.
 export const GET = route(async (_request, ctx: RouteContext<"/api/v1/products/[id]/photo">) => {
   const { id } = await ctx.params;

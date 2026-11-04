@@ -18,7 +18,7 @@ import { errorKey } from "@/lib/errors";
 const MAX_PRODUCTS = 500;
 const SAMPLE = `data:text/csv;charset=utf-8,${encodeURIComponent(TEMPLATE_CSV)}`;
 
-// V-01 Excel or CSV: read in the browser, shown for ticking, then added in
+// Read in the browser, shown for ticking, then added in
 // one go. Products the shop already has are marked and left out.
 export function SheetImport({ have }: { have: string[] }) {
   const { t } = useLang();

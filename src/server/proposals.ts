@@ -18,7 +18,7 @@ type Ctx = Owner & { shop: Shop; requestId: string };
 // Plain JSON for the database: drops undefined fields, as the wire would.
 const toJson = (value: unknown) => JSON.parse(JSON.stringify(value)) as NonNullable<Json>;
 
-export const UNDO_WINDOW_SECONDS = 60; // UI shows 10 s (doc 06); slack for slow networks (E-02)
+export const UNDO_WINDOW_SECONDS = 60; // UI shows 10 s; slack for slow networks
 
 export function aiFailure(error: unknown): never {
   if (error instanceof AiError) {
@@ -43,8 +43,8 @@ export async function catalogFor({ db, shop }: Ctx): Promise<CatalogItem[]> {
 // ------------------------------------------------------------------ uploads
 export type UploadKind = "voice" | "bill" | "shelf";
 
-// A signed URL for one object under the owner's shop folder (doc 02:
-// files skip the server; doc 03: scoped to one path, short-lived).
+// A signed URL for one object under the owner's shop folder:
+// files skip the server, and each URL is scoped to one path and short-lived.
 export async function signedUpload(ctx: Ctx, kind: UploadKind, clientId: string) {
   const bucket = kind === "voice" ? "voice" : "photos";
   const path = kind === "voice" ? `${ctx.shop.id}/owner/${clientId}.wav` : `${ctx.shop.id}/${kind}/${clientId}.jpg`;
@@ -85,7 +85,7 @@ async function store(ctx: Ctx, kind: "SETUP" | "COMMAND" | "BILL" | "SHELF", inp
 
 // ------------------------------------------------------------ voice proposal
 export async function voiceProposal(ctx: Ctx, path: string, kind: "SETUP" | "COMMAND") {
-  // Same clip again (retry, double tap): no second Meta call (doc 07).
+  // Same clip again (retry, double tap): no second Meta call.
   const prior = await existing(ctx, path);
   if (prior) return { proposal: prior, question: null, rejected: [] as string[] };
 
@@ -115,7 +115,7 @@ export async function voiceProposal(ctx: Ctx, path: string, kind: "SETUP" | "COM
 
 // ------------------------------------------------------------ photo proposal
 // A typical price, category and spoken names for a product read off a photo,
-// from the ready-made lists (V-01); the owner checks the price.
+// from the ready-made lists; the owner checks the price.
 function suggest(name: string, unit: string | null) {
   const item = matchStarter(name, unit);
   return item ? { category: item.category, pricePaise: item.pricePaise, aliases: item.aliases } : null;
@@ -129,7 +129,7 @@ export async function photoProposal(ctx: Ctx, path: string, kind: "bill" | "shel
   const prior = await existing(ctx, path);
   if (prior) return { proposal: prior };
   const image = await download(ctx, "photos", path, kind);
-  // Magic bytes: JPEG starts FF D8 FF (doc 03 upload checks).
+  // Magic bytes: JPEG starts FF D8 FF.
   if (image.byteLength > 3 * 1024 * 1024 || image[0] !== 0xff || image[1] !== 0xd8 || image[2] !== 0xff) {
     throw new ApiError(422, "BAD_IMAGE", "The photo must be a JPEG under 3 MB");
   }
@@ -148,14 +148,14 @@ export async function photoProposal(ctx: Ctx, path: string, kind: "bill" | "shel
 }
 
 // ------------------------------------------------------------------- confirm
-// The owner may edit or remove cards before confirming (doc 06 O-4), so the
+// The owner may edit or remove cards before confirming, so the
 // confirmed list comes from the request, validated again here and in SQL.
 export async function confirmProposal(ctx: Ctx, proposalId: string, edited?: Change[]) {
   const { data: proposal } = await ctx.db.from("proposals").select("*").eq("id", proposalId).maybeSingle();
   if (!proposal) throw new ApiError(404, "PROPOSAL_NOT_FOUND", "Proposal not found");
   const changes = Changes.parse(edited ?? proposal.changes);
 
-  // Doc 03: a new price must be above 0 and under 10x the old one.
+  // A new price must be above 0 and under 10x the old one.
   const priced = changes.filter((c): c is Extract<Change, { op: "update_price" }> => c.op === "update_price");
   if (priced.length && proposal.status === "PENDING") {
     const { data: rows } = await ctx.db.from("products").select("id, price_paise").in("id", priced.map((c) => c.product_id));
@@ -168,7 +168,7 @@ export async function confirmProposal(ctx: Ctx, proposalId: string, edited?: Cha
   const { data, error } = await ctx.db.rpc("confirm_proposal", { p_proposal_id: proposalId, p_changes: toJson(changes) });
   if (error) throw fromPostgres(error);
 
-  // For the admin page's confirm-unedited rate (W-20b). Only the first
+  // For the admin page's confirm-unedited rate. Only the first
   // confirm counts; a repeat of the same request changes nothing.
   if (proposal.status === "PENDING") {
     const ownerEdited = JSON.stringify(changes) !== JSON.stringify(Changes.parse(proposal.changes));
@@ -180,7 +180,7 @@ export async function confirmProposal(ctx: Ctx, proposalId: string, edited?: Cha
 
 // ---------------------------------------------------------------------- undo
 export async function undoProposal(ctx: Ctx, proposalId: string) {
-  // Ownership through RLS first; the undo itself runs as the server (E-02).
+  // Ownership through RLS first; the undo itself runs as the server.
   const { data: proposal } = await ctx.db.from("proposals").select("id").eq("id", proposalId).maybeSingle();
   if (!proposal) throw new ApiError(404, "PROPOSAL_NOT_FOUND", "Proposal not found");
   const { data, error } = await adminClient().rpc("undo_proposal", {

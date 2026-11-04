@@ -21,7 +21,7 @@ const STAGES: Array<{ stage: Stage; key: MessageKey; icon: typeof Check }> = [
   { stage: "delivered", key: "live.delivered", icon: Check },
 ];
 
-// The confirmation and live tracker (V-12): "Order placed", minutes to go,
+// The confirmation and live tracker: "Order placed", minutes to go,
 // each step lighting up as time passes, the items and the total.
 export function LiveOrderView() {
   const { t } = useLang();

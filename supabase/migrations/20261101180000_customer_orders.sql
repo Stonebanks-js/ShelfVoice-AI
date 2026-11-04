@@ -1,4 +1,4 @@
--- Customer orders (V-04, E-36): a customer fills a cart on the shop page and
+-- Customer orders: a customer fills a cart on the shop page and
 -- places it with a name and phone number, for pickup or home delivery. The
 -- owner sees it in Orders, marks items available or not, and moves it along;
 -- completing it logs the sales. Customers don't sign in: the server writes

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Where a shop is (V-03): a 6-digit Indian pincode and, when the owner
+// Where a shop is: a 6-digit Indian pincode and, when the owner
 // shared it, the phone's location. Latitude and longitude come together.
 export const Pincode = z.string().regex(/^[1-9][0-9]{5}$/);
 export const Latitude = z.number().min(-90).max(90);

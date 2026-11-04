@@ -48,7 +48,7 @@ async function ownProduct(ctx: Ctx, id: string) {
   return data;
 }
 
-// Photos that may be this product (V-11): by its barcode first, then by its
+// Photos that may be this product: by its barcode first, then by its
 // name, judged against its name and pack, best first. Never saved here: the
 // owner chooses. An empty list when the service is off or unreachable, so
 // the sheet simply says no photos were found.

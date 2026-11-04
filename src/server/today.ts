@@ -20,9 +20,9 @@ export interface TodaySummary {
   lowCount: number;
   reviews: Array<{ id: string; sentiment: "POSITIVE" | "NEUTRAL" | "NEGATIVE" | null; summary: string | null; createdAt: string }>;
   newReviews: number;
-  // The last few voice or photo changes the owner confirmed (V-02).
+  // The last few voice or photo changes the owner confirmed.
   recent: Array<{ id: string; kind: "SETUP" | "COMMAND" | "BILL" | "SHELF"; changes: number; decidedAt: string }>;
-  // Customer orders waiting for the owner (V-04).
+  // Customer orders waiting for the owner.
   newOrders: Array<{ id: string; code: string; name: string; items: number; createdAt: string }>;
 }
 
@@ -36,7 +36,7 @@ function revenue(sales: Sale[]): number {
   }, 0);
 }
 
-// Doc 06 O-5: today's sales, items running low and new reviews, all read
+// Today's sales, items running low and new reviews, all read
 // under the owner's RLS policies. Days are India days.
 export async function todaySummary(db: Db, shopId: string, now = new Date()): Promise<TodaySummary> {
   const dayStart = Math.floor((now.getTime() + IST_OFFSET_MS) / DAY_MS) * DAY_MS - IST_OFFSET_MS;

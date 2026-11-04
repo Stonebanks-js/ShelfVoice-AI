@@ -1,4 +1,4 @@
-// Shops near a customer (V-03) against the local database. Needs `supabase start`.
+// Shops near a customer against the local database. Needs `supabase start`.
 import { randomUUID } from "node:crypto";
 
 import { describe, expect, it } from "vitest";

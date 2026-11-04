@@ -13,7 +13,7 @@ export interface StockProduct {
   mrp_paise: number | null;
   image_path: string | null;
   image_credit: string | null;
-  // The photo customers see, worked out on the server (V-12).
+  // The photo customers see, worked out on the server.
   photo_url?: string | null;
   stock_qty: number | null;
   is_in_stock: boolean;

@@ -10,7 +10,7 @@ const Body = z
   .object({
     name: z.string().trim().min(1).max(80).default("My shop"),
     language: z.enum(LANGS as [Lang, ...Lang[]]).optional(),
-    // The setup steps (V-03): shop type, and where the shop is.
+    // The setup steps: shop type, and where the shop is.
     category: z.string().trim().max(80).nullable().optional(),
     ...ShopLocation,
   })
@@ -18,7 +18,7 @@ const Body = z
   .refine(bothOrNeither, { message: "Latitude and longitude go together", path: ["lat"] });
 
 // Creates the signed-in owner's shop from the setup steps. RLS allows one
-// shop per owner and none for anonymous users (E-29).
+// shop per owner and none for anonymous users.
 export const POST = route(async (request) => {
   const { db, user } = await requireOwner();
   const { name, language, ...rest } = await readJson(request, Body);

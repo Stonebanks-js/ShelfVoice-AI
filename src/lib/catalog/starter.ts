@@ -1,4 +1,4 @@
-// Ready-made product lists (V-01, E-36): the common items each kind of shop
+// Ready-made product lists: the common items each kind of shop
 // stocks, so an owner ticks what they sell instead of speaking every name.
 // Prices are typical MRPs in Nov 2026, shown as "check price": owners
 // correct any that differ before saving. No tobacco or pan masala.
@@ -21,7 +21,7 @@ const TYPE_CODES: Record<string, ShopType> = { k: "kirana", d: "departmental", b
 
 type Row = [name: string, unit: string, rupees: number, types: string, aliases?: string[]];
 
-// Category names match the festival calendar's (W-19), so festival bumps
+// Category names match the festival calendar's, so festival bumps
 // apply to products added from these lists.
 const ROWS: Record<string, Row[]> = {
   "Atta and rice": [

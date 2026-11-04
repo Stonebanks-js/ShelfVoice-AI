@@ -1,4 +1,4 @@
-// Server-side check of uploaded audio (doc 03 TH-07, upload table): read the
+// Server-side check of uploaded audio: read the
 // WAV header itself instead of trusting the file name or content type.
 export interface WavInfo {
   sampleRate: number;
@@ -38,7 +38,7 @@ export function checkWav(bytes: Uint8Array, limits: { maxBytes: number; maxSecon
   }
 
   if (!fmt || dataBytes === undefined) return { ok: false, reason: "not a WAV file" };
-  // Doc 02: mono 16-bit PCM at 16 or 24 kHz, the only format Voice Transcribe takes.
+  // Mono 16-bit PCM at 16 or 24 kHz, the only format Voice Transcribe takes.
   if (fmt.format !== 1 || fmt.channels !== 1 || fmt.bitsPerSample !== 16) return { ok: false, reason: "must be mono 16-bit PCM" };
   if (fmt.sampleRate !== 16000 && fmt.sampleRate !== 24000) return { ok: false, reason: "must be 16 or 24 kHz" };
 
@@ -47,7 +47,7 @@ export function checkWav(bytes: Uint8Array, limits: { maxBytes: number; maxSecon
   return { ok: true, info: { sampleRate: fmt.sampleRate, channels: 1, bitsPerSample: 16, durationMs } };
 }
 
-// Doc 03 upload limits, with half a second of slack for the recorder's stop.
+// Upload limits, with half a second of slack for the recorder's stop.
 export const AUDIO_LIMITS = {
   setup: { maxBytes: 4 * 1024 * 1024, maxSeconds: 120.5 },
   command: { maxBytes: 4 * 1024 * 1024, maxSeconds: 30.5 },

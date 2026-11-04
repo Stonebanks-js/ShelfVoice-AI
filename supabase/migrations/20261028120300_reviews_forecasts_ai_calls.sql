@@ -1,8 +1,8 @@
--- Migration 4 (doc 07): reviews, product_forecasts, ai_calls.
+-- Migration 4: reviews, product_forecasts, ai_calls.
 
 -- Customer voice reviews. The server inserts them (customers never sign in),
 -- and the review id is the client UUID created when the page opens, so a
--- retried submit can't create a second row (doc 07, idempotency).
+-- retried submit can't create a second row.
 create table public.reviews (
   id uuid primary key default gen_random_uuid(),
   shop_id uuid not null references public.shops (id) on delete cascade,
@@ -16,7 +16,7 @@ create table public.reviews (
   stockout_product_ids uuid[] not null default '{}',
   is_hidden boolean not null default false,
   consent_at timestamptz not null,
-  -- Hashed with a rotating salt; the daily job clears it after 7 days (E-08).
+  -- Hashed with a rotating salt; the daily job clears it after 7 days.
   ip_hash text,
   created_at timestamptz not null default now()
 );
@@ -24,7 +24,7 @@ create table public.reviews (
 create index reviews_shop_time on public.reviews (shop_id, created_at desc);
 create index reviews_pending on public.reviews (status) where status = 'PENDING';
 
--- One row per product, rewritten on each forecast refresh (doc 02 formula).
+-- One row per product, rewritten on each forecast refresh.
 create table public.product_forecasts (
   product_id uuid primary key,
   shop_id uuid not null references public.shops (id) on delete cascade,
@@ -41,8 +41,8 @@ create table public.product_forecasts (
   foreign key (product_id, shop_id) references public.products (id, shop_id) on delete cascade
 );
 
--- One row per Meta API call (doc 05, "AI observability"). No prompts,
--- transcripts or outputs are stored here (doc 03).
+-- One row per Meta API call. No prompts,
+-- transcripts or outputs are stored here.
 create table public.ai_calls (
   id uuid primary key default gen_random_uuid(),
   request_id text,
@@ -74,7 +74,7 @@ alter table public.ai_calls enable row level security;
 
 revoke all on public.reviews, public.product_forecasts, public.ai_calls from anon, authenticated;
 grant select on public.reviews, public.product_forecasts, public.ai_calls to authenticated;
--- Owners can hide a review but never edit what a customer said (doc 03).
+-- Owners can hide a review but never edit what a customer said.
 grant update (is_hidden) on public.reviews to authenticated;
 grant all on public.reviews, public.product_forecasts, public.ai_calls to service_role;
 

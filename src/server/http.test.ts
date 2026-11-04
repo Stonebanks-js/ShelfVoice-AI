@@ -6,7 +6,7 @@ import { liveTransport } from "./ai/transport";
 
 const req = (init: RequestInit & { url?: string } = {}) => new Request(init.url ?? "https://shop.example/api/v1/x", init);
 
-describe("route wrapper (doc 02 contract rules)", () => {
+describe("route wrapper", () => {
   it("returns the handler's response with a request ID", async () => {
     const handler = route(async () => Response.json({ ok: true }));
     const res = await handler(req({ headers: { "x-request-id": "req-1" } }), {});
@@ -37,7 +37,7 @@ describe("route wrapper (doc 02 contract rules)", () => {
     errorLog.mockRestore();
   });
 
-  it("refuses cross-origin writes but allows same-origin and reads (doc 03 TH-09)", async () => {
+  it("refuses cross-origin writes but allows same-origin and reads", async () => {
     const ok = route(async () => new Response(null, { status: 204 }));
     expect((await ok(req({ method: "POST", headers: { origin: "https://evil.example" } }), {})).status).toBe(403);
     expect((await ok(req({ method: "POST", headers: { origin: "https://shop.example" } }), {})).status).toBe(204);

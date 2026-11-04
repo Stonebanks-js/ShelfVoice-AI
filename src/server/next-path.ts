@@ -1,4 +1,4 @@
-// Where to land after Google sign-in (V-05): the owner app, a customer's
+// Where to land after Google sign-in: the owner app, a customer's
 // Account, or the shop page they came from. Only these, so the sign-in can't
 // be used to send someone to another site.
 export const NEXT_COOKIE = "sv_next";

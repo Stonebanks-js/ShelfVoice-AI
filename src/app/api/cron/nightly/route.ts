@@ -16,7 +16,7 @@ function authorised(request: Request): boolean {
   return timingSafeEqual(Buffer.from(given), Buffer.from(expected));
 }
 
-// Nightly job (doc 02 "Background jobs"): the daily cleanup first (W-17b:
+// Nightly job: the daily cleanup first (
 // expired proposals and demo shops, old recordings, photos and logs of AI
 // calls), then every shop's forecasts and reviews still waiting for
 // analysis. Vercel cron calls it with CRON_SECRET; running it daily also
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
 
   log(result.failures ? "warn" : "info", "cron.nightly.finished", { ...result, cleanup, durationMs: Date.now() - started });
 
-  // Doc 05: Better Stack alerts if this ping is 2 hours late; /fail reports
+  // Better Stack alerts if this ping is 2 hours late; /fail reports
   // a run that finished with errors.
   if (env.BETTERSTACK_HEARTBEAT_URL) {
     const url = result.failures ? `${env.BETTERSTACK_HEARTBEAT_URL.replace(/\/$/, "")}/fail` : env.BETTERSTACK_HEARTBEAT_URL;

@@ -1,7 +1,6 @@
 import { ApiFailure } from "@/lib/api";
 
-// Voice notes waiting for a connection (F-03b; doc 02 "Offline behaviour",
-// doc 07 "Offline queue"). Each clip keeps the client ID it was recorded
+// Voice notes waiting for a connection. Each clip keeps the client ID it was recorded
 // with, so however often it's retried, Storage holds one file and the
 // server makes one proposal from it.
 

@@ -17,7 +17,7 @@ import Loading from "./loading";
 import { ShopAlerts } from "./shop-alerts";
 import { ShopCard } from "./shop-card";
 
-// O-5 Home (doc 06 Today, reshaped by V-02): the shop first, with View,
+// Home: the shop first, with View,
 // Share and Edit (or Build for an empty shop), then today's sales, what's
 // running low, what customers said and the latest changes.
 export default function TodayPage() {
@@ -41,7 +41,7 @@ async function Today() {
   return (
     // Phone: one column, the day's answer first. From 1024 px a two-column
     // dashboard: the day on the left, the shop and what customers said on
-    // the right (E-37).
+    // the right.
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-6 lg:max-w-6xl lg:px-4">
       <header className="flex items-end justify-between gap-3 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] lg:pt-8">
         <div>
@@ -90,7 +90,7 @@ type T = (key: MessageKey, vars?: Record<string, string | number>) => string;
 function SalesCard({ summary, weekday, t }: { summary: TodaySummary; weekday: string; t: T }) {
   const change = summary.lastWeekPaise > 0 ? Math.round(((summary.salesPaise - summary.lastWeekPaise) / summary.lastWeekPaise) * 100) : null;
   return (
-    // The day's answer, in the logo's red (E-37); white on it is 5.9:1.
+    // The day's answer, in the logo's red; white on it is 5.9:1.
     <section aria-labelledby="sales-title" className="relative mx-4 overflow-hidden rounded-xl bg-accent-fill p-5 text-on-accent shadow-float lg:p-6">
       <svg aria-hidden viewBox="0 0 200 120" className="pointer-events-none absolute -right-6 -bottom-8 h-28 w-auto opacity-15 lg:h-40">
         {/* The logo's voice bars, large and quiet, as the card's mark. */}
@@ -111,7 +111,7 @@ function SalesCard({ summary, weekday, t }: { summary: TodaySummary; weekday: st
           </p>
           <p className="text-footnote">{t("today.units", { n: summary.unitsSold })}</p>
           {change !== null && (
-            // Icon plus words, never colour alone (doc 06).
+            // Icon plus words, never colour alone.
             <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-footnote font-semibold">
               {change >= 0 ? <TrendingUp aria-hidden className="size-4" /> : <TrendingDown aria-hidden className="size-4" />}
               {change === 0
@@ -239,7 +239,7 @@ const KIND_ICON: Record<TodaySummary["recent"][number]["kind"], ReactNode> = {
 };
 
 // The last few confirmed voice and photo changes, so the owner can see what
-// the app just did (V-02).
+// the app just did.
 function RecentList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
   const when = new Intl.RelativeTimeFormat(localeFor(lang), { numeric: "auto" });
   const ago = (iso: string) => {
@@ -268,7 +268,7 @@ function RecentList({ summary, lang, now, t }: { summary: TodaySummary; lang: La
   );
 }
 
-// New customer orders, first on Home so none waits (V-04).
+// New customer orders, first on Home so none waits.
 function OrdersList({ summary, lang, now, t }: { summary: TodaySummary; lang: Lang; now: Date; t: T }) {
   const when = new Intl.RelativeTimeFormat(localeFor(lang), { numeric: "auto" });
   const ago = (iso: string) => {

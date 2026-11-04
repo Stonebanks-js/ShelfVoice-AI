@@ -2,7 +2,7 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-12 review gate: the admin page (A-1, W-20b) is a real 404 to everyone not
+// The admin page is a real 404 to everyone not
 // on ADMIN_EMAILS (set for these runs in playwright.config.ts), shows today's
 // numbers to the team, and its switch pauses and resumes AI.
 

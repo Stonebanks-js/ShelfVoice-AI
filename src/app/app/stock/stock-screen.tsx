@@ -25,7 +25,7 @@ import { ProductName } from "@/i18n/products";
 
 import { PhotoPicker } from "./photo-picker";
 
-// A product's photo as customers see it (V-11).
+// A product's photo as customers see it.
 const photoOf = (p: StockProduct) =>
   p.photo_url !== undefined
     ? p.photo_url
@@ -54,7 +54,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
     setProducts(fresh);
   }
 
-  // Doc 06: the switch flips at once; a failure flips it back with a reason.
+  // The switch flips at once; a failure flips it back with a reason.
   async function setInStock(product: StockProduct, inStock: boolean) {
     setProducts((list) => list.map((p) => (p.id === product.id ? { ...p, is_in_stock: inStock } : p)));
     try {
@@ -65,8 +65,8 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
     }
   }
 
-  // V-02 − / + on each row, as on Instamart: the count changes at once and
-  // taps in a row are saved as one correction (decision K2: counts change
+  // − / + on each row, as on Instamart: the count changes at once and
+  // taps in a row are saved as one correction (counts change
   // only through the movement log). A failure puts the count back.
   const pending = useRef(new Map<string, { delta: number; before: StockProduct; timer: ReturnType<typeof setTimeout> }>());
 
@@ -161,7 +161,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
           <EmptyState icon={<SearchX />} title={t("stock.noMatch", { q: query || t("status.outOfStock") })} />
         </div>
       ) : (
-        // Two columns of categories from 1024 px (E-37).
+        // Two columns of categories from 1024 px.
         <div className="flex flex-col gap-6 px-4 pb-4 lg:block lg:columns-2 lg:gap-6 lg:[&>*]:mb-6 lg:[&>*]:break-inside-avoid">
           {groups.map((group) => (
             <section key={group.name} className="flex flex-col gap-1.5">
@@ -186,7 +186,7 @@ export function StockScreen({ initial }: { initial: StockProduct[] }) {
   );
 }
 
-// Stock lives under My shop (V-02): the way back, and how many products.
+// Stock lives under My shop: the way back, and how many products.
 function BackToShop({ count }: { count?: number }) {
   const { t } = useLang();
   return (
@@ -200,7 +200,7 @@ function BackToShop({ count }: { count?: number }) {
   );
 }
 
-// Add by tap, or many at once: list, shelf photo, barcodes, bill, sheet (V-01).
+// Add by tap, or many at once: list, shelf photo, barcodes, bill, sheet.
 function AddButton({ onClick }: { onClick: () => void }) {
   const { t } = useLang();
   return (
@@ -215,9 +215,9 @@ function AddButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-// Doc 06 StockRow: name, unit, price, stock count or in/out badge; tap to
+// Name, unit, price, stock count or in/out badge; tap to
 // edit. The switch is its own control beside the row, not inside it, and
-// the count has − / + below the name (V-02).
+// the count has − / + below the name.
 function StockRow({
   product,
   onEdit,
@@ -276,7 +276,7 @@ function StockRow({
 
 const rupees = (paise: number | null) => (paise ? String(paise / 100) : "");
 
-// Edit an existing product, or add a new one (doc 02: catalog edits by tap).
+// Edit an existing product, or add a new one (catalog edits by tap).
 function ProductSheet({
   product,
   onClose,
@@ -338,7 +338,7 @@ function ProductSheet({
       // out of stock.
       const noneLeft = count === 0 && product.stock_qty === null;
       await api(`/api/v1/products/${product.id}`, { method: "PATCH", json: noneLeft ? { ...fields, is_in_stock: false } : fields });
-      // Counts change only through the movement log (decision K2).
+      // Counts change only through the movement log.
       if (count !== null && count !== product.stock_qty && !noneLeft) {
         await api("/api/v1/stock-movements", {
           json: { product_id: product.id, kind: "CORRECTION", qty: count - (product.stock_qty ?? 0), idempotency_key: crypto.randomUUID() },

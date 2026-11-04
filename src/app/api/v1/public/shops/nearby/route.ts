@@ -10,7 +10,7 @@ const Query = z.union([
   z.object({ pincode: Pincode }).strict(),
 ]);
 
-// Shops near a customer (V-03): by the phone's location or a pincode. No
+// Shops near a customer: by the phone's location or a pincode. No
 // sign-in; 60 searches per minute per device.
 export const GET = route(async (request) => {
   await limit(`nearby:${ipHash(request)}`, 60, 60);

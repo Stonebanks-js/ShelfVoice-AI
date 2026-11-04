@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-08 review gate: the review feed (O-8) against the local database:
+// The review feed against the local database:
 // sentiment, words, item chips, Hide and Show, filters, the 30-day audio.
 
 test.skip(!localSupabase, "needs the local Supabase stack");
@@ -86,7 +86,7 @@ test("a shop with no reviews is pointed to its QR", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Get your QR" })).toHaveAttribute("href", "/app/shop");
 });
 
-// V-12 (owner, Nov 5: "check it reaches the owner"): a customer's voice
+// (owner, Nov 5: "check it reaches the owner"): a customer's voice
 // review from the shop's review page shows up in the owner's Reviews feed.
 test("a customer's voice review reaches the owner's Reviews", async ({ page, browser }) => {
   const shopId = await openReviews(page);

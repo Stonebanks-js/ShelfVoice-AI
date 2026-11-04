@@ -30,7 +30,7 @@ const Patch = z
     hours: Hours.nullable().optional(),
     language: z.enum(LANGS as [Lang, ...Lang[]]).optional(),
     delivers: z.boolean().optional(),
-    // Payments and delivery (V-05).
+    // Payments and delivery.
     upi_id: z.string().trim().regex(/^[A-Za-z0-9._-]{2,64}@[A-Za-z]{2,64}$/).nullable().optional(),
     accepts_cash: z.boolean().optional(),
     pay_on_delivery: z.boolean().optional(),
@@ -43,7 +43,7 @@ const Patch = z
   .strict()
   .refine(bothOrNeither, { message: "Latitude and longitude go together", path: ["lat"] });
 
-// Edit shop details from My shop (doc 06 O-9), under the owner's RLS.
+// Edit shop details from My shop, under the owner's RLS.
 export const PATCH = route(async (request) => {
   const { db, shop } = await requireShop();
   const body = await readJson(request, Patch);
@@ -53,7 +53,7 @@ export const PATCH = route(async (request) => {
   return Response.json({ shop: data });
 });
 
-// Delete my shop (doc 01 FR-16): shop, files and account, then signed out.
+// Delete my shop: shop, files and account, then signed out.
 export const DELETE = route(async (_request, _ctx, { requestId }) => {
   const { db, user, shop } = await requireShop();
   await deleteShop({ shopId: shop.id, userId: user.id, requestId });

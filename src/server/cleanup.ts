@@ -4,8 +4,7 @@ import { deleteShop } from "./delete-shop";
 import { log } from "./log";
 import { adminClient } from "./supabase";
 
-// Daily cleanup (W-17b; doc 03 data inventory, doc 07 data lifecycle,
-// errata E-08, E-12). These are the promises on the privacy page
+// Daily cleanup. These are the promises on the privacy page
 // (src/app/privacy/content.ts): change both together.
 export const RETENTION = {
   ownerVoiceDays: 7,
@@ -14,7 +13,7 @@ export const RETENTION = {
   ipHashDays: 7,
   proposalDays: 90,
   aiCallDays: 90,
-  orderDays: 90, // customer orders: name, phone, address (V-04)
+  orderDays: 90, // customer orders: name, phone, address
   rateLimitDays: 2,
   pendingProposalHours: 24,
   // Uploaded but never turned into a proposal or a review.
@@ -155,7 +154,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupResult> {
     result.ipHashesCleared = count ?? 0;
   });
 
-  // No new demo shops since E-36; this clears any left from before.
+  // No new demo shops are made; this clears any left from before.
   await step("delete_demo_shops", async () => {
     const { data, error } = await db
       .from("shops")

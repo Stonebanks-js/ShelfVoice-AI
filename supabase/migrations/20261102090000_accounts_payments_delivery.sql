@@ -1,4 +1,4 @@
--- Accounts and settings (V-05, E-36). Customers get accounts (Google sign-in,
+-- Accounts and settings. Customers get accounts (Google sign-in,
 -- like owners): their details, saved addresses, wishlist and favourite
 -- shops, and their orders. Shops get payment modes (cash, UPI ID, pay on
 -- delivery) and delivery rules (minimum order, charge, free above, distance).

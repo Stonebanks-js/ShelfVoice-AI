@@ -1,4 +1,4 @@
-// Delivery rules and UPI payment links (V-05), shared by the shop page,
+// Delivery rules and UPI payment links, shared by the shop page,
 // checkout, the order page and the server's check when an order is placed.
 
 export interface DeliveryRules {

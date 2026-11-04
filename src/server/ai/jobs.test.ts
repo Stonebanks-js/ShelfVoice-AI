@@ -7,7 +7,7 @@ import type { MetaClient } from "./meta";
 describe("restock reason template", () => {
   const input = { productName: "Haldiram Bhujia", orderQty: 12, daysLeft: 1.5, dailyDemand: 4, stock: 6, leadTimeDays: 2, customerFlagged: false, language: "en" as const };
 
-  it("names a festival that raised the quantity (W-19)", () => {
+  it("names a festival that raised the quantity", () => {
     expect(templateExplanation({ ...input, festival: "Diwali" })).toBe("Haldiram Bhujia: sells about 4 a day and 6 are left. Order 12. Diwali is coming up.");
     expect(templateExplanation({ ...input, festival: "Diwali", language: "hi" })).toContain("12 mangwa lo. Diwali paas hai.");
   });

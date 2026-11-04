@@ -1,4 +1,4 @@
--- Shop location (V-03, E-36): where a shop is, so customers can find the
+-- Shop location: where a shop is, so customers can find the
 -- ones near them. The owner shares the phone's location during setup, or
 -- types the pincode; a shop is a public business, so its location is
 -- public once the shop is published.
@@ -17,7 +17,7 @@ create index shops_published_pincode on public.shops (pincode) where is_publishe
 
 -- Published shops near a point (great-circle distance in km, nearest first)
 -- or, without a point, in the same pincode area (same first three digits,
--- the exact pincode first). Demo shops left from before E-36 never show.
+-- the exact pincode first). Old demo shops never show.
 -- Called by the server only.
 create function public.nearby_shops(p_lat double precision, p_lng double precision, p_pincode text, p_limit integer default 30)
 returns table (slug text, name text, category text, address text, pincode text, hours jsonb, timezone text, distance_km double precision)

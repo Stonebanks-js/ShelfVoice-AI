@@ -18,7 +18,7 @@ const product = (name: string, category: string | null, aliases: string[] = []):
   product_forecasts: null,
 });
 
-describe("Stock search and chips (doc 06 O-6)", () => {
+describe("Stock search and chips", () => {
   it("finds products by name or spoken alias, any case", () => {
     const atta = product("Aashirvaad Atta 5 kg", "Staples", ["aata", "आटा"]);
     expect(matches(atta, "atta")).toBe(true);

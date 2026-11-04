@@ -2,7 +2,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// V-04 review gate: a customer fills a cart on the shop page (ADD, then − n +),
+// A customer fills a cart on the shop page (ADD, then − n +),
 // orders for pickup or delivery with a name and number, and follows the
 // order; the owner accepts it, marks what's missing, says it's ready and
 // finishes it, which logs the sales.
@@ -149,7 +149,7 @@ test("+ on an uncounted stock row starts counting it", async ({ page }) => {
   await expect(page.getByRole("listitem").filter({ has: page.getByRole("button", { name: /^Jaggery/ }) }).getByRole("status")).toHaveText("2");
 });
 
-// TEMPORARY for the demo recording (V-12, lib/live-orders): when the order
+// TEMPORARY for the demo recording (lib/live-orders): when the order
 // can't reach the shop, the customer still sees it placed, with a 15-minute
 // live tracker, and it shows under "Your current orders"; a mistake they can
 // fix still shows its reason.

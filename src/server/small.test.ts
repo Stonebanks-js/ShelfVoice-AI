@@ -16,7 +16,7 @@ function wav({ rate = 16000, channels = 1, bits = 16, seconds = 1, format = 1 } 
   return new Uint8Array(b);
 }
 
-describe("WAV check (doc 03 TH-07)", () => {
+describe("WAV check", () => {
   it("accepts 16 kHz mono 16-bit PCM and reports its length", () => {
     expect(checkWav(wav({ seconds: 2 }), AUDIO_LIMITS.command)).toEqual({ ok: true, info: { sampleRate: 16000, channels: 1, bitsPerSample: 16, durationMs: 2000 } });
     expect(checkWav(wav({ rate: 24000 }), AUDIO_LIMITS.command).ok).toBe(true);
@@ -46,7 +46,7 @@ describe("change contract", () => {
     expect(toE164(null)).toBeNull();
   });
 
-  it("allows a new price above 0 and under 10x the old one (doc 03)", () => {
+  it("allows a new price above 0 and under 10x the old one", () => {
     expect(priceChangeAllowed(1400, 1500)).toBe(true);
     expect(priceChangeAllowed(1400, 14000)).toBe(false);
     expect(priceChangeAllowed(null, 99999)).toBe(true);
@@ -61,7 +61,7 @@ describe("change contract", () => {
   });
 });
 
-describe("log redaction (doc 05)", () => {
+describe("log redaction", () => {
   it("removes secrets, audio and transcripts at any depth", () => {
     expect(redact({ shopId: "s1", transcript: "hi", nested: { authorization: "Bearer x", ok: 1 }, list: [{ token: "t" }] })).toEqual({
       shopId: "s1",

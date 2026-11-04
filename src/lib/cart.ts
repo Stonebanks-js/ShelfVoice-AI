@@ -1,4 +1,4 @@
-// A customer's cart for one shop (V-04), kept on their phone so it survives
+// A customer's cart for one shop, kept on their phone so it survives
 // a reload. Browser storage can be missing or blocked (private windows), so
 // the cart then lives in memory for the visit. Read through
 // useSyncExternalStore with cartSnapshot/subscribeCart.
@@ -52,7 +52,7 @@ export function setCart(slug: string, cart: Cart) {
 }
 
 // Orders this phone has placed, newest first, for the status links and for
-// "Previously ordered" later (V-05). Only what the customer already has.
+// "Previously ordered" later. Only what the customer already has.
 export interface PlacedOrder {
   id: string;
   token: string;

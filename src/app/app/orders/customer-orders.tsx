@@ -38,7 +38,7 @@ export interface OwnerOrder {
 
 const OPEN: Status[] = ["NEW", "ACCEPTED", "READY"];
 
-// Customer orders (V-04): accept, mark what the shop doesn't have, say it's
+// Customer orders: accept, mark what the shop doesn't have, say it's
 // ready, and finish it, which logs the sales. A WhatsApp message to the
 // customer is one tap at every step. New orders come in every 30 seconds.
 export function CustomerOrders({ orders, shopName, vapidKey }: { orders: OwnerOrder[]; shopName: string; vapidKey: string | null }) {
@@ -286,7 +286,7 @@ function OrderCard({ order, shopName }: { order: OwnerOrder; shopName: string })
   );
 }
 
-// A refund on a finished order (V-05): the amount and why. The money goes
+// A refund on a finished order: the amount and why. The money goes
 // back in cash or by UPI; this records it for the shop and the customer.
 function RefundSheet({ order, left, onClose }: { order: OwnerOrder; left: number; onClose: () => void }) {
   const { t } = useLang();

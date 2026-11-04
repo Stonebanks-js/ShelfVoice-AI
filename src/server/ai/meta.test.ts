@@ -128,7 +128,7 @@ describe("Meta client: structured output", () => {
   });
 });
 
-describe("Meta client: budget caps (errata E-06)", () => {
+describe("Meta client: budget caps", () => {
   const run = (spend: { totalUsd: number; todayUsd: number; shopTodayUsd: number }) => {
     const { transport, requests } = scripted(sparkReply({ name: "a", price: 1 }));
     const { ledger } = memoryLedger(spend);
@@ -157,7 +157,7 @@ describe("Meta client: budget caps (errata E-06)", () => {
   });
 });
 
-describe("Meta client: circuit breaker (doc 05)", () => {
+describe("Meta client: circuit breaker", () => {
   const now = new Date("2026-11-05T10:00:00Z");
 
   it("refuses calls while open, without calling Meta", async () => {
@@ -220,7 +220,7 @@ describe("Meta client: tools and transcription", () => {
     expect(result.calls).toEqual([{ name: "update_price", arguments: { product_id: "p1", price_rupees: 15 } }]);
     const body = requests[0][1].json as { tools: Array<{ type: string; strict: boolean }>; tool_choice?: string };
     expect(body.tools[0]).toMatchObject({ type: "function", strict: true });
-    // Meta supports only the default "auto" (errata E-30).
+    // Meta supports only the default "auto".
     expect(body.tool_choice).toBeUndefined();
   });
 
@@ -244,7 +244,7 @@ describe("Meta client: tools and transcription", () => {
   });
 });
 
-describe("recorded transport (doc 04, V3)", () => {
+describe("recorded transport", () => {
   it("replays a saved response and refuses an unrecorded request", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "meta-"));
     const payload = { model: "m", input: "hello" };

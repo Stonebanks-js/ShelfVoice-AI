@@ -36,7 +36,7 @@ function headline(order: OrderView): { key: MessageKey; icon: ReactNode; tone: s
   }
 }
 
-// The customer's order (V-04): where it is, what the shop has, about how
+// The customer's order: where it is, what the shop has, about how
 // much, and a way to call. Checks again every 20 seconds while it's open.
 export function OrderStatusView({ initial, token }: { initial: OrderView | null; token: string }) {
   const { lang, t } = useLang();
@@ -71,7 +71,7 @@ export function OrderStatusView({ initial, token }: { initial: OrderView | null;
   const total = have.reduce((sum, i) => sum + (i.pricePaise ?? 0) * i.qty, 0);
   const refunded = order.refunds.reduce((sum, r) => sum + r.amountPaise, 0);
   const due = order.status === "CANCELLED" ? 0 : Math.max(0, total + order.deliveryFeePaise - refunded);
-  // V-05: pay the shop straight from a UPI app, once the shop has said what it has.
+  // Pay the shop straight from a UPI app, once the shop has said what it has.
   const canPay = Boolean(order.shop.upiId) && due > 0 && order.status !== "NEW" && order.status !== "CANCELLED";
   const upi = canPay ? upiLink({ upiId: order.shop.upiId!, shopName: order.shop.name, amountPaise: due, note: `Order ${order.code}` }) : null;
   const modes = [order.shop.acceptsCash && t("pay.CASH"), order.shop.upiId && t("pay.UPI"), order.shop.payOnDelivery && order.fulfilment === "DELIVERY" && t("pay.cod")].filter(Boolean).join(" · ");

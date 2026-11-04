@@ -12,13 +12,13 @@ export interface NearbyShop {
   hours: unknown;
   timezone: string;
   distanceKm: number | null;
-  // Rounded to about 100 m by the database: a pin on the map (V-09).
+  // Rounded to about 100 m by the database: a pin on the map.
   lat: number | null;
   lng: number | null;
   delivers: boolean;
 }
 
-// Published shops near a point, or in a pincode area (V-03). Public data
+// Published shops near a point, or in a pincode area. Public data
 // only: what each shop already shows on its page.
 export async function nearbyShops(where: { lat?: number; lng?: number; pincode?: string }): Promise<NearbyShop[]> {
   const { data, error } = await adminClient().rpc("nearby_shops", {

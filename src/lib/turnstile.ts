@@ -32,7 +32,7 @@ function loadScript(): Promise<TurnstileApi> {
   });
 }
 
-// Cloudflare Turnstile, invisible (doc 03 P2): the widget renders into a
+// Cloudflare Turnstile, invisible: the widget renders into a
 // hidden container and only shows itself if Cloudflare needs the person to
 // interact. `token()` runs a fresh challenge each time, since a token can be
 // used once.

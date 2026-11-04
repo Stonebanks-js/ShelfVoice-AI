@@ -1,12 +1,12 @@
--- Doc 04 "Database and authorization tests" and doc 03 TH-01: one owner can
+-- One owner can
 -- never read or change another owner's rows; anonymous visitors see only
--- published shops and safe columns (errata E-05, E-29).
+-- published shops and safe columns.
 begin;
 create extension if not exists pgtap with schema extensions;
 
 select plan(29);
 
--- The sample shops (V-10) are published too; inside this transaction only,
+-- The sample shops are published too; inside this transaction only,
 -- they are taken away so the anonymous checks see just the fixture.
 delete from auth.users where email like '%@shelfvoice.invalid';
 
@@ -93,7 +93,7 @@ select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('voice', 'bbbbbbbb-0000-0000-0000-000000000001/owner/clip.wav')$$,
   '42501', null, 'owner A cannot upload under shop B''s folder');
 
--- ------------------------------------------- anonymous demo sign-in (doc 03)
+-- ------------------------------------------- anonymous demo sign-in
 reset role;
 insert into auth.users (id, email, aud, role, is_anonymous) values
   ('00000000-0000-0000-0000-0000000000dd', null, 'authenticated', 'authenticated', true);
@@ -117,9 +117,9 @@ select results_eq('select distinct shop_id from public.public_storefront',
 select results_eq(
   $$select in_stock from public.public_storefront where product_name = 'Aashirvaad Atta'$$,
   $$values (false)$$,
-  'out-of-stock products stay listed with in_stock false (E-05)');
+  'out-of-stock products stay listed with in_stock false');
 select results_eq('select id from public.shops', $$values ('aaaaaaaa-0000-0000-0000-000000000001'::uuid)$$,
-  'anon reads only published shops from the base table (E-29)');
+  'anon reads only published shops from the base table');
 select throws_ok('select stock_qty from public.products', '42501', null,
   'anon can never read stock counts');
 select throws_ok('select owner_id from public.shops', '42501', null,

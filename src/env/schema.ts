@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-// Environment contract from doc 08 ("Environment variables and secrets") plus
-// errata E-03 (META_CREDIT_ENDS_AT, replay-demo) and E-06 ($100 total budget,
-// per-shop daily cap). Kept free of "server-only" so src/instrumentation.ts can
+// Environment contract: every variable the app reads, with the AI budget
+// ($100 total, per-shop daily cap) and META_CREDIT_ENDS_AT. Kept free of "server-only" so src/instrumentation.ts can
 // import it and fail fast at startup.
 
 // Vercel sets VERCEL_ENV on preview and production deploys. Locally, the
@@ -17,7 +16,7 @@ const emptyAsUndefined = (value: unknown) => (value === "" ? undefined : value);
 
 // A Turnstile site key ("0x4…", or one of Cloudflare's "1x0000…" test keys).
 // Production once shipped the Meta API key in this variable, so every page
-// showed it and every order failed the bot check (V-10): on Vercel the build
+// showed it and every order failed the bot check: on Vercel the build
 // now stops instead. The message never repeats the value.
 const TURNSTILE_SITE_KEY = /^(0x4|[123]x0000)[A-Za-z0-9_-]{16,}$/;
 
@@ -33,7 +32,7 @@ export const serverSchema = clientSchema
   .extend({
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 
-    // Meta Model API: the only AI provider (Meta models only).
+    // Meta Model API: the only AI provider.
     META_API_KEY: z.preprocess(emptyAsUndefined, z.string().min(1).optional()),
     META_BASE_URL: z.url().default("https://api.meta.ai/v1"),
     META_MODE: z.enum(["recorded", "live", "replay-demo"]).default("recorded"),
@@ -57,22 +56,22 @@ export const serverSchema = clientSchema
     AI_SHOP_DAILY_BUDGET_USD: z.coerce.number().positive().default(2),
     AI_TOTAL_BUDGET_USD: z.coerce.number().positive().max(150).default(100),
 
-    // Open Food Facts names scanned barcodes (V-01, E-36): free, public, no
+    // Open Food Facts names scanned barcodes: free, public, no
     // key. "off" skips it, so tests never reach the internet.
     OPEN_FOOD_FACTS_URL: z.union([z.literal("off"), z.url()]).default("https://world.openfoodfacts.org"),
 
-    // Address and pincode from the phone's position (V-10): OpenStreetMap's
+    // Address and pincode from the phone's position: OpenStreetMap's
     // Nominatim, free with no key. "off" skips it, so tests never reach it.
     REVERSE_GEOCODE_URL: z.union([z.literal("off"), z.url()]).default("https://nominatim.openstreetmap.org"),
 
     RELEASE: z.string().default("dev"),
 
-    // Web push for new-order notifications (V-04): a VAPID key pair made
+    // Web push for new-order notifications: a VAPID key pair made
     // for this app. Without it, order alerts are simply not offered.
     VAPID_PUBLIC_KEY: z.preprocess(emptyAsUndefined, z.string().regex(/^[A-Za-z0-9_-]{80,100}$/).optional()),
     VAPID_PRIVATE_KEY: z.preprocess(emptyAsUndefined, z.string().regex(/^[A-Za-z0-9_-]{40,50}$/).optional()),
 
-    // The Playwright journeys' sample-shop route (E-36). Never on a deploy.
+    // The Playwright journeys' sample-shop route. Never on a deploy.
     E2E_TEST_ROUTES: z.enum(["1"]).optional(),
   })
   .superRefine((env, ctx) => {

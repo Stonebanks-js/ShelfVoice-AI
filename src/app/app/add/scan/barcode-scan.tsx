@@ -43,7 +43,7 @@ interface Suggestion {
 }
 type Found = { code: string; product: Product | null; suggestion: Suggestion | null };
 
-// V-01 barcodes: scan a pack (or type the number under the barcode). A pack
+// Scan a pack (or type the number under the barcode). A pack
 // the shop has gets its delivery logged; a new one is named from Open Food
 // Facts when it's known there, or by the owner once, and the shop keeps the
 // code so the next scan finds it.

@@ -1,4 +1,4 @@
-# Doc 08 nightly jobs (W-03; errata E-14): an encrypted backup of the
+# An encrypted backup of the
 # database with its own Better Stack heartbeat, and the AI job tests run
 # against Meta's live models to catch drift. 02:30 IST, after the Vercel
 # cleanup cron at 02:00.
@@ -74,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
-      # Meta models only (doc 04 "AI evaluation"); a few cents of credit a night.
+      # Meta models only; a few cents of credit a night.
       - name: Run the AI job tests against Meta
         env:
           META_MODE: live

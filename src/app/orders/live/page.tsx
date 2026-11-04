@@ -8,7 +8,7 @@ import { LiveOrderView } from "./live-order-view";
 
 export const metadata: Metadata = { title: "Your order · Shelf Voice", robots: { index: false, follow: false } };
 
-// An order on its way (V-12): placed, the delivery time and a live tracker.
+// An order on its way: placed, the delivery time and a live tracker.
 // Read from this phone only (lib/live-orders), so the page itself is the
 // same for everyone.
 export default function LiveOrderPage() {

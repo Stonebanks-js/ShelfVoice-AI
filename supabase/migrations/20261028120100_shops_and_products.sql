@@ -1,7 +1,7 @@
--- Migration 2 (doc 07): shops and products, with RLS, grants and indexes.
--- Tenancy rule (doc 03): an owner reaches only rows whose shop_id is a shop
+-- Migration 2: shops and products, with RLS, grants and indexes.
+-- Tenancy rule: an owner reaches only rows whose shop_id is a shop
 -- they own. Customers never sign in; the public storefront reads published
--- rows as the anon role, limited to safe columns by column grants (E-29).
+-- rows as the anon role, limited to safe columns by column grants.
 
 create table public.shops (
   id uuid primary key default gen_random_uuid(),
@@ -52,7 +52,7 @@ create trigger shops_updated_at before update on public.shops
 create trigger products_updated_at before update on public.products
   for each row execute function private.set_updated_at();
 
--- Indexes (doc 07, "Indexes, derived values and RLS"). shops(owner_id) and
+-- Indexes. shops(owner_id) and
 -- shops(slug) are covered by their unique constraints.
 create index products_shop_category_name on public.products (shop_id, category, name);
 create index products_name_trgm on public.products using gin (lower(name) extensions.gin_trgm_ops);
@@ -74,7 +74,7 @@ grant select (id, shop_id, name, category, unit, price_paise, is_in_stock, image
 grant all on public.shops, public.products to service_role;
 
 -- Shops: owners read and change their own. Deleting a shop goes through the
--- server function for FR-16, which also removes storage and the auth user.
+-- delete-shop server function, which also removes storage and the auth user.
 create policy shops_owner_select on public.shops for select to authenticated
   using (owner_id = (select auth.uid()));
 create policy shops_owner_insert on public.shops for insert to authenticated

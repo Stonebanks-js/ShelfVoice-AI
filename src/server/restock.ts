@@ -25,7 +25,7 @@ export interface RestockItem {
   reason: string;
 }
 
-// The order list (doc 01 FR-07, doc 06 O-7): items at or below their reorder
+// The order list: items at or below their reorder
 // point, or at the owner's low-stock level during cold start; customer-
 // flagged items first, then fewest days left. Missing explanations are
 // worded by Muse Spark after the response, cached per item per day; until

@@ -2,8 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInToSampleShop } from "./support";
 
-// F-11 review gate: the public storefront (P-1) and the voice review page
-// (P-2), seen as a customer with no account. Turnstile's browser script is
+// The public storefront and the voice review page
+//, seen as a customer with no account. Turnstile's browser script is
 // replaced with a stand-in that returns Cloudflare's dummy token; the server
 // still verifies it with Cloudflare's test secret.
 
@@ -40,13 +40,13 @@ test.describe("storefront", () => {
     await expect(page.getByRole("link", { name: "Call" })).toHaveAttribute("href", "tel:+919876543210");
     const products = page.getByRole("region", { name: "Products" });
     await expect(products.getByText("Maggi 2-Minute Noodles · 70 g")).toBeVisible();
-    // Never a stock count, only in or out (errata E-05).
+    // Never a stock count, only in or out.
     await expect(products).not.toContainText("18");
     expect(await blockingViolations(page)).toEqual([]);
     await darkMode(page);
     expect(await blockingViolations(page)).toEqual([]);
 
-    // The cart also goes as a WhatsApp message, with quantities (V-04).
+    // The cart also goes as a WhatsApp message, with quantities.
     await page.getByRole("button", { name: /^Add Maggi/ }).click();
     await page.getByRole("button", { name: /^One more Maggi/ }).click();
     await page.getByRole("button", { name: /^Add Parle-G/ }).click();

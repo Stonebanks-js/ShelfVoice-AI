@@ -12,7 +12,7 @@ import { refreshStorefront } from "@/server/storefront";
 const Body = z.object({ changes: Changes.optional() }).strict();
 
 // Apply an owner-approved proposal in one transaction; idempotent by
-// proposal ID (doc 02). Forecasts and the storefront refresh afterwards.
+// proposal ID. Forecasts and the storefront refresh afterwards.
 export const POST = route(async (request, ctx: RouteContext<"/api/v1/proposals/[id]/confirm">, { requestId }) => {
   const { id } = await ctx.params;
   const owner = await requireShop();

@@ -1,4 +1,4 @@
--- Doc 07 "Derived values" (decision K2), doc 01 story 3 and FR-16: the stock
+-- Derived values and shop deletion: the stock
 -- trigger keeps counts in step with the movement log, stock never goes below
 -- zero, retries can't double-count, and deleting a shop removes all its rows.
 begin;
@@ -61,7 +61,7 @@ select results_eq($$select stock_qty from public.products where id = 'aaaaaaaa-0
 select results_eq($$select count(*)::int from public.stock_movements where product_id = 'aaaaaaaa-0000-0000-0000-000000000012'$$,
   $$values (1)$$, 'the sale of an untracked item is still logged for forecasting');
 
--- FR-16: deleting a shop (the server does this) removes all of its rows.
+-- Deleting a shop (the server does this) removes all of its rows.
 reset role;
 insert into public.proposals (shop_id, kind) values ('aaaaaaaa-0000-0000-0000-000000000001', 'SETUP');
 insert into public.reviews (shop_id, consent_at) values ('aaaaaaaa-0000-0000-0000-000000000001', now());

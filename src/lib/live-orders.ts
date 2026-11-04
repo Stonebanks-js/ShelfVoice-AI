@@ -1,4 +1,4 @@
-// Orders on their way, kept on this phone (V-12): what the "Your current
+// Orders on their way, kept on this phone: what the "Your current
 // orders" cards and the live delivery page read.
 //
 // TEMPORARY, for the demo recording (owner, Nov 5): when a real order can't

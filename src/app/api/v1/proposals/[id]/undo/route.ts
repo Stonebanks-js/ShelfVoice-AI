@@ -7,7 +7,7 @@ import { requireShop } from "@/server/owner";
 import { touchedProducts, undoProposal } from "@/server/proposals";
 import { refreshStorefront } from "@/server/storefront";
 
-// Reverse a confirmed proposal within the undo window (errata E-02).
+// Reverse a confirmed proposal within the undo window.
 export const POST = route(async (_request, ctx: RouteContext<"/api/v1/proposals/[id]/undo">, { requestId }) => {
   const { id } = await ctx.params;
   const owner = await requireShop();

@@ -7,7 +7,7 @@ import { concat, encodeWav, resample, TARGET_RATE } from "./wav";
 const tone = (rate: number, seconds: number, hz = 440) =>
   Float32Array.from({ length: Math.round(rate * seconds) }, (_, i) => 0.5 * Math.sin((2 * Math.PI * hz * i) / rate));
 
-describe("browser WAV encoder (F-03)", () => {
+describe("browser WAV encoder", () => {
   it.each([48_000, 44_100, 24_000, 16_000, 8_000])("turns %i Hz microphone audio into a WAV the server accepts", (rate) => {
     const wav = encodeWav(resample(tone(rate, 2), rate));
     const check = checkWav(wav, AUDIO_LIMITS.command);

@@ -4,7 +4,7 @@ import { catalogMatch } from "./photo-url";
 
 const file = (name: string, unit?: string | null) => catalogMatch(name, unit)?.file ?? null;
 
-describe("finding a ready-made image for an owner's product (V-12)", () => {
+describe("finding a ready-made image for an owner's product", () => {
   it("takes the same name and pack", () => {
     expect(file("Tata Salt", "1 kg")).toBe("tata-salt-1-kg.webp");
   });

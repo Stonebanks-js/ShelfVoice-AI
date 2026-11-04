@@ -12,9 +12,9 @@ const Fields = z.object({
   turnstileToken: z.string().min(1).max(4096),
 });
 
-// Customer voice review (doc 01 FR-08, doc 03): no sign-in, Turnstile, rate
+// Customer voice review: no sign-in, Turnstile, rate
 // limits, consent, a WAV check, then a thank-you while analysis runs after
-// the response (doc 02 background jobs).
+// the response.
 export const POST = route(async (request, ctx: RouteContext<"/api/v1/public/shops/[slug]/reviews">, { requestId }) => {
   const { slug } = await ctx.params;
   const { data: shop } = await adminClient().from("shops").select("id, is_published").eq("slug", slug).maybeSingle();

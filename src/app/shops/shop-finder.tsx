@@ -37,7 +37,7 @@ interface NearbyShop {
 // The last pincode searched, so coming back shows the same shops (testers).
 const PINCODE_KEY = "sv_pincode";
 
-// Customers (V-03, E-36): published shops near the phone, or in a typed
+// Customers: published shops near the phone, or in a typed
 // pincode's area, nearest first. No account; each shop opens its page.
 export function ShopFinder() {
   const { lang, t } = useLang();
@@ -220,7 +220,7 @@ export function ShopFinder() {
               </div>
             </section>
           )}
-          {/* The map above the list on a phone; beside it, pinned, from 1024 px (V-09). */}
+          {/* The map above the list on a phone; beside it, pinned, from 1024 px. */}
           <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-6">
             <ShopMap shops={shops.map((shop) => ({ ...shop, detail: describe(shop) }))} me={me} focus={focus?.length ? focus : null} className="h-64 sm:h-80 lg:sticky lg:top-6 lg:order-2 lg:h-[min(38rem,calc(100dvh-3rem))]" />
             {/* A new search is a new list, not the old one rearranged. */}

@@ -9,7 +9,7 @@ import { ownerClient } from "@/server/supabase";
 import Loading from "../loading";
 import { CustomerOrders, type OwnerOrder } from "./customer-orders";
 
-// Customer orders (V-04): new ones first, then the ones being packed, then
+// Customer orders: new ones first, then the ones being packed, then
 // today's finished ones. Read under the owner's RLS.
 export default function OrdersPage() {
   return (

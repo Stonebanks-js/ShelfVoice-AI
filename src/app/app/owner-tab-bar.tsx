@@ -14,7 +14,7 @@ const FULL_SCREEN = ["/app/check/", "/app/setup", "/app/camera", "/app/add/"];
 const fullScreen = (pathname: string) => FULL_SCREEN.some((prefix) => pathname.startsWith(prefix));
 
 // The screen area: room for the bottom bar on a phone, and beside the
-// sidebar from 1024 px (E-37).
+// sidebar from 1024 px.
 export function OwnerMain({ withBar, children }: { withBar: boolean; children: ReactNode }) {
   const pathname = usePathname();
   const bar = withBar && !fullScreen(pathname);
@@ -25,7 +25,7 @@ export function OwnerMain({ withBar, children }: { withBar: boolean; children: R
   );
 }
 
-// The live tab bar. The centre mic records a 30-second command (doc 06),
+// The live tab bar. The centre mic records a 30-second command,
 // turns it into proposed changes, and opens Check and confirm.
 export function OwnerTabBar({ shop }: { shop: { name: string; slug: string } }) {
   const router = useRouter();

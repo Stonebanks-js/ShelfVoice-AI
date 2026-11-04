@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-// F-01 review gate: the style guide is axe clean in both themes and both
+// The style guide is axe clean in both themes and both
 // languages, never scrolls sideways on phones, and its components behave.
 
 async function blockingViolations(page: Page) {

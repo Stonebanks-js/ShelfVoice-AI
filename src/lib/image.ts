@@ -1,4 +1,4 @@
-// Phone photos to what the bill reader takes (doc 02, doc 03 uploads): a
+// Phone photos to what the bill reader takes: a
 // JPEG no larger than 1600 px on its longest side and under 3 MB. Drawing
 // the photo onto a canvas and encoding it again keeps only the pixels, so
 // EXIF data, including the GPS location, never leaves the phone.

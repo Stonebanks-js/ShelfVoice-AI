@@ -5,7 +5,7 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/cn";
 
-// Instamart-style quantity control (E-36): − count +. A null count reads as
+// Instamart-style quantity control: − count +. A null count reads as
 // `emptyLabel` (not counted yet); − at the minimum goes back to null when
 // `clearable`, so "not counted" stays reachable.
 export function Stepper({
@@ -29,7 +29,7 @@ export function Stepper({
   lessLabel: string;
   moreLabel: string;
   className?: string;
-  filled?: boolean; // the brand-red pill of a cart line (E-37)
+  filled?: boolean; // the brand-red pill of a cart line
 }) {
   const less = () => {
     if (value === null) return;

@@ -9,8 +9,8 @@ import { ownerState, requestLang } from "@/server/session";
 import Loading from "./loading";
 import { OwnerMain, OwnerTabBar } from "./owner-tab-bar";
 
-// The owner app shell (doc 06 U3): every screen in the owner's language, the
-// tab bar (a sidebar on desktop, E-37) once a shop exists. Per-user, so it streams in behind a skeleton.
+// The owner app shell: every screen in the owner's language, the
+// tab bar (a sidebar on desktop) once a shop exists. Per-user, so it streams in behind a skeleton.
 export default function AppLayout({ children }: LayoutProps<"/app">) {
   return (
     <Suspense fallback={<Loading />}>

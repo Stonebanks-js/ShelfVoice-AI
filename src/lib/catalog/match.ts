@@ -1,4 +1,4 @@
-// Is this photo the same product? (V-11) A product database entry is the
+// Is this photo the same product? A product database entry is the
 // same as one of ours only when its name holds every word of ours, it adds no
 // word that marks another variant ("Multigrain", "Select", "Masala"), and its
 // pack is the same size. No photo is better than the wrong one: an uncertain

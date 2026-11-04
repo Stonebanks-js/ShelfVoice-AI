@@ -11,7 +11,7 @@ import { isLang } from "@/i18n/dictionary";
 
 export const metadata: Metadata = { title: "Your order · Shelf Voice", robots: { index: false, follow: false }, referrer: "no-referrer" };
 
-// The customer's order (V-04), from the secret link they got on placing it.
+// The customer's order, from the secret link they got on placing it.
 export default function OrderPage({ params, searchParams }: PageProps<"/o/[id]">) {
   return (
     <Suspense>

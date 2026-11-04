@@ -2,10 +2,10 @@ import { judge, words } from "./match";
 import { OFF_CREDIT } from "./off";
 import { CATALOG_PHOTOS } from "./photos";
 
-// Where a product's photo comes from (V-11, V-12), first match wins:
+// Where a product's photo comes from, first match wins:
 // 1. the photo the owner chose, copied into the shop's own Storage folder;
 // 2. the ready-made list's checked image for this product: the same name
-//    and pack, or (V-12) the same product written a little differently by
+//    and pack, or the same product written a little differently by
 //    an owner or their voice ("Britannia Bread", "Surf Excel" with no size),
 //    as long as no word marks another variant and the sizes agree;
 // 3. none: the drawn tile.

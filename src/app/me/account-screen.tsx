@@ -121,7 +121,7 @@ export function AccountScreen({ account }: { account: Account }) {
   }
 
   return (
-    // Two columns of groups from 1024 px (E-37).
+    // Two columns of groups from 1024 px.
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:grid lg:max-w-6xl lg:grid-cols-2 lg:items-start lg:px-8">
       <div className="flex flex-col gap-1 lg:col-span-2">
         <Header title={t("acct.title")} />

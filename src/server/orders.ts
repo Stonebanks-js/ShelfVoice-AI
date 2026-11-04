@@ -19,7 +19,7 @@ type Ctx = Owner & { shop: Shop; requestId: string };
 export type OrderStatus = Database["public"]["Enums"]["order_status"];
 export type ItemStatus = Database["public"]["Enums"]["order_item_status"];
 
-// What a customer sends from the cart (V-04). Prices and names come from the
+// What a customer sends from the cart. Prices and names come from the
 // shop's own products, never from the request.
 export const NewOrder = z
   .object({
@@ -28,7 +28,7 @@ export const NewOrder = z
     fulfilment: z.enum(["PICKUP", "DELIVERY"]),
     address: z.string().trim().max(300).nullable().optional(),
     note: z.string().trim().max(300).nullable().optional(),
-    // Where to deliver, when the shop delivers only within a distance (V-05).
+    // Where to deliver, when the shop delivers only within a distance.
     lat: z.number().min(-90).max(90).nullable().optional(),
     lng: z.number().min(-180).max(180).nullable().optional(),
     items: z
@@ -78,7 +78,7 @@ export async function placeOrder(slug: string, order: NewOrder, ipHash: string, 
   const available = products.filter((p) => p.is_in_stock);
   if (available.length !== qty.size) throw new ApiError(409, "ITEMS_CHANGED", "Some items are no longer available; please check your cart");
 
-  // Delivery rules (V-05): minimum order, charge (free above an amount) and
+  // Delivery rules: minimum order, charge (free above an amount) and
   // distance, measured from the shop to where the customer wants it.
   let fee = 0;
   if (order.fulfilment === "DELIVERY") {
@@ -158,7 +158,7 @@ export interface OrderView {
 }
 
 // The customer's view of their order, from the secret link, or for the
-// signed-in customer who placed it (V-05).
+// signed-in customer who placed it.
 export async function orderForCustomer(id: string, token: string, userId: string | null = null): Promise<OrderView | null> {
   if (!z.uuid().safeParse(id).success) return null;
   const tokenOk = /^[A-Za-z0-9_-]{20,64}$/.test(token);
@@ -208,7 +208,7 @@ export function orderTotal(order: Pick<OrderView, "items" | "deliveryFeePaise" |
   return { itemsPaise, duePaise: Math.max(0, itemsPaise + order.deliveryFeePaise - refunded) };
 }
 
-// A refund the owner records on a finished or cancelled order (V-05): how
+// A refund the owner records on a finished or cancelled order: how
 // much and why. Never more than the order came to, all refunds together.
 export const Refund = z.object({ amount_paise: z.number().int().min(1).max(10_000_000), reason: z.string().trim().min(1).max(200) }).strict();
 
@@ -229,7 +229,7 @@ export async function addRefund(ctx: Ctx, orderId: string, refund: z.infer<typeo
 }
 
 // --------------------------------------------------------------------- owner
-// Which way an order may move from each status (doc: V-04).
+// Which way an order may move from each status.
 const NEXT: Record<OrderStatus, OrderStatus[]> = {
   NEW: ["ACCEPTED", "CANCELLED"],
   ACCEPTED: ["READY", "COMPLETED", "CANCELLED"],

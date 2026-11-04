@@ -10,7 +10,7 @@ import { useLang } from "@/i18n/lang";
 import { api } from "@/lib/api";
 import { errorKey } from "@/lib/errors";
 
-// What stops customers finding the shop, at the top of Home (V-10). Testers
+// What stops customers finding the shop, at the top of Home. Testers
 // set shops up and never saw them in Shops near you: a new shop stays hidden
 // until its owner shows it, and one without a location never appears on the
 // map or in a search by location. Each alert carries the one action that

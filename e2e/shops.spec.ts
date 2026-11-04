@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { blockingViolations, chooseLanguage, darkMode, localAdmin, localSupabase, signInAsNewOwner } from "./support";
 
-// V-03 review gate: customers find shops near them without an account, by
+// Customers find shops near them without an account, by
 // pincode or by the phone's location, nearest first, and open a shop's page.
 
 test.skip(!localSupabase, "needs the local Supabase stack");
@@ -54,7 +54,7 @@ test("a customer finds shops by pincode and by location, nearest first", async (
   await page.getByRole("textbox", { name: "Pincode" }).fill(shops.pincode);
   await page.getByRole("button", { name: "Find" }).click();
   const list = page.getByRole("list", { name: "Shops near you" });
-  // V-10: measured from the middle of the pincode's shops, and pickup or delivery said up front.
+  // Measured from the middle of the pincode's shops, and pickup or delivery said up front.
   await expect(list.getByRole("link", { name: `Near Kirana ${shops.tag}` })).toContainText(`km from ${shops.pincode} · Pickup only`);
   await expect(list.getByRole("link", { name: `Far Kirana ${shops.tag}` })).toBeVisible();
   await expect(list.getByRole("link", { name: `Hidden Kirana ${shops.tag}` })).toHaveCount(0);
@@ -68,7 +68,7 @@ test("a customer finds shops by pincode and by location, nearest first", async (
   // The customer's point is rounded to about 100 m, so distances move a little.
   await expect(ours.first()).toContainText(/0\.\d km away/);
   await expect(ours.nth(1)).toContainText(/[23](\.\d)? km away/);
-  // Each shop comes with a map pin, rounded to about 100 m and no finer (V-09).
+  // Each shop comes with a map pin, rounded to about 100 m and no finer.
   const { shops: found } = await page.evaluate(
     (q) => fetch(`/api/v1/public/shops/nearby?lat=${q.lat}&lng=${q.lng}`).then((r) => r.json()),
     { lat: Math.round(shops.lat * 1000) / 1000, lng: Math.round(shops.lng * 1000) / 1000 },

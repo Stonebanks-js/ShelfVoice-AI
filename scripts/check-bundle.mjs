@@ -1,4 +1,4 @@
-// Doc 03 TH-08: fail if the browser bundle contains a server secret.
+// Fail if the browser bundle contains a server secret.
 // Run after `next build`; scans every file the browser can download.
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";

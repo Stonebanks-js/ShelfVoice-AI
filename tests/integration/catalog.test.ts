@@ -1,4 +1,4 @@
-// Bulk adding and barcodes (V-01) against the local database. Open Food
+// Bulk adding and barcodes against the local database. Open Food
 // Facts is replaced by a stub at a test address: tests never reach the
 // internet. Needs `supabase start`.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";

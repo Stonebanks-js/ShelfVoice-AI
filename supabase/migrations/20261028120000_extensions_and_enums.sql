@@ -1,5 +1,5 @@
--- Migration 1 (doc 07 "Planned first migrations"): extensions and enums.
--- pg_cron arrives with the first scheduled job (W-13, W-17b), not before.
+-- Migration 1: extensions and enums.
+-- pg_cron arrives with the first scheduled job, not before.
 
 create extension if not exists pgcrypto with schema extensions;
 create extension if not exists pg_trgm with schema extensions;
@@ -9,17 +9,17 @@ create schema if not exists private;
 revoke all on schema private from public, anon, authenticated;
 
 create type public.movement_kind as enum ('SALE', 'DELIVERY', 'CORRECTION');
--- UNDO: offsetting movements written by proposal undo (errata E-02).
+-- UNDO: offsetting movements written by proposal undo.
 create type public.movement_source as enum ('VOICE', 'BILL', 'TAP', 'SEED', 'UNDO');
 create type public.proposal_kind as enum ('SETUP', 'COMMAND', 'BILL', 'SHELF');
--- UNDONE: a confirmed proposal reversed within the undo window (errata E-02).
+-- UNDONE: a confirmed proposal reversed within the undo window.
 create type public.proposal_status as enum ('PENDING', 'CONFIRMED', 'CANCELLED', 'FAILED', 'EXPIRED', 'UNDONE');
 create type public.review_status as enum ('PENDING', 'ANALYZED', 'FAILED');
 create type public.sentiment as enum ('POSITIVE', 'NEUTRAL', 'NEGATIVE');
 create type public.ai_job as enum (
   'SETUP_EXTRACTION', 'COMMAND', 'BILL', 'SHELF', 'REVIEW', 'EXPLANATION', 'TRANSCRIBE', 'SEGMENT'
 );
--- Outcome names from doc 05 (errata E-10).
+-- Outcome names for AI call logging.
 create type public.ai_outcome as enum ('OK', 'SCHEMA_REJECTED', 'TIMEOUT', 'RATE_LIMITED', 'ERROR');
 create type public.owner_action as enum ('CONFIRMED', 'EDITED', 'REJECTED');
 create type public.breaker_state as enum ('CLOSED', 'OPEN', 'HALF_OPEN');

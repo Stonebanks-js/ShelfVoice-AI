@@ -1,5 +1,5 @@
 // Server services against the real local database and storage, with only
-// the Meta client replaced (doc 04 "Mocking rules": only src/server/ai is
+// the Meta client replaced (only src/server/ai is
 // mocked; Supabase never is). Needs `supabase start`.
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -83,7 +83,7 @@ describe("sample shop and forecasts", () => {
     expect(await refreshForecasts(owner.shop.id)).toBe(0);
   });
 
-  // W-19: forecasts rise in the 7 days before a seeded festival, only for
+  // Forecasts rise in the 7 days before a seeded festival, only for
   // the categories it covers (compared without case).
   it("raises the forecast before a calendar festival", { timeout: 60_000 }, async () => {
     const owner = await testOwner();
@@ -116,20 +116,20 @@ describe("sample shop and forecasts", () => {
       return { milk: by("Amul Milk"), kurkure: by("Kurkure") };
     };
 
-    // Oct 20: Diwali (Nov 6) is 17 days away, so no bump yet.
+    // Diwali is 17 days away, so no bump yet.
     await refreshForecasts(shop_id, undefined, new Date("2026-10-20T06:00:00Z"));
     const before = await forecasts();
     expect(before.milk.festival).toBeNull();
     expect(before.milk.reorder_point).toBe(before.kurkure.reorder_point);
 
-    // Oct 31: Diwali is 6 days away and covers every category.
+    // Diwali is 6 days away and covers every category.
     await refreshForecasts(shop_id, undefined, new Date("2026-10-31T06:00:00Z"));
     const diwali = await forecasts();
     expect(diwali.milk.festival).toBe("Diwali");
     expect(diwali.kurkure.festival).toBe("Diwali");
     expect(diwali.milk.reorder_point!).toBeGreaterThan(before.milk.reorder_point!);
 
-    // Nov 12: Diwali is over; Chhath (Nov 13) covers dairy, not snacks.
+    // Diwali is over; Chhath covers dairy, not snacks.
     await refreshForecasts(shop_id, undefined, new Date("2026-11-12T06:00:00Z"));
     const chhath = await forecasts();
     expect(chhath.milk.festival).toBe("Chhath");
@@ -138,7 +138,7 @@ describe("sample shop and forecasts", () => {
   });
 });
 
-describe("Today summary (doc 06 O-5)", () => {
+describe("Today summary", () => {
   it("adds up today's sales, the running-low items and new reviews for a demo shop", async () => {
     const owner = await testOwner(false);
     const now = new Date();
@@ -199,7 +199,7 @@ describe("Today summary (doc 06 O-5)", () => {
   });
 });
 
-describe("order list (doc 06 O-7)", () => {
+describe("order list", () => {
   it("puts the customer-flagged atta first with a quantity and a reason quoting it", async () => {
     const owner = await testOwner(false);
     const shopId = await createSampleShop(owner.user.id, new Date(), "en");
@@ -221,7 +221,7 @@ describe("order list (doc 06 O-7)", () => {
   });
 });
 
-describe("review feed (doc 06 O-8)", () => {
+describe("review feed", () => {
   it("lists reviews newest first with a play link only while the audio exists", async () => {
     const owner = await testOwner(false);
     const shopId = await createSampleShop(owner.user.id, new Date(), "en");
@@ -251,7 +251,7 @@ describe("review feed (doc 06 O-8)", () => {
   });
 });
 
-describe("delete my shop (doc 01 FR-16, W-17)", () => {
+describe("delete my shop", () => {
   it("removes the shop, its rows, its files and the account, and nothing else", { timeout: 30_000 }, async () => {
     const owner = await testOwner(false);
     const shopId = await createSampleShop(owner.user.id);
@@ -548,7 +548,7 @@ describe("rate limits and the AI ledger", () => {
   });
 });
 
-describe("admin page numbers (W-20b)", () => {
+describe("admin page numbers", () => {
   it("counts today's AI calls, spend and confirmations", async () => {
     const owner = await testOwner();
     const before = await adminToday();

@@ -20,7 +20,7 @@ export function VoiceSetup() {
         <p className="text-body text-ink-2">{t("setup.body")}</p>
       </div>
 
-      {/* Doc 06 O-3: three example prompts. */}
+      {/* Three example prompts. */}
       <ul className="mt-6 flex flex-col gap-3">
         {[
           { icon: <MapPin />, text: t("setup.tip1") },

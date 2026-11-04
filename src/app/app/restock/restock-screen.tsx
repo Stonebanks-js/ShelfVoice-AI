@@ -88,8 +88,8 @@ export function RestockScreen({ items, shopName }: { items: RestockItem[]; shopN
   );
 }
 
-// Doc 06 ReorderRow: days left (large), order quantity, reason line and the
-// review flag. Numbers are the biggest text on the screen (doc 06 objective 3).
+// Days left (large), order quantity, reason line and the
+// review flag. Numbers are the biggest text on the screen.
 function ReorderRow({ item, onDelivered }: { item: RestockItem; onDelivered: () => void }) {
   const { t } = useLang();
   const whole = item.daysLeft === null ? null : Math.floor(item.daysLeft);

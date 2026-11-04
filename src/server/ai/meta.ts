@@ -1,8 +1,8 @@
-// The only module that talks to the Meta Model API (doc 02 ADR-007, doc 07).
-// Every call: budget caps (E-06) and circuit breaker checked first, a timeout,
-// one retry on 429/5xx/timeout, one ai_calls row (doc 05), and outputs
+// The only module that talks to the Meta Model API.
+// Every call: budget caps and circuit breaker checked first, a timeout,
+// one retry on 429/5xx/timeout, one ai_calls row, and outputs
 // parsed again with Zod. Meta models only: muse-spark-1.3,
-// muse-voice-transcribe-1.0 (and sam-3.1 for W-18).
+// muse-voice-transcribe-1.0 (and sam-3.1 for shelf photos).
 import { createHash } from "node:crypto";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ export const MODELS = {
   transcribe: "muse-voice-transcribe-1.0",
 } as const;
 
-// Rate card (doc 07): USD per token, per audio second.
+// Rate card: USD per token, per audio second.
 const RATES = {
   sparkIn: 1.25 / 1e6,
   sparkCachedIn: 0.15 / 1e6,
@@ -94,7 +94,7 @@ export interface MetaClientOptions {
   now?: () => Date;
 }
 
-// Doc 05 "Reliability patterns".
+// Timeouts, retries and the circuit breaker.
 const TIMEOUT_MS = { spark: 30_000, transcribe: 20_000 };
 const BREAKER = { failuresToOpen: 5, halfOpenAfterMs: 60_000 };
 const PAUSE_AT_FRACTION = 0.95;
@@ -275,7 +275,7 @@ export function createMetaClient(options: MetaClientOptions) {
         {
           json: {
             model: MODELS.spark,
-            // The default effort is high (E-30); always set it.
+            // The default effort is high; always set it.
             reasoning: { effort: request.effort ?? "low" },
             max_output_tokens: request.maxOutputTokens ?? 2000,
             input: [
@@ -307,7 +307,7 @@ export function createMetaClient(options: MetaClientOptions) {
     },
 
     // Muse Spark with tools (owner commands). Tools only propose; the server
-    // validates every argument before anything is shown or saved (doc 03).
+    // validates every argument before anything is shown or saved.
     async tools(ctx: AiContext, request: ToolRequest): Promise<{ calls: ToolCall[]; text?: string }> {
       let result: { calls: ToolCall[]; text?: string } = { calls: [] };
       await send(
@@ -324,7 +324,7 @@ export function createMetaClient(options: MetaClientOptions) {
               { role: "user", content: request.input },
             ],
             tools: request.tools.map((t) => ({ type: "function", strict: true, ...t })),
-            // Meta accepts only tool_choice "auto" (errata E-30); the model
+            // Meta accepts only tool_choice "auto"; the model
             // may answer in text instead, which callers treat as a question.
           },
         },
@@ -347,7 +347,7 @@ export function createMetaClient(options: MetaClientOptions) {
       return result;
     },
 
-    // Muse Voice Transcribe (spike S3 / errata E-30 request shape).
+    // Muse Voice Transcribe (request shape checked against the live API).
     async transcribe(
       ctx: AiContext,
       request: { audio: Uint8Array; keywords: string[]; languageBias?: string[] },

@@ -4,7 +4,7 @@ import qrcode from "qrcode-generator";
 import { useMemo } from "react";
 
 // A QR code as plain SVG (no injected markup): one path of dark squares on
-// white, with the quiet zone scanners need. Used for UPI payments (V-05).
+// white, with the quiet zone scanners need. Used for UPI payments.
 export function QrCode({ value, label, className }: { value: string; label: string; className?: string }) {
   const { size, path } = useMemo(() => {
     const code = qrcode(0, "M");

@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
-// V-11 review gate: an owner enters the MRP from the pack; customers see the
+// An owner enters the MRP from the pack; customers see the
 // shop's own price, the MRP and a discount worked out from the two, with the
 // ready-made list's checked photo; with photo search off (as in every test
 // run) the owner is told so and the product works the same; a broken photo

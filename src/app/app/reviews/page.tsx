@@ -10,7 +10,7 @@ import { ReviewsScreen } from "./reviews-screen";
 
 const PAGE_SIZE = 20;
 
-// O-8 Reviews (doc 06): the customers' voice feed with sentiment, what they
+// The customers' voice feed with sentiment, what they
 // said, the items they mentioned, the recording for 30 days, and Hide.
 export default function ReviewsPage() {
   return (

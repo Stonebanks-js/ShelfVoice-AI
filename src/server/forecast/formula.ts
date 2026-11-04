@@ -1,13 +1,12 @@
-// Restock forecast (doc 02 "Restock forecasting method", decision T7).
+// Restock forecast.
 // Pure functions: every suggested quantity can be checked by hand, and the
-// model only words the explanation (ADR-002).
+// model only words the explanation.
 export const FORECAST = {
-  // Smoothing factor. Doc 02 starts at 0.3 and says to tune it in the doc 04
-  // backtest: 0.3 held 11% more stock than a moving average (gate: 10%),
-  // 0.2 passes every gate on four seeds (errata E-31).
+  // Smoothing factor, tuned in the backtest: 0.3 held 11% more stock than a moving average (gate: 10%),
+  // 0.2 passes every gate on four seeds.
   alpha: 0.2,
   z: 1.28, // 90% service level
-  stockoutFactor: 1.2, // demand hidden by a stock-out (doc 02 step 2)
+  stockoutFactor: 1.2, // demand hidden by a stock-out 
   stockoutBoostDays: 14,
   coldStartDays: 14,
   sigmaWindowDays: 28,
@@ -66,7 +65,7 @@ export function forecast(input: ForecastInput): Forecast {
   const safetyStock = FORECAST.z * sigma * Math.sqrt(L);
   const daysLeft = input.stock === null ? null : demand > 0 ? input.stock / demand : null;
 
-  // Cold start (doc 02): under two weeks of logs, warn at the owner's own
+  // Cold start: under two weeks of logs, warn at the owner's own
   // low-stock level and don't suggest a quantity yet.
   if (input.historyDays < FORECAST.coldStartDays) {
     return {

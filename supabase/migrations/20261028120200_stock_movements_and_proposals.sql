@@ -1,5 +1,5 @@
--- Migration 3 (doc 07): proposals, stock_movements and the trigger that keeps
--- products.stock_qty in step with the movement log (decision K2).
+-- Migration 3: proposals, stock_movements and the trigger that keeps
+-- products.stock_qty in step with the movement log.
 
 create table public.proposals (
   id uuid primary key default gen_random_uuid(),
@@ -10,12 +10,12 @@ create table public.proposals (
   transcript text check (char_length(transcript) <= 4000),
   changes jsonb not null default '[]' check (jsonb_typeof(changes) = 'array'),
   -- Each confirmed change keeps its before and after values, so undo can
-  -- restore them (errata E-02).
+  -- restore them.
   confirmed_changes jsonb check (jsonb_typeof(confirmed_changes) = 'array'),
   created_at timestamptz not null default now(),
   decided_at timestamptz,
   unique (id, shop_id),
-  -- The same clip never creates two proposals (doc 07, idempotency).
+  -- The same clip never creates two proposals.
   unique (shop_id, input_path)
 );
 
@@ -47,7 +47,7 @@ create index proposals_shop_status_time on public.proposals (shop_id, status, cr
 -- SALE subtracts, DELIVERY adds, CORRECTION applies its signed amount. Items
 -- whose count isn't tracked (stock_qty null) keep a null count; the movement
 -- still counts toward forecasts. A result below zero fails the insert, and the
--- app asks the owner to correct the count first (doc 01 story 3).
+-- app asks the owner to correct the count first.
 create function private.apply_stock_movement()
 returns trigger
 language plpgsql
@@ -91,7 +91,7 @@ alter table public.stock_movements enable row level security;
 
 revoke all on public.proposals, public.stock_movements from anon, authenticated;
 grant select, insert on public.proposals, public.stock_movements to authenticated;
--- Owners may only decide a pending proposal (doc 07 RLS summary).
+-- Owners may only decide a pending proposal.
 grant update (status, confirmed_changes, decided_at) on public.proposals to authenticated;
 grant all on public.proposals, public.stock_movements to service_role;
 

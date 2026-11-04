@@ -5,7 +5,7 @@ import { requireShop } from "@/server/owner";
 
 const Body = z.object({ is_hidden: z.boolean() }).strict();
 
-// Owners can hide a review, never edit what a customer said (doc 03).
+// Owners can hide a review, never edit what a customer said.
 export const PATCH = route(async (request, ctx: RouteContext<"/api/v1/reviews/[id]">) => {
   const { id } = await ctx.params;
   const { db } = await requireShop();

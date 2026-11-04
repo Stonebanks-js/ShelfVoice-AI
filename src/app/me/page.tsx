@@ -12,7 +12,7 @@ import { AccountScreen, SignInToAccount } from "./account-screen";
 
 export const metadata: Metadata = { title: "Account · Shelf Voice", robots: { index: false, follow: false } };
 
-// A customer's Account (V-05, E-36): sign in with Google, then details,
+// A customer's Account: sign in with Google, then details,
 // saved addresses, how they pay, past orders, refunds, wishlist and
 // favourite shops. `?next=` brings them back to the shop they came from.
 export default function MePage({ searchParams }: PageProps<"/me">) {

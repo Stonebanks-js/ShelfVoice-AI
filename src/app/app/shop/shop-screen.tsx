@@ -89,7 +89,7 @@ export function ShopScreen({
     }
   }
 
-  // V-05 payment switches, saved as they flip.
+  // Payment switches, saved as they flip.
   const [settings, setSettings] = useState({ accepts_cash: shop.accepts_cash, pay_on_delivery: shop.pay_on_delivery });
   async function saveSetting(patch: Partial<typeof settings>) {
     const before = settings;
@@ -112,7 +112,7 @@ export function ShopScreen({
       .filter(Boolean)
       .join(" · ") || undefined;
 
-  // V-04: customers can choose home delivery only when the shop delivers.
+  // Customers can choose home delivery only when the shop delivers.
   const [delivers, setDelivers] = useState(shop.delivers);
   async function toggleDelivers(on: boolean) {
     setDelivers(on);
@@ -178,11 +178,11 @@ export function ShopScreen({
       <PageHeader title={t("tab.shop")} />
 
       {/* From 1024 px: the shop preview pinned on the left, the settings in
-          two columns beside it (E-37). */}
+          two columns beside it. */}
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:gap-6">
-        {/* Doc 06: a live preview of what customers see. */}
+        {/* A live preview of what customers see. */}
         <section aria-label={t("shop.page")} className="mx-4 flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-card lg:sticky lg:top-6 lg:mx-0">
-          {/* The badge drops below a long name or a long regional label (V-06). */}
+          {/* The badge drops below a long name or a long regional label. */}
           <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
             <div className="min-w-0">
               <h2 className="font-display text-title font-bold tracking-tight">{shop.name}</h2>
@@ -208,7 +208,7 @@ export function ShopScreen({
         </section>
 
         <div className="flex flex-col gap-6 px-4">
-          {/* V-02: products and their stock live under My shop. */}
+          {/* Products and their stock live under My shop. */}
           <ListGroup header={t("shop.products")}>
             <ListRow icon={<Package />} title={t("shop.allProducts")} value={<span className="tabular-nums">{productCount}</span>} href="/app/stock" />
             <ListRow icon={<ListPlus />} title={t("add.title")} href="/app/add" />
@@ -226,7 +226,7 @@ export function ShopScreen({
             <ListRow icon={<QrCode />} title={t("shop.qrShop")} onClick={() => setSheet("qrShop")} />
           </ListGroup>
 
-          {/* V-05: how customers pay. Money goes straight to the shop. */}
+          {/* How customers pay. Money goes straight to the shop. */}
           <ListGroup header={t("shop.payments")}>
             <ListRow icon={<IndianRupee />} title={t("shop.upi")} value={<span className="line-clamp-1 max-w-44">{shop.upi_id ?? t("shop.notSet")}</span>} onClick={() => setSheet("upi")} />
             <ListRow
@@ -332,7 +332,7 @@ export function ShopScreen({
   );
 }
 
-// The counter QR (doc 06 O-9): opens the customer review page.
+// The counter QR: opens the customer review page.
 function QrSheet({ url, shopName, kind, hidden, onClose }: { url: string; shopName: string; kind: "review" | "shop"; hidden: boolean; onClose: () => void }) {
   const { t } = useLang();
   const title = t(kind === "review" ? "shop.qrTitle" : "shop.qrShopTitle");
@@ -435,7 +435,7 @@ function DetailsSheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void 
     description: shop.description ?? "",
     pincode: shop.pincode ?? "",
   });
-  // Where the shop is, for customers nearby (V-03).
+  // Where the shop is, for customers nearby.
   const [where, setWhere] = useState(shop.lat !== null && shop.lng !== null ? { lat: shop.lat, lng: shop.lng } : null);
   const [locating, setLocating] = useState(false);
   const [invalid, setInvalid] = useState<string | null>(null);
@@ -649,7 +649,7 @@ const toPaise = (text: string) => {
   return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : null;
 };
 
-// The shop's UPI ID (V-05): customers pay straight from their UPI app.
+// The shop's UPI ID: customers pay straight from their UPI app.
 function UpiSheet({ upiId, onClose }: { upiId: string | null; onClose: () => void }) {
   const { t } = useLang();
   const router = useRouter();
@@ -699,7 +699,7 @@ function UpiSheet({ upiId, onClose }: { upiId: string | null; onClose: () => voi
   );
 }
 
-// Delivery rules (V-05): minimum order, charge, free above, distance.
+// Delivery rules: minimum order, charge, free above, distance.
 function DeliverySheet({ shop, onClose }: { shop: OwnerShop; onClose: () => void }) {
   const { t } = useLang();
   const router = useRouter();

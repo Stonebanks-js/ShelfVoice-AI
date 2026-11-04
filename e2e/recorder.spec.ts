@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { blockingViolations } from "./support";
 
-// F-03 review gate: the mic records, explains itself the first time, stops,
+// The mic records, explains itself the first time, stops,
 // and says what went wrong in plain words. The style guide's live recorder
 // needs no backend; the upload journey runs on the local Supabase stack.
 

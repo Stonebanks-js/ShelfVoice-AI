@@ -1,4 +1,4 @@
-// Reading a product list from Excel or CSV (V-01, E-36), in the browser, so
+// Reading a product list from Excel or CSV, in the browser, so
 // the file never leaves the phone; only the products the owner keeps are
 // sent. Billing apps (Vyapar, Marg, Tally) export either format. A small
 // .xlsx reader instead of a library: an .xlsx is a zip of XML files, and

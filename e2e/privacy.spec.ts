@@ -2,8 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, chooseLanguage, darkMode, localSupabase, signInToSampleShop } from "./support";
 
-// F-14 review gate: the privacy page says where data lives (Seoul, errata
-// E-28) and how long each kind is kept, in Hindi and English, and is linked
+// The privacy page says where data lives (Seoul) and how long each kind is kept, in Hindi and English, and is linked
 // from sign-in, the storefront, the review page and My shop.
 
 async function expectEnglish(page: Page) {

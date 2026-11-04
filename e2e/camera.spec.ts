@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
-// F-10 review gate: the bill photo (O-10). The photo is resized and loses its
+// The bill photo. The photo is resized and loses its
 // EXIF (GPS included) before it leaves the phone; the bill reader is replaced
 // with a proposal written to the database, so no AI credit is spent.
 

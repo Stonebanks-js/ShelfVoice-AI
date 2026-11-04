@@ -13,7 +13,7 @@ import te from "@/i18n/product-names/te";
 
 // A product name an owner spoke or typed in an Indian script, back to the
 // ready-made list's English name ("आशीर्वाद आटा" → "Aashirvaad Atta"), so it
-// finds its image (V-12). Names not on the list come back unchanged.
+// finds its image. Names not on the list come back unchanged.
 const back = new Map<string, string>();
 for (const names of [hi, bn, gu, kn, ml, mr, or, pa, ta, te]) {
   for (const [english, local] of Object.entries(names)) back.set(local.trim().toLowerCase(), english);

@@ -1,7 +1,7 @@
 import type { Instrumentation } from "next";
 
 // Runs once when a server instance starts, before it handles requests. A
-// missing or malformed variable stops startup with a clear message (doc 08),
+// missing or malformed variable stops startup with a clear message,
 // while lint, typegen and typecheck run without secrets.
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
@@ -10,7 +10,7 @@ export async function register() {
   }
 }
 
-// Errors no route handler caught (doc 05 "Error tracking"): logged with the
+// Errors no route handler caught: logged with the
 // route and request ID, which also sends them to Axiom and Discord.
 export const onRequestError: Instrumentation.onRequestError = async (error, request, context) => {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;

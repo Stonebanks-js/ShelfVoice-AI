@@ -27,7 +27,7 @@ export const hasHours = (hours: Hours) => DAYS.some((d) => hours[d].length > 0);
 
 const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
 
-// The shop's own clock (doc 06 OpenNowBadge): weekday and minutes since midnight.
+// The shop's own clock: weekday and minutes since midnight.
 export function shopClock(now: Date, timeZone: string): { day: Day; minute: number } {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now);
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";

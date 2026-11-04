@@ -1,5 +1,5 @@
 -- "Try the demo shop" visitors get an anonymous sign-in that owns one demo
--- copy made by the server (doc 03). They may work inside that copy, but must
+-- copy made by the server. They may work inside that copy, but must
 -- not create shops of their own through the API.
 drop policy shops_owner_insert on public.shops;
 

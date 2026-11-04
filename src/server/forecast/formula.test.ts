@@ -4,7 +4,7 @@ import { forecast, roundUpToPack, smooth, stdDev } from "./formula";
 
 const base = { historyDays: 90, leadTimeDays: 2, reviewPeriodDays: 7, packSize: 1, lowStockLevel: 5 };
 
-describe("forecast formula (doc 02)", () => {
+describe("forecast formula", () => {
   it("smooths a flat series to its level", () => {
     expect(smooth(Array(30).fill(9))).toBeCloseTo(9, 9);
   });
@@ -75,7 +75,7 @@ describe("forecast formula (doc 02)", () => {
     expect(forecast({ ...base, dailySales: Array(30).fill(1), stock: 3 }).needsReorder).toBe(false);
   });
 
-  it("reproduces the Key Screens order list after errata E-19", () => {
+  it("reproduces the sample shop's order list", () => {
     // Surf Excel sells about 1 a day but unevenly (0, 2, 0, 2 ...): sigma ~1,
     // so SS ~1.8 and ROP ~3.5 >= 3 left, which puts it on the list. The
     // quantity follows Q = ceil(d * (L + R) + SS - stock) exactly.

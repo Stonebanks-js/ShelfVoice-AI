@@ -17,7 +17,7 @@ export interface StorefrontProduct {
   unit: string | null;
   pricePaise: number | null;
   inStock: boolean;
-  // The MRP the owner entered, and the product's photo with its credit (V-11).
+  // The MRP the owner entered, and the product's photo with its credit.
   mrpPaise: number | null;
   photo: { url: string; credit: string | null } | null;
 }
@@ -33,7 +33,7 @@ export interface Storefront {
   hours: Hours;
   language: Lang;
   delivers: boolean;
-  // How to pay and the delivery rules (V-05).
+  // How to pay and the delivery rules.
   upiId: string | null;
   acceptsCash: boolean;
   payOnDelivery: boolean;
@@ -44,8 +44,8 @@ export interface Storefront {
 const SLUG = /^[a-z0-9-]{1,100}$/;
 
 // A published shop and its published products, as any customer sees them
-// (doc 06 P-1): read with the public key and no session, so the view's anon
-// grants apply; never a stock count, only in or out (errata E-05). Cached
+//: read with the public key and no session, so the view's anon
+// grants apply; never a stock count, only in or out. Cached
 // and tagged; every owner edit calls refreshStorefront(slug).
 export async function getStorefront(slug: string): Promise<Storefront | null> {
   "use cache";
@@ -97,7 +97,7 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
 
 // After any owner edit that customers can see. `expire: 0` means the next
 // visitor never gets the old page: an unpublished shop or an out-of-stock
-// item must show at once (doc 03 TH-10), not after a background refresh.
+// item must show at once, not after a background refresh.
 export function refreshStorefront(slug: string) {
   revalidateTag(`storefront:${slug}`, { expire: 0 });
 }

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { blockingViolations, chooseLanguage, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
-// V-06 review gate: eleven languages. The picker switches every screen; a
+// Eleven languages. The picker switches every screen; a
 // visitor from Karnataka is asked whether they want Kannada (Vercel's IP
 // region headers, faked here); an owner's choice is saved with the shop.
 

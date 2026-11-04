@@ -26,7 +26,7 @@ describe("interface dictionary", () => {
   });
 });
 
-describe("regional languages (V-06)", () => {
+describe("regional languages", () => {
   const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(",");
 
   it.each(REGIONAL)("%s keeps every {placeholder} and has no stray keys", (lang) => {

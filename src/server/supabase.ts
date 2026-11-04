@@ -23,7 +23,7 @@ export async function ownerClient(): Promise<Db> {
   });
 }
 
-// Bypasses RLS. Only for work doc 03 assigns to the server: public review
+// Bypasses RLS. Only for work that belongs on the server: public review
 // inserts, background jobs, sample shops for tests, rate limits, AI call logging, undo.
 let admin: Db | undefined;
 export function adminClient(): Db {

@@ -9,7 +9,7 @@ import { ownerClient } from "@/server/supabase";
 import Loading from "../loading";
 import { StockScreen } from "./stock-screen";
 
-// O-6 Stock (doc 06): the catalog with stock levels. Search, category chips,
+// The catalog with stock levels. Search, category chips,
 // each row with price, stock and an in/out switch; tap a row to edit.
 export default function StockPage() {
   return (

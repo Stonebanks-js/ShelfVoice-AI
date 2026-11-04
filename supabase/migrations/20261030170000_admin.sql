@@ -1,4 +1,4 @@
--- Admin page (W-20b, F-12): a manual breaker switch, whether the owner
+-- Admin page: a manual breaker switch, whether the owner
 -- changed a proposal before confirming, and today's numbers in one call.
 
 -- Set by the admin page; keeps AI paused until switched back, unlike an

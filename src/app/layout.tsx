@@ -7,14 +7,14 @@ import { ClientMonitor } from "@/components/shell/client-monitor";
 
 import "./globals.css";
 
-// Latin text uses the phone's own font; this covers Hindi (errata E-32).
+// Latin text uses the phone's own font; this covers Hindi.
 const devanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari"],
   variable: "--font-devanagari",
   display: "swap",
 });
 
-// Headings, figures and prices (E-37); body text stays on the phone's font.
+// Headings, figures and prices; body text stays on the phone's font.
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-bricolage",
@@ -24,7 +24,7 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: "Shelf Voice",
   description: "Speak your shop online, know what to restock, and hear every customer.",
-  // Added to an iPhone's home screen, it opens as an app, not a tab (E-37).
+  // Added to an iPhone's home screen, it opens as an app, not a tab.
   appleWebApp: { capable: true, title: "Shelf Voice", statusBarStyle: "default" },
 };
 
@@ -39,12 +39,12 @@ export const viewport: Viewport = {
 };
 
 // `lang` here is the document default; each screen's language provider marks
-// its own subtree, so Hindi is announced correctly (doc 06).
+// its own subtree, so Hindi is announced correctly.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${devanagari.variable} ${bricolage.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-bg font-sans text-ink">
-        {/* Screens change with a short fade and rise (V-10); navigations are
+        {/* Screens change with a short fade and rise; navigations are
             transitions, so React runs it through the browser's View
             Transitions where they exist and skips it where they don't. */}
         <ViewTransition default="page">{children}</ViewTransition>

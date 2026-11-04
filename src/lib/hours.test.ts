@@ -15,7 +15,7 @@ const daily: Hours = asHours({
 // Times are UTC; India is UTC+5:30. 2026-10-29 is a Thursday.
 const ist = (date: string, hhmm: string) => new Date(`${date}T${hhmm}:00+05:30`);
 
-describe("open now (doc 06 OpenNowBadge)", () => {
+describe("open now", () => {
   it("is open inside today's hours, in India time", () => {
     expect(openStatus(daily, ist("2026-10-29", "09:30"))).toEqual({ open: true, closesAt: "22:00" });
   });

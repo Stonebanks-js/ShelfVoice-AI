@@ -7,7 +7,7 @@ import { useLang } from "./lang";
 
 type Names = Record<string, string>;
 
-// The ready-made products' names in each language (V-10), one chunk per
+// The ready-made products' names in each language, one chunk per
 // language, fetched only when a page shows that language. A name that isn't
 // in the list (one the owner typed) shows as written.
 const load: Record<Exclude<Lang, "en">, () => Promise<{ default: Names }>> = {

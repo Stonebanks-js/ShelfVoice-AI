@@ -16,7 +16,7 @@ interface LangContext {
 const Context = createContext<LangContext | null>(null);
 
 // Holds the interface language and marks its subtree with the right `lang`
-// so screen readers pronounce Hindi correctly (doc 06). The choice is kept in
+// so screen readers pronounce Hindi correctly. The choice is kept in
 // a cookie so server-rendered pages can start in it.
 // A regional language's text arrives with the page (`messages`, from
 // LangRoot); switching to another loads its chunk first.

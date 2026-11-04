@@ -19,7 +19,7 @@ import { haveKey, SHOP_TYPES, STARTER_ITEMS, starterFor, type ShopType, type Sta
 import { errorKey } from "@/lib/errors";
 import { ProductName } from "@/i18n/products";
 
-// V-01 ready-made list: pick the shop type, tick what the shop sells (ADD,
+// Pick the shop type, tick what the shop sells (ADD,
 // as on Instamart), fix any price, add them all in one go. Ticks and prices
 // survive switching type, so a kirana can also take from the pan list.
 export function ListPicker({ initialType, have }: { initialType: ShopType; have: string[] }) {
@@ -125,7 +125,7 @@ export function ListPicker({ initialType, have }: { initialType: ShopType; have:
                   const price = priceOf(item);
                   return (
                     <li key={item.key} className="flex items-center gap-3 border-separator py-2.5 pr-3 pl-4 not-first:border-t">
-                      {/* The checked packshot, so the owner ticks the right pack (V-11). */}
+                      {/* The checked packshot, so the owner ticks the right pack. */}
                       <ProductThumb name={item.name} category={item.category} imageUrl={productPhoto(item, "")?.url} size="sm" />
                       <div className="flex min-w-0 flex-1 flex-col">
                         <span className="text-body text-ink"><ProductName name={item.name} /></span>

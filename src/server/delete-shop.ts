@@ -32,9 +32,9 @@ async function removeFiles(shopId: string) {
   }
 }
 
-// Delete my shop (doc 01 FR-16, doc 03): the shop row and everything that
+// Delete my shop: the shop row and everything that
 // cascades from it, every stored file, then the account. Files are removed
-// first and retried once; the nightly job sweeps anything left (W-17b).
+// first and retried once; the nightly job sweeps anything left.
 export async function deleteShop({ shopId, userId, requestId }: { shopId: string; userId: string; requestId: string }) {
   try {
     await removeFiles(shopId);

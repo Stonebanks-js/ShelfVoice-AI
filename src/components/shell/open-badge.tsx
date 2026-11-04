@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/controls";
 import { useLang } from "@/i18n/lang";
 import { dayName, formatTime, openStatus, shopClock, type Hours } from "@/lib/hours";
 
-// Doc 06 OpenNowBadge: "Open now" / "Closed, opens 7 AM", in the shop's time.
+// "Open now" / "Closed, opens 7 AM", in the shop's time.
 export function OpenBadge({ hours, timeZone }: { hours: Hours; timeZone: string }) {
   const { lang, t } = useLang();
   const [now] = useState(() => new Date());

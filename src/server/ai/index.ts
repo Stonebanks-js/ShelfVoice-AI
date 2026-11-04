@@ -69,7 +69,7 @@ export const ledger: AiLedger = {
   },
 };
 
-// Doc 05 credit burn: alert at 50% and 80% of the total AI budget, and at
+// Alert at 50% and 80% of the total AI budget, and at
 // 95%, where the client pauses AI features. Fires on the call that crosses.
 const BUDGET_ALERTS = [
   { at: 0.95, severity: "critical" },
@@ -92,8 +92,8 @@ let client: MetaClient | undefined;
 export function meta(): MetaClient {
   if (!client) {
     if (env.META_MODE === "replay-demo") {
-      // Decided after spike S0 (errata E-03); not built yet.
-      throw new Error("META_MODE=replay-demo is not implemented yet (errata E-03)");
+      // Not built yet.
+      throw new Error("META_MODE=replay-demo is not implemented yet");
     }
     const transport =
       env.META_MODE === "live"

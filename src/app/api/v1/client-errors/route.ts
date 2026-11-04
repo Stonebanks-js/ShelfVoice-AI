@@ -30,7 +30,7 @@ const Report = z.discriminatedUnion("type", [
     .strict(),
 ]);
 
-// Browser errors and Web Vitals (doc 05 "Error tracking"): logged with the
+// Browser errors and Web Vitals: logged with the
 // page and release, never user text, and shipped to Axiom with every other
 // log line. Rate-limited per device so a broken page can't flood the logs.
 export const POST = route(async (request) => {
