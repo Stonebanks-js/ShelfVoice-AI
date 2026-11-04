@@ -4,7 +4,7 @@ import { ApiError, readJson, route } from "@/server/http";
 import { PushSubscription, pushEnabled, removePushSubscription, savePushSubscription } from "@/server/orders";
 import { requireShop } from "@/server/owner";
 
-// This phone gets a notification for each new customer order (V-04).
+// This phone gets a notification for each new customer order.
 export const POST = route(async (request, _ctx, { requestId }) => {
   if (!pushEnabled()) throw new ApiError(503, "PUSH_OFF", "Order alerts aren't available yet");
   const owner = await requireShop();

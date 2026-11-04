@@ -1,6 +1,6 @@
-// W-17b: the daily cleanup against the real local database and storage.
+// The daily cleanup against the real local database and storage.
 // Rows are backdated; stored files can't be, so for them the job runs with
-// the clock moved forward ("frozen time", doc 04). Needs `supabase start`.
+// the clock moved forward ("frozen time"). Needs `supabase start`.
 import { randomUUID } from "node:crypto";
 
 import { describe, expect, it } from "vitest";
@@ -13,7 +13,7 @@ const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0x10, 0x4a, 0x46, 0x49, 0x46]);
 
-describe("daily cleanup (W-17b)", () => {
+describe("daily cleanup", () => {
   it("matches the privacy page", () => {
     expect(RETENTION).toMatchObject({ ownerVoiceDays: 7, reviewAudioDays: 30, photoDays: 30, ipHashDays: 7, proposalDays: 90, aiCallDays: 90 });
   });

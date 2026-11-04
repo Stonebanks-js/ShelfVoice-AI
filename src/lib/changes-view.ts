@@ -2,7 +2,7 @@ import type { Lang, MessageKey } from "@/i18n/dictionary";
 import { translate } from "@/i18n/dictionary";
 import type { Change } from "@/server/changes";
 
-// How the owner sees a proposed change (doc 06 O-4): one plain sentence per
+// How the owner sees a proposed change: one plain sentence per
 // card, like "Maggi: price ₹14 → ₹15", never system terms.
 
 export interface CatalogEntry {
@@ -25,7 +25,7 @@ export function formatPhone(e164: string): string {
   return m ? `+91 ${m[1]} ${m[2]}` : e164;
 }
 
-// Doc 06: anything unclear is marked "Please check" in amber and is never
+// Anything unclear is marked "Please check" in amber and is never
 // pre-selected. A new product with no price heard is the unclear case the
 // AI can produce; its other outputs are already checked against the catalog.
 export function needsCheck(change: Change): boolean {

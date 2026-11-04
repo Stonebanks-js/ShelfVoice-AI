@@ -1,4 +1,4 @@
--- Product photos and MRP (V-11). Additive and nullable: every product keeps
+-- Product photos and MRP. Additive and nullable: every product keeps
 -- working without them.
 --
 -- MRP is what the owner reads off the pack; the shop's own price stays

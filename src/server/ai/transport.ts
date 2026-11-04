@@ -1,5 +1,5 @@
 // HTTP transports for the Meta client. "live" calls the real API; "recorded"
-// replays saved responses keyed by a hash of the request (doc 04, V3), so
+// replays saved responses keyed by a hash of the request, so
 // tests and CI are deterministic and free. With META_RECORD=1 in live mode,
 // each live response is saved as a recording.
 import { createHash } from "node:crypto";

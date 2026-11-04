@@ -1,4 +1,4 @@
-// Doc 04 "Forecast backtest": replay 90 days of seeded sales day by day and
+// Replay 90 days of seeded sales day by day and
 // judge the reorder policy against the gates. Fixed seed, so results repeat.
 import { describe, expect, it } from "vitest";
 
@@ -31,7 +31,7 @@ function generate(seed = 404): Item[] {
 
 type Policy = (sales: number[], day: number, stock: number) => { warn: boolean; order: number };
 
-// Shelf Voice: the doc 02 formula on what the shop has actually sold.
+// Shelf Voice: the forecast formula on what the shop has actually sold.
 const shelfVoice: Policy = (sales, day, stock) => {
   const f = forecast({ dailySales: sales, historyDays: day, stock, leadTimeDays: L, reviewPeriodDays: R, packSize: 1, lowStockLevel: 5 });
   return { warn: f.needsReorder, order: f.needsReorder ? (f.orderQty ?? 0) : 0 };
@@ -106,7 +106,7 @@ function total(items: Item[], policy: Policy): Run {
   }));
 }
 
-describe("forecast backtest (doc 04)", () => {
+describe("forecast backtest", () => {
   const items = generate();
   const ours = total(items, shelfVoice);
   const baseline = total(items, whenEmpty);

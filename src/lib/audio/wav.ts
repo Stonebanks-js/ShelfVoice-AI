@@ -1,4 +1,4 @@
-// Browser audio to the only format Voice Transcribe takes (doc 02): mono
+// Browser audio to the only format Voice Transcribe takes: mono
 // 16-bit PCM WAV at 16 kHz. Pure functions, so they're unit-tested against
 // the server's own WAV check.
 export const TARGET_RATE = 16_000;

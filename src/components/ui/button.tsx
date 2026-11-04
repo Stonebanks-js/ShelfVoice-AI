@@ -7,8 +7,8 @@ import { cn } from "@/lib/cn";
 export type ButtonVariant = "filled" | "ink" | "tinted" | "gray" | "plain" | "destructive";
 export type ButtonSize = "md" | "lg";
 
-// Doc 06: at least 48 px tall; one filled (primary) button per screen. Filled
-// is the logo's red (E-37); ink is near-black (white in dark mode), for
+// At least 48 px tall; one filled (primary) button per screen. Filled
+// is the logo's red; ink is near-black (white in dark mode), for
 // buttons whose brand rules forbid our colour, such as Sign in with Google;
 // tinted is the outlined secondary.
 export function buttonClass(variant: ButtonVariant = "filled", size: ButtonSize = "md", className?: string) {
@@ -30,7 +30,7 @@ export function buttonClass(variant: ButtonVariant = "filled", size: ButtonSize 
 interface CommonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  icon?: ReactNode; // shown before the label; the label is always words (doc 06)
+  icon?: ReactNode; // shown before the label; the label is always words
 }
 
 export function Button({

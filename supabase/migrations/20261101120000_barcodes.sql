@@ -1,4 +1,4 @@
--- Barcodes (V-01, E-36). A product can carry the barcode printed on its
+-- Barcodes. A product can carry the barcode printed on its
 -- pack, unique within a shop, so scanning it again finds the product. Names
 -- for barcodes come from Open Food Facts, a free public database; the
 -- answers are cached here (found or not) so each code is asked about once.

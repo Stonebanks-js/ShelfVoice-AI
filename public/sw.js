@@ -1,4 +1,4 @@
-// Shelf Voice service worker (V-04, E-37): shows a notification for each new
+// Shelf Voice service worker: shows a notification for each new
 // customer order and opens the Orders tab when it's tapped; registered on
 // every page so the installed app is a real app. It caches one thing, the
 // offline page, shown when a screen can't load without a connection.

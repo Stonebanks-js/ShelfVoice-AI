@@ -1,5 +1,5 @@
 // Nightly job against the local database: auth and the Better Stack
-// heartbeat (doc 05: alert if the daily job's ping is 2 hours late).
+// heartbeat (alert if the daily job's ping is 2 hours late).
 import { describe, expect, it, vi } from "vitest";
 
 process.env.BETTERSTACK_HEARTBEAT_URL = "https://uptime.example/api/v1/heartbeat/abc";
@@ -30,7 +30,7 @@ describe("nightly cron", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.failures).toBe(0);
-    // The daily cleanup runs first (W-17b).
+    // The daily cleanup runs first.
     expect(body.cleanup).toMatchObject({ failures: 0, proposalsExpired: expect.any(Number), demoShopsDeleted: expect.any(Number) });
     expect(pings).toEqual(["https://uptime.example/api/v1/heartbeat/abc"]);
   });

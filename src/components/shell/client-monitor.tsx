@@ -16,7 +16,7 @@ function send(body: Record<string, unknown>) {
   void fetch(ENDPOINT, { method: "POST", headers: { "content-type": "application/json" }, body: json, keepalive: true }).catch(() => undefined);
 }
 
-// Browser errors and Web Vitals for the logs (doc 05): never what anyone
+// Browser errors and Web Vitals for the logs: never what anyone
 // typed or said, only the page, the message and where it came from.
 export function ClientMonitor() {
   useReportWebVitals((metric) => {

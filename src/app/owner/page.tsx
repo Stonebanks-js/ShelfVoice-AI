@@ -6,7 +6,7 @@ import { requestLang } from "@/server/session";
 
 import { OwnerSignIn } from "./owner-sign-in";
 
-// O-1 Sign in for shop owners (doc 06, E-36): Continue with Google, which
+// Sign in for shop owners: Continue with Google, which
 // also creates the account. The language comes from the request.
 export default function OwnerPage({ searchParams }: PageProps<"/owner">) {
   return (

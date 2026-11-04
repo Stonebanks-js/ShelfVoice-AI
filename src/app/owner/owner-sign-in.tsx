@@ -39,7 +39,7 @@ function Example() {
   );
 }
 
-// E-37: the first screen's shape. On a phone the red panel holds the promise
+// The first screen's shape. On a phone the red panel holds the promise
 // and the example, and the sign-in rises over it at the bottom, in thumb
 // reach; from 1024 px the two sit side by side.
 export function OwnerSignIn({ failed }: { failed: boolean }) {
@@ -69,7 +69,7 @@ export function OwnerSignIn({ failed }: { failed: boolean }) {
         </div>
       </section>
 
-      {/* Doc 06: the primary action sits in the thumb zone. */}
+      {/* The primary action sits in the thumb zone. */}
       <section className="relative -mt-6 flex flex-col rounded-t-[1.75rem] bg-bg px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:mt-0 lg:justify-center lg:rounded-none lg:px-14">
         <div className="mx-auto flex w-full max-w-md flex-col gap-3">
           {failed && (

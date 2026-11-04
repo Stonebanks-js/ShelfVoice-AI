@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
 
-// Shops near you on a map (V-09, V-10): the customer's rounded position as a
+// Shops near you on a map: the customer's rounded position as a
 // blue dot and each shop as a red pin with its initial. Pins closer than a
 // thumb's width merge into one bubble with a count; tapping it zooms in.
 // Tapping a pin shows the shop in a card with a way into it. Tiles come from

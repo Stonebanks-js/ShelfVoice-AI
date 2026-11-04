@@ -91,7 +91,7 @@ function Guide({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => 
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-10 pb-16">
-      <PageHeader title="Design" subtitle="Shelf Voice · E-32, E-35" />
+      <PageHeader title="Design" subtitle="Shelf Voice" />
 
       {/* Preview controls stay at the top so every section can be checked both ways. */}
       <div className="sticky top-0 z-30 flex flex-col gap-2 border-b border-separator bg-chrome px-4 py-3 backdrop-blur-xl">
@@ -246,7 +246,7 @@ function Guide({ theme, setTheme }: { theme: Theme; setTheme: (theme: Theme) => 
         </div>
       </Section>
 
-      <Section title="Mic" note="Doc 06 states: idle, recording (ring fills toward the limit, live level bars), sending, understanding, resting.">
+      <Section title="Mic" note="States: idle, recording (ring fills toward the limit, live level bars), sending, understanding, resting.">
         <div className="mx-4 grid grid-cols-3 justify-items-center gap-y-8 rounded-lg bg-surface py-8 shadow-card sm:grid-cols-5">
           <MicButton state="idle" />
           <MicButton state="recording" elapsedMs={12_000} maxSeconds={30} level={0.6} />

@@ -5,7 +5,7 @@ test("home page renders without serious accessibility issues", async ({ page }) 
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: "Shelf Voice" })).toBeVisible();
 
-  // Doc 04: zero serious or critical axe violations, WCAG 2.1 AA rules.
+  // Zero serious or critical axe violations, WCAG 2.1 AA rules.
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();

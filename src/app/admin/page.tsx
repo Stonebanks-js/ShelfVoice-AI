@@ -13,7 +13,7 @@ import { BreakerSwitch } from "./breaker-switch";
 
 export const metadata: Metadata = { title: "Admin · Shelf Voice", robots: { index: false, follow: false } };
 
-// A-1 admin (W-20b, F-12): today's spend against the budget, how each AI job
+// Today's spend against the budget, how each AI job
 // is doing, how often owners confirm what the AI proposed, the counts, and
 // the switch that pauses AI. Team only; the proxy 404s everyone else. In
 // English, for the team.

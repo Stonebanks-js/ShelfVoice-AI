@@ -8,7 +8,7 @@ import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
 import { isCurrent, stageAt, useLiveOrders } from "@/lib/live-orders";
 
-// "Your current orders" (V-12): each order still on its way from this phone,
+// "Your current orders": each order still on its way from this phone,
 // with minutes to go and a link to its live tracker. Nothing when there are
 // none, so pages look the same as before for everyone else.
 export function CurrentOrders({ className }: { className?: string }) {

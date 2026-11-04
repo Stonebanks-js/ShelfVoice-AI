@@ -8,7 +8,7 @@ import { ListGroup, ListRow } from "@/components/ui/list";
 import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
 
-// Every way to add products in one place (V-01, E-36): a kirana stocks far
+// Every way to add products in one place: a kirana stocks far
 // too much to speak item by item, so voice is one option among the faster
 // ones. First run shows it full screen with Skip; later it's under Stock.
 export function AddHub({ firstRun = false }: { firstRun?: boolean }) {
@@ -38,7 +38,7 @@ export function AddHub({ firstRun = false }: { firstRun?: boolean }) {
           <ListRow key={way.href} href={way.href} icon={way.icon} title={way.title} subtitle={way.body} wrap />
         ))}
       </ListGroup>
-      {/* From 1024 px the ways are tiles side by side (E-37). */}
+      {/* From 1024 px the ways are tiles side by side. */}
       {!firstRun && (
         <section aria-label={t("add.ways")} className="hidden grid-cols-3 gap-4 px-4 lg:grid">
           {ways.map((way, i) => (

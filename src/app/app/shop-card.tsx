@@ -8,10 +8,10 @@ import { useToast } from "@/components/ui/toast";
 import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
 
-// The owner's shop at the top of Home (V-02, E-36): owners asked where to
+// The owner's shop at the top of Home: owners asked where to
 // build the shop and where to see it, so both are the first thing on screen.
 // An empty shop gets one big Build button instead; a hidden one with
-// products gets the button that shows it to customers (V-03).
+// products gets the button that shows it to customers.
 export function ShopCard({
   name,
   slug,
@@ -49,7 +49,7 @@ export function ShopCard({
   return (
     <section aria-labelledby="home-shop" className="mx-4 flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-card">
       <div className="flex items-center gap-3">
-        {/* The shop's monogram, in the brand's tint (E-37). */}
+        {/* The shop's monogram, in the brand's tint. */}
         <span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-lg bg-accent-soft font-display text-title font-bold text-accent-fill">
           {name.trim().charAt(0).toUpperCase()}
         </span>
@@ -82,7 +82,7 @@ export function ShopCard({
         </>
       ) : (
         <>
-          {/* Round action tiles, as in the big consumer apps (E-37). */}
+          {/* Round action tiles, as in the big consumer apps. */}
           <div className="grid grid-cols-3 gap-2">
             <a href={path} target="_blank" rel="noopener" className={TILE}>
               <span className={TILE_ICON}>

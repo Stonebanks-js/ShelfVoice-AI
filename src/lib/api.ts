@@ -1,5 +1,5 @@
 // Browser-side calls to our own API. Every failure becomes an ApiFailure with
-// the server's error code, so screens can pick the right words (doc 06).
+// the server's error code, so screens can pick the right words.
 export class ApiFailure extends Error {
   constructor(
     readonly status: number,

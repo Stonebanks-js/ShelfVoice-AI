@@ -1,5 +1,5 @@
 // Writes the ready-made products' names in each language with Muse Spark
-// (V-10, Meta models only): src/i18n/product-names/<lang>.ts. Testers who
+//: src/i18n/product-names/<lang>.ts. Testers who
 // switched to Hindi saw every screen in Hindi but the products in English.
 // Brand names are written in the language's script as people say them;
 // common words are translated. Names an owner types stay as typed.

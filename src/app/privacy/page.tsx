@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "What Shelf Voice keeps, where it is stored and when it is deleted.",
 };
 
-// F-14 privacy page (doc 03, errata E-28). Linked from the storefront, the
+// Privacy page. Linked from the storefront, the
 // review page, sign-in and My shop; `?lang=` carries the shop's language
 // from those pages, otherwise the visitor's choice or phone language.
 export default function PrivacyPage({ searchParams }: PageProps<"/privacy">) {

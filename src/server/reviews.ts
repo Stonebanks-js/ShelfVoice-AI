@@ -16,7 +16,7 @@ export interface ReviewSubmission {
   ipHash: string;
 }
 
-// Stores a customer's voice review (doc 01 FR-08). Customers never sign in,
+// Stores a customer's voice review. Customers never sign in,
 // so the server writes with the service role after its own checks.
 // Returns false when this review ID was already submitted (a retry).
 export async function storeReview(shopId: string, review: ReviewSubmission): Promise<boolean> {
@@ -48,8 +48,8 @@ export async function storeReview(shopId: string, review: ReviewSubmission): Pro
   return true;
 }
 
-// Transcribe and analyse a stored review (doc 01 FR-09). On an AI failure the
-// review stays PENDING for the nightly retry (doc 02 background jobs).
+// Transcribe and analyse a stored review. On an AI failure the
+// review stays PENDING for the nightly retry.
 export async function analyseStoredReview(reviewId: string, requestId?: string): Promise<"ANALYZED" | "PENDING" | "FAILED"> {
   const db = adminClient();
   const { data: review } = await db.from("reviews").select("*").eq("id", reviewId).maybeSingle();
@@ -91,7 +91,7 @@ export async function analyseStoredReview(reviewId: string, requestId?: string):
       })
       .eq("id", reviewId);
 
-    // Stock-out mentions raise the item on the order list (doc 01 story 4).
+    // Stock-out mentions raise the item on the order list.
     if (insight.stockout_product_ids.length) await refreshForecasts(review.shop_id, insight.stockout_product_ids);
     return "ANALYZED";
   } catch (error) {
@@ -113,10 +113,10 @@ export interface FeedReview {
   is_hidden: boolean;
   created_at: string;
   audioUrl: string | null; // short-lived link while the audio exists
-  audioRemoved: boolean; // deleted after 30 days (decision P1)
+  audioRemoved: boolean; // deleted after 30 days
 }
 
-// The owner's review feed (doc 06 O-8), newest first, under their RLS.
+// The owner's review feed, newest first, under their RLS.
 export async function reviewFeed(db: Db, shopId: string, page = 1, pageSize = 20): Promise<FeedReview[]> {
   const { data, error } = await db
     .from("reviews")

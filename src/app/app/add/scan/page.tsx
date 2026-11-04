@@ -6,7 +6,7 @@ import { ownerState } from "@/server/session";
 import Loading from "../../loading";
 import { BarcodeScan } from "./barcode-scan";
 
-// V-01 add or restock products by barcode.
+// Add or restock products by barcode.
 export default function ScanPage() {
   return (
     <Suspense fallback={<Loading />}>

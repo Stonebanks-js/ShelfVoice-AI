@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
-// F-04 review gate: Check and confirm (O-4) and voice setup (O-3) against the
+// Check and confirm and voice setup against the
 // local database. The Meta step is replaced with a proposal written straight
 // to the database, so journeys never spend AI credit.
 
@@ -36,7 +36,7 @@ test("edit, remove, confirm and undo a voice proposal", async ({ page }) => {
   await expect(page.getByText("What we heard")).toBeVisible();
   // Screens with their own bottom actions hide the tab bar.
   await expect(page.getByRole("navigation", { name: "Main sections" })).toBeHidden();
-  // Doc 06: the unclear item is marked and not pre-selected.
+  // The unclear item is marked and not pre-selected.
   await expect(page.getByRole("checkbox", { name: /Add Tata Salt Lite/ })).toHaveAttribute("aria-checked", "false");
   await expect(page.getByText("Please check")).toBeVisible();
   await expect(page.getByRole("button", { name: "Confirm 3 changes" })).toBeVisible();

@@ -10,7 +10,7 @@ async function productId(ctx: RouteContext<"/api/v1/me/wishlist/[productId]">) {
   return value;
 }
 
-// Save a product to the wishlist, or take it off (V-05).
+// Save a product to the wishlist, or take it off.
 export const PUT = route(async (_request, ctx: RouteContext<"/api/v1/me/wishlist/[productId]">) => {
   await setWishlisted(await requireOwner(), await productId(ctx), true);
   return new Response(null, { status: 204 });

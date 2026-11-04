@@ -7,7 +7,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
-      // Model and user text is always rendered as plain text (doc 03, TH-06).
+      // Model and user text is always rendered as plain text.
       "react/no-danger": "error",
     },
   },
@@ -18,7 +18,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // MapLibre's worker, copied from node_modules at build time (V-09).
+    // MapLibre's worker, copied from node_modules at build time.
     "public/vendor/**",
   ]),
 ]);

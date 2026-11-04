@@ -1,8 +1,8 @@
-# Doc 08 release path (W-03): every green CI run on main is migrated and
+# Every green CI run on main is migrated and
 # deployed here, and only here (Vercel's own deploys from main are off in
-# vercel.json). One Supabase project serves the live app (E-28), so there is
+# vercel.json). One Supabase project serves the live app, so there is
 # one migrate step. From the freeze, the "production" environment needs the
-# owner's approval for each run (E-07).
+# owner's approval for each run.
 name: release
 
 on:
@@ -43,7 +43,7 @@ jobs:
           ref: ${{ env.SHA }}
       - uses: ./.github/actions/setup
 
-      # Migrations first: new code may read new columns (doc 07 migration order).
+      # Migrations first: new code may read new columns.
       - name: Apply database migrations
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
           echo "RELEASE=${SHA::7}" >> "$GITHUB_ENV"
           npx --yes "$VERCEL_CLI" deploy --prod --yes --token="$VERCEL_TOKEN"             --build-env RELEASE="${SHA::7}" --env RELEASE="${SHA::7}"
 
-      # Doc 04 release verification: the new release answers, the database is
+      # The new release answers, the database is
       # reachable, and the pages owners and customers open first load.
       - name: Smoke test
         run: |

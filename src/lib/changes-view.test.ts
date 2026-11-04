@@ -7,7 +7,7 @@ import { describeChange, formatPhone, formatRupees, needsCheck, type CatalogEntr
 const MAGGI = "11111111-1111-4111-8111-111111111111";
 const catalog: CatalogEntry[] = [{ id: MAGGI, name: "Maggi", price_paise: 1400 }];
 
-describe("change sentences (doc 06 O-4)", () => {
+describe("change sentences", () => {
   it.each<[Change, string, string]>([
     [{ op: "update_price", product_id: MAGGI, price_paise: 1500 }, "Maggi: price ₹14 → ₹15", "Maggi: दाम ₹14 → ₹15"],
     [{ op: "set_in_stock", product_id: MAGGI, in_stock: false }, "Maggi: out of stock", "Maggi: स्टॉक ख़त्म"],

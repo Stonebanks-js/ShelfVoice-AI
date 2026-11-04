@@ -9,7 +9,7 @@ import { ownerClient } from "@/server/supabase";
 import Loading from "../../loading";
 import { CheckScreen } from "./check-screen";
 
-// O-4 Check and confirm (doc 06): every voice or photo action lands here
+// Every voice or photo action lands here
 // before anything is saved.
 export default function CheckPage({ params }: PageProps<"/app/check/[id]">) {
   return (

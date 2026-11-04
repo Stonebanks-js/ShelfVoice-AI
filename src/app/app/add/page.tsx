@@ -6,7 +6,7 @@ import { ownerState } from "@/server/session";
 import Loading from "../loading";
 import { AddHub } from "./add-hub";
 
-// Add products (V-01): ready-made list, shelf photo, barcodes, bill, sheet, voice.
+// Add products: ready-made list, shelf photo, barcodes, bill, sheet, voice.
 export default function AddPage() {
   return (
     <Suspense fallback={<Loading />}>

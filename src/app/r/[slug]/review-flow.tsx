@@ -15,7 +15,7 @@ import { useTurnstile } from "@/lib/turnstile";
 
 type Step = "consent" | "record" | "sending" | "done" | "failed";
 
-const LIMIT_SECONDS = 15; // doc 06: reviews stop by themselves at 15 seconds
+const LIMIT_SECONDS = 15; // Reviews stop by themselves at 15 seconds
 
 export function ReviewFlow({ slug, shopName, siteKey }: { slug: string; shopName: string; siteKey: string }) {
   const { lang, t } = useLang();
@@ -67,7 +67,7 @@ export function ReviewFlow({ slug, shopName, siteKey }: { slug: string; shopName
     },
   });
 
-  // Consent is the tap that starts recording (doc 03 P3).
+  // Consent is the tap that starts recording.
   function agree() {
     setStep("record");
     void recorder.start();

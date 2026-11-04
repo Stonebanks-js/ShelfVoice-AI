@@ -12,8 +12,8 @@ import { cn } from "@/lib/cn";
 
 type Icon = ComponentType<{ className?: string; strokeWidth?: number; "aria-hidden"?: boolean }>;
 
-// My shop holds the products and their stock, and adding more (V-02, E-36).
-// The same four places are the desktop sidebar (E-37).
+// My shop holds the products and their stock, and adding more.
+// The same four places are the desktop sidebar.
 export const TABS: Array<{ href: string; label: MessageKey; icon: Icon; also?: string[] }> = [
   { href: "/app", label: "tab.home", icon: House },
   { href: "/app/shop", label: "tab.shop", icon: Store, also: ["/app/stock", "/app/add", "/app/restock"] },
@@ -24,11 +24,11 @@ export const TABS: Array<{ href: string; label: MessageKey; icon: Icon; also?: s
 export const isTabActive = (current: string, href: string, also: string[] = []) =>
   href === "/app" ? current === "/app" : [href, ...also].some((prefix) => current.startsWith(prefix));
 
-// Doc 06 U3, in the iOS 26 shape (E-35): four tabs on a floating frosted
+// In the iOS 26 shape: four tabs on a floating frosted
 // capsule inset from the screen edges, with the Bolo button beside it in the
 // thumb zone. The selected tab is ink with a heavier icon, never colour
 // alone. `preview` renders it in place for the style guide.
-// From 1024 px the same nav is a sidebar (E-37): the product and the shop at
+// From 1024 px the same nav is a sidebar: the product and the shop at
 // the top, the four places, quick links, and the Bolo button at the foot. One
 // nav and one mic at every width, so the landmark never moves.
 export function TabBar({
@@ -90,7 +90,7 @@ export function TabBar({
                 )}
               >
                 <TabIcon aria-hidden className={cn("size-6 shrink-0", side && "lg:size-5", on && side && "lg:text-accent-fill")} strokeWidth={on ? 2.4 : 1.75} />
-                {/* Regional scripts run wider (V-06): a phone tab bar's 12 px, and a
+                {/* Regional scripts run wider: a phone tab bar's 12 px, and a
                     second line between words ("ನನ್ನ ಅಂಗಡಿ") rather than cut off. */}
                 <span className={cn("line-clamp-2 max-w-full text-center", side && "lg:text-left", isRegional(lang) && "text-xs lg:text-body")}>
                   {t(label)}

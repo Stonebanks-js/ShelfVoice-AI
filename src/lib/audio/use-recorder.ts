@@ -15,7 +15,7 @@ export interface Recording {
 
 const MIN_MS = 500; // shorter than this is a mis-tap, not speech
 
-// Doc 06 haptics: short buzz on start and done, double buzz on failure.
+// Short buzz on start and done, double buzz on failure.
 export const buzz = (pattern: number | number[]) => {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(pattern);
 };
@@ -27,7 +27,7 @@ function errorFor(error: unknown): RecorderError {
   return "mic.error.failed";
 }
 
-// Tap to start, tap to stop (doc 06). Records the microphone through Web
+// Tap to start, tap to stop. Records the microphone through Web
 // Audio, stops by itself at `maxSeconds`, and hands back a 16 kHz mono WAV.
 export function useRecorder({ maxSeconds, onRecorded }: { maxSeconds: number; onRecorded: (recording: Recording) => void }) {
   const [recording, setRecording] = useState(false);
@@ -148,7 +148,7 @@ export function useRecorder({ maxSeconds, onRecorded }: { maxSeconds: number; on
       timer: window.setInterval(() => {
         const ms = performance.now() - startedAt;
         setElapsedMs(ms);
-        // Doc 06: stops by itself at the limit; only ever this recording.
+        // Stops by itself at the limit; only ever this recording.
         if (ms >= maxSeconds * 1000 && session.current?.startedAt === startedAt) stop();
       }, 100),
     };

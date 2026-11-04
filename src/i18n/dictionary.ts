@@ -1,5 +1,5 @@
-// Interface text (doc 06 U2). English and Hindi are written here and ship
-// with every page; the nine regional languages (V-06, E-36) live in
+// Interface text. English and Hindi are written here and ship
+// with every page; the nine regional languages live in
 // ./locales, translated by Muse Spark and checked by native speakers, and
 // load only for people who choose them. Plain everyday words, never system
 // terms like "proposal" or "SKU".
@@ -1507,14 +1507,14 @@ export function translate(lang: Lang, key: MessageKey, vars?: Record<string, str
   return vars ? text.replace(/\{(\w+)\}/g, (match, name: string) => String(vars[name] ?? match)) : text;
 }
 
-// Doc 06 U2: follow the phone's first language when the app has it.
+// Follow the phone's first language when the app has it.
 export function langFromAcceptLanguage(header: string | null | undefined): Lang {
   const first = header?.split(",")[0]?.trim().toLowerCase().split("-")[0] ?? "";
   return isLang(first) ? first : "en";
 }
 
 // The state a visitor seems to be in (Vercel's IP region: ISO 3166-2 codes)
-// and its language, for "You seem to be in Karnataka" (V-06). Hindi-speaking
+// and its language, for "You seem to be in Karnataka". Hindi-speaking
 // states suggest Hindi.
 const REGION_LANG: Record<string, [state: string, lang: Lang]> = {
   KA: ["Karnataka", "kn"],

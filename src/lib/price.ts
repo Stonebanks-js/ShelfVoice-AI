@@ -1,4 +1,4 @@
-// The discount a customer sees (V-11): only from the shop's own price and
+// The discount a customer sees: only from the shop's own price and
 // the MRP the owner entered, worked out here and never by the AI. Whole
 // percent, rounded down so it never overstates; nothing when either is
 // missing or the price isn't below the MRP.

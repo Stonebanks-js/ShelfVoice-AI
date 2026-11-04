@@ -11,7 +11,7 @@ interface VoiceResult {
 
 const extrasKey = (id: string) => `sv_proposal_${id}`;
 
-// Turns an uploaded clip into a proposal (doc 02 voice pipeline). The
+// Turns an uploaded clip into a proposal. The
 // clarifying question and left-out items aren't stored with the proposal,
 // so they ride along to the Check and confirm screen in this tab's storage.
 export async function submitVoice(path: string, kind: "SETUP" | "COMMAND"): Promise<string> {
@@ -41,7 +41,7 @@ export function parseExtras(raw: string | null): { question: string | null; reje
   return { question: null, rejected: [] };
 }
 
-// What the voice pipeline's failures mean for the owner (doc 05: the
+// What the voice pipeline's failures mean for the owner (the
 // recording is saved, so "try again" reuses it).
 export function voiceErrorKey(error: unknown): MessageKey {
   if (error instanceof ApiFailure) {

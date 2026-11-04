@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { blockingViolations, darkMode, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-05 review gate: Home (O-5, reshaped by V-02) with the sample shop's real
+// Home with the sample shop's real
 // numbers, both languages, both themes, and a new shop with nothing in it yet.
 
 test.skip(!localSupabase, "needs the local Supabase stack");

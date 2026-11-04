@@ -11,9 +11,9 @@ import { ownerClient } from "@/server/supabase";
 import Loading from "../loading";
 import { ShopScreen } from "./shop-screen";
 
-// O-9 My shop (doc 06): storefront preview, products and stock (V-02),
+// Storefront preview, products and stock,
 // publish switch, review QR, share link, details and hours, language, sign
-// out and delete. Its own tab since V-02.
+// out and delete.
 export default function ShopPage() {
   return (
     <Suspense fallback={<Loading />}>

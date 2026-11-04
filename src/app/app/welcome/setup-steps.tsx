@@ -28,7 +28,7 @@ const STEPS = 4;
 
 type Where = { lat: number; lng: number } | null;
 
-// O-2 setup (doc 06, changed by E-36): four quick questions, one per screen,
+// Four quick questions, one per screen,
 // like the sign-up of a calorie-tracking app: language first so the rest
 // reads in it, then the shop's name, its kind and where it is. Then the
 // owner adds products.
@@ -148,7 +148,7 @@ export function SetupSteps({ initial, suggestion }: { initial: Lang; suggestion:
         {step === 0 && (
           <>
             <Heading title={t("welcome.title")} body={t("welcome.body")} />
-            {/* V-06: the state's language first, from where the phone seems to be. */}
+            {/* The state's language first, from where the phone seems to be. */}
             {suggestion && (
               <p className="flex items-start gap-2 rounded-md bg-fill px-4 py-3 text-footnote text-ink">
                 <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />

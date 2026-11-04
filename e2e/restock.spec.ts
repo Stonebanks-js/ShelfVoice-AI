@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-07 review gate: the restock list (O-7, under My shop since V-04) against
+// The restock list (under My shop) against
 // the local database. AI
 // wording runs in recorded mode here, so every reason is the template
 // sentence, which quotes the same numbers.

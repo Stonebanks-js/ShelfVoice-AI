@@ -12,8 +12,8 @@ const istDay = (t: Date | string) => Math.floor((new Date(t).getTime() + IST_OFF
 const istDate = (day: number) => new Date(day * DAY_MS).toISOString().slice(0, 10);
 
 // Recomputes forecasts for a shop, or just some of its products, and stores
-// them in product_forecasts (doc 02: after each logged sale, and nightly).
-// Runs with the service role because owners only read forecasts (E-29).
+// them in product_forecasts (after each logged sale, and nightly).
+// Runs with the service role because owners only read forecasts.
 export async function refreshForecasts(shopId: string, productIds?: string[], now = new Date()): Promise<number> {
   const db = adminClient();
   const today = istDay(now);
@@ -76,7 +76,7 @@ export async function refreshForecasts(shopId: string, productIds?: string[], no
       if (m.kind === "SALE" && i < dailySales.length) dailySales[i] += m.qty;
     }
 
-    // Doc 02: the biggest bump of any festival within 7 days that covers
+    // The biggest bump of any festival within 7 days that covers
     // this product's category (or every category). Categories are free
     // text, so they're compared without case.
     const category = product.category?.trim().toLowerCase() ?? null;

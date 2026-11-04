@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { buttonClass } from "@/components/ui/button";
 
-// Doc 06 P-1: an unknown or unpublished shop gets a plain 404 in both
+// An unknown or unpublished shop gets a plain 404 in both
 // languages, since there is no shop to take a language from.
 export default function StorefrontNotFound() {
   return (

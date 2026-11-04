@@ -1,4 +1,4 @@
--- Sample shops (V-10, owner decision Nov 3): two orderable kirana shops in
+-- Sample shops: two orderable kirana shops in
 -- each of 85 neighbourhoods across India, with real pincodes,
 -- approximate positions and products from the ready-made lists at typical
 -- MRPs. No photos and no phone numbers (a made-up number could ring a real
@@ -8,7 +8,7 @@
 -- Generated; safe to run twice.
 
 alter table public.shops add column if not exists is_sample boolean not null default false;
-comment on column public.shops.is_sample is 'Sample shop seeded for testing and demos (V-10); not shown as such to customers.';
+comment on column public.shops.is_sample is 'Sample shop seeded for testing and demos; not shown as such to customers.';
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values

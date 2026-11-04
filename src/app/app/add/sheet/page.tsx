@@ -8,7 +8,7 @@ import { ownerClient } from "@/server/supabase";
 import Loading from "../../loading";
 import { SheetImport } from "./sheet-import";
 
-// V-01 products from an Excel or CSV file.
+// Products from an Excel or CSV file.
 export default function SheetPage() {
   return (
     <Suspense fallback={<Loading />}>

@@ -1,7 +1,6 @@
 import type { Lang } from "@/i18n/dictionary";
 
-// The privacy page's words (F-14; doc 03 data inventory, errata E-08, E-12,
-// E-28). Each "how long" must match the cleanup job and the delete-shop
+// The privacy page's words. Each "how long" must match the cleanup job and the delete-shop
 // function; change them together.
 
 export const ISSUES_URL = "https://github.com/Stonebanks-js/ShelfVoice-AI/issues";
@@ -173,5 +172,5 @@ const hi: PrivacyContent = {
 };
 
 // English and Hindi, as written and reviewed; other languages show English
-// until a translation is checked (V-06): a policy must not be guessed at.
+// until a translation is checked: a policy must not be guessed at.
 export const PRIVACY: Partial<Record<Lang, PrivacyContent>> & { en: PrivacyContent } = { en, hi };

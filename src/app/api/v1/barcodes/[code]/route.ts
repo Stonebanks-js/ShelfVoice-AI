@@ -4,7 +4,7 @@ import { ApiError, route } from "@/server/http";
 import { requireShop } from "@/server/owner";
 
 // A scanned barcode: the shop's own product, or a suggested name for a new
-// one from Open Food Facts (V-01). Unknown codes return no suggestion; the
+// one from Open Food Facts. Unknown codes return no suggestion; the
 // owner names the product and the shop remembers its code.
 export const GET = route(async (_request, ctx: RouteContext<"/api/v1/barcodes/[code]">, { requestId }) => {
   const { code } = await ctx.params;

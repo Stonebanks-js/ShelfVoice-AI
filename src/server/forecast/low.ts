@@ -1,4 +1,4 @@
-// Which products belong on the order list (doc 01 FR-07): at or below the
+// Which products belong on the order list: at or below the
 // reorder point with something to order, or, during cold start (no reorder
 // point yet), at or below the owner's own low-stock level. Shared by the
 // Orders tab and the Today summary so both always agree.

@@ -33,7 +33,7 @@ export const ProductInput = z
   .strict();
 export type ProductInput = z.infer<typeof ProductInput>;
 
-// A whole ready-made list or spreadsheet at once (V-01).
+// A whole ready-made list or spreadsheet at once.
 export const MAX_BULK = 500;
 
 const inStock = (qty: number | null | undefined) => qty === undefined || qty === null || qty > 0;

@@ -1,4 +1,4 @@
-// Makes a VAPID key pair for web push (V-04) and writes it to a file, so the
+// Makes a VAPID key pair for web push and writes it to a file, so the
 // private key is never printed. Usage: node scripts/vapid-keys.mjs <out-file>
 import { generateKeyPairSync } from "node:crypto";
 import { writeFileSync } from "node:fs";

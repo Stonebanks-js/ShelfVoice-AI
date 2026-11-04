@@ -39,7 +39,7 @@ import { CurrentOrders } from "@/components/shell/current-orders";
 const serverCart = () => "{}";
 
 
-// The signed-in customer's account, or null when signed out (V-05). The shop
+// The signed-in customer's account, or null when signed out. The shop
 // page itself is cached for everyone, so this is read in the browser.
 function useAccount() {
   const [account, setAccount] = useState<Account | null | undefined>(undefined);
@@ -101,7 +101,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
   const productName = useProductName();
   const other = t("stock.other");
   const categories = [...new Set(shop.products.map((p) => p.category ?? other))].sort();
-  // Search by name or category, as in the quick-commerce apps (V-10).
+  // Search by name or category, as in the quick-commerce apps.
   const q = query.trim().toLowerCase();
   const shown = shop.products.filter(
     (p) => (category === null || (p.category ?? other) === category) && (!q || `${p.name} ${productName(p.name)} ${p.category ?? ""}`.toLowerCase().includes(q)),
@@ -115,12 +115,12 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
 
   const setQty = (id: string, qty: number) => setCart(shop.slug, { ...cart, [id]: qty });
 
-  // Doc 06: WhatsApp still works, now with quantities: the cart as a message.
+  // WhatsApp still works, now with quantities: the cart as a message.
   const message = [t("store.waHello", { shop: shop.name }), ...lines.map((l) => `• ${l.product.name}${l.product.unit ? ` (${l.product.unit})` : ""} × ${l.qty}`)].join("\n");
   const whatsapp = phoneDigits ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}` : null;
 
   return (
-    // E-37: the signboard as a card, then the shelf as a grid of product
+    // The signboard as a card, then the shelf as a grid of product
     // cards (two across on a phone, up to five on a desktop), as in the big
     // quick-commerce apps.
     <main className={cn("mx-auto flex min-h-dvh w-full max-w-2xl flex-col md:max-w-4xl lg:max-w-6xl lg:px-4", count > 0 && "pb-24")}>
@@ -192,7 +192,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
         <p className="mx-4 rounded-lg bg-surface p-6 text-center text-body text-ink-2 shadow-card">{t("store.empty")}</p>
       ) : (
         <section aria-label={t("store.products")} className="flex flex-col gap-3">
-          {/* Doc 06: search and the category chips stay at the top while scrolling. */}
+          {/* Search and the category chips stay at the top while scrolling. */}
           <div className="sticky top-0 z-10 -mb-1 flex flex-col gap-2 bg-chrome pt-3 pb-2 backdrop-blur-xl lg:rounded-b-lg">
             <div className="px-4">
               <SearchField label={t("search.placeholder")} clearLabel={t("search.clear")} value={query} onValueChange={setQuery} />
@@ -238,7 +238,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
           </span>
           <ChevronRight aria-hidden className="size-5 text-ink-3" />
         </Link>
-        {/* Open Food Facts photos are CC BY-SA: credited wherever they show (V-11). */}
+        {/* Open Food Facts photos are CC BY-SA: credited wherever they show. */}
         {shop.products.some((p) => p.photo?.credit === OFF_CREDIT) && (
           <p className="text-center text-footnote text-ink-2">
             <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
@@ -246,7 +246,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
             </a>
           </p>
         )}
-        {/* Drawn images say so (V-12). */}
+        {/* Drawn images say so. */}
         {shop.products.some((p) => p.photo?.credit === GENERATED_CREDIT) && <p className="text-center text-footnote text-ink-2">{t("store.drawnCredit")}</p>}
         <p className="flex items-center justify-center gap-2 text-footnote text-ink-2">
           <Link href="/" className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:underline">
@@ -298,7 +298,7 @@ export function StorefrontView({ shop, siteKey }: { shop: Storefront; siteKey: s
 }
 
 // One product as a card, with ADD and then the stepper, as on Instamart
-// (E-37: its face on top, the heart on the picture, the price in the display
+// (its face on top, the heart on the picture, the price in the display
 // face). Out-of-stock items cannot be added; prices only if the owner set
 // them; never a stock count.
 function ProductCard({
@@ -394,7 +394,7 @@ function HeartButton({ on, label, onClick, small = false, disabled = false }: { 
 
 type Line = { product: StorefrontProduct; qty: number };
 
-// Checkout (V-04, V-05): the cart, pickup or delivery, name and number, then
+// Checkout: the cart, pickup or delivery, name and number, then
 // Place order. A signed-in customer's details and saved addresses fill in;
 // the shop's delivery rules apply (minimum, charge, distance). No payment
 // here: the customer pays the shop, in cash or by UPI.

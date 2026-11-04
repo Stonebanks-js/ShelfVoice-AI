@@ -6,7 +6,7 @@ import { cache } from "react";
 
 import { isLang, type Lang, langFromAcceptLanguage, langFromRegion, translate } from "@/i18n/dictionary";
 
-import "@/i18n/server"; // regional text for server-rendered pages (V-06)
+import "@/i18n/server"; // regional text for server-rendered pages
 
 import { ownerClient } from "./supabase";
 
@@ -41,7 +41,7 @@ export const ownerState = cache(async (): Promise<OwnerState | null> => {
   };
 });
 
-// "You seem to be in Karnataka" (V-06): the language of the state the
+// "You seem to be in Karnataka": the language of the state the
 // visitor's internet address is in (Vercel sets these headers), unless they
 // already chose one, or it's the one they have.
 export async function languageSuggestion(current: Lang): Promise<{ state: string; lang: Lang; question: string } | null> {
@@ -54,13 +54,13 @@ export async function languageSuggestion(current: Lang): Promise<{ state: string
 
 // A customer's pages (shop, review, order) are in the language they chose,
 // else the shop's own: testers who picked Hindi got Bengaluru shops in
-// Kannada with no way back (V-10).
+// Kannada with no way back.
 export async function customerLang(shopLang: Lang): Promise<Lang> {
   const chosen = (await cookies()).get("sv_lang")?.value;
   return isLang(chosen) ? chosen : shopLang;
 }
 
-// Doc 06 U2: the owner's saved choice, else the cookie set by the language
+// The owner's saved choice, else the cookie set by the language
 // switch, else the phone's language.
 export async function requestLang(state?: OwnerState | null): Promise<Lang> {
   if (state?.shop) return state.shop.language;

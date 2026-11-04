@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { Candidate } from "./match";
 
-// Open Food Facts, read for product photos (V-11): the documented search
+// Open Food Facts, read for product photos: the documented search
 // (cgi/search.pl) and product (api/v2/product) endpoints, free with no key.
 // Photos are CC BY-SA: whoever shows one credits "Open Food Facts
 // contributors". Responses are checked before use, and a photo address is

@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner } from "./support";
 
-// V-01 review gate: adding many products without speaking each one: the
+// Adding many products without speaking each one: the
 // ready-made list, an Excel or CSV file, barcodes typed in (Open Food Facts
 // is off in tests, so every code is new), and a shelf photo whose reader is
 // replaced with a proposal written to the database (no AI credit spent).

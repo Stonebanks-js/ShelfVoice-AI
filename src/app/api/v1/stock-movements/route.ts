@@ -13,13 +13,13 @@ const Body = z
     kind: z.enum(["SALE", "DELIVERY", "CORRECTION"]),
     qty: z.number().int().min(-10_000).max(10_000).refine((n) => n !== 0, "qty can't be 0"),
     unit_price_paise: z.number().int().positive().max(10_000_000).nullable().optional(),
-    // Client UUID per tap, so a double tap logs once (doc 07 idempotency).
+    // Client UUID per tap, so a double tap logs once.
     idempotency_key: z.uuid(),
   })
   .strict()
   .refine((b) => b.kind === "CORRECTION" || b.qty > 0, { message: "Sales and deliveries are positive", path: ["qty"] });
 
-// Tap-to-log a sale, delivery or count correction (doc 02, FR-06). The stock
+// Tap-to-log a sale, delivery or count correction. The stock
 // trigger refuses anything that would take stock below zero.
 export const POST = route(async (request, _ctx, { requestId }) => {
   const { db, shop } = await requireShop();

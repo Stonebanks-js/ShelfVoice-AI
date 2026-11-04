@@ -2,7 +2,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// V-05 review gate: customer accounts (details, saved addresses, wishlist,
+// Customer accounts (details, saved addresses, wishlist,
 // favourite shops, past orders, Order again, refunds) and the owner's
 // settings (UPI ID, delivery charge, refunds, QR poster, help).
 

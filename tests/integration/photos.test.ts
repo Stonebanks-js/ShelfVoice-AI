@@ -1,4 +1,4 @@
-// Product photos (V-11) against the local database and Storage. Open Food
+// Product photos against the local database and Storage. Open Food
 // Facts and its image host are stubs: tests never reach the internet.
 // Needs `supabase start`.
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";

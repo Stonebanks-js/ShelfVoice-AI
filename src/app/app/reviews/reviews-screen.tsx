@@ -61,7 +61,7 @@ export function ReviewsScreen({
     }
   }
 
-  // Doc 03: owners can hide a review from the shop page, never edit it.
+  // Owners can hide a review from the shop page, never edit it.
   async function setHidden(review: FeedReview, hidden: boolean) {
     setReviews((list) => list.map((r) => (r.id === review.id ? { ...r, is_hidden: hidden } : r)));
     try {
@@ -139,7 +139,7 @@ function ago(iso: string, lang: Lang): string {
   return Math.abs(hours) < 24 ? when.format(hours, "hour") : when.format(Math.round(hours / 24), "day");
 }
 
-// Doc 06 ReviewCard: sentiment icon and word, transcript, item chips, play
+// Sentiment icon and word, transcript, item chips, play
 // button (hidden after 30 days), hide.
 function ReviewCard({
   review,

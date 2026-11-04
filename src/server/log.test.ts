@@ -21,7 +21,7 @@ afterEach(() => {
 
 const calls = () => fetchMock.mock.calls as unknown as Array<[string, RequestInit]>;
 
-describe("Axiom shipping (doc 05 O1)", () => {
+describe("Axiom shipping", () => {
   it("sends nothing without a token", async () => {
     log("info", "test.event");
     await flushLogs();
@@ -52,7 +52,7 @@ describe("Axiom shipping (doc 05 O1)", () => {
   });
 });
 
-describe("Discord alerts (doc 05 O4)", () => {
+describe("Discord alerts", () => {
   beforeEach(() => vi.stubEnv("DISCORD_ALERT_WEBHOOK_URL", "https://discord.example/hook"));
 
   it("posts error events once per 10 minutes, redacted, with no pings", async () => {

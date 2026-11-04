@@ -3,10 +3,10 @@ import type { NextConfig } from "next";
 import { parseClientEnv } from "./src/env/schema";
 
 // On Vercel the browser's variables are checked before anything is built, so
-// a key in the wrong variable stops the deploy instead of shipping (V-10).
+// a key in the wrong variable stops the deploy instead of shipping.
 if (process.env.VERCEL_ENV) parseClientEnv();
 
-// Security headers on every response (doc 03, W-03c; errata E-33). Partial
+// Security headers on every response. Partial
 // prerendering can't carry per-request nonces, so scripts are limited to our
 // own origin (inline allowed, for Next's bootstrap) and Turnstile; network,
 // images and audio only to Supabase; nothing may frame the app or load
@@ -15,9 +15,9 @@ const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const deployed = supabase.startsWith("https://");
 const dev = process.env.NODE_ENV === "development";
 const turnstile = "https://challenges.cloudflare.com";
-// Map tiles, fonts and icons for Shops near you (V-09), OpenStreetMap data.
+// Map tiles, fonts and icons for Shops near you, OpenStreetMap data.
 const mapTiles = "https://tiles.openfreemap.org";
-// Product photos an owner chooses from (V-11): Open Food Facts' image host only.
+// Product photos an owner chooses from: Open Food Facts' image host only.
 const productPhotos = "https://images.openfoodfacts.org";
 
 const csp = [
@@ -44,7 +44,7 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // The owner app needs the mic and camera; shop setup and the shop finder
-  // ask for the location (V-03); nothing needs anything else.
+  // ask for the location; nothing needs anything else.
   { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), browsing-topics=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
@@ -55,10 +55,10 @@ const nextConfig: NextConfig = {
   experimental: {
     // Vercel restores .next/cache between releases, and a warm Turbopack
     // build served a stale globals.css: a release shipped new components with
-    // the previous colour tokens (E-35, Nov 1). Release builds compile fresh.
+    // the previous colour tokens. Release builds compile fresh.
     turbopackFileSystemCacheForBuild: false,
   },
-  // Browser error reports carry the deploy they came from (doc 05).
+  // Browser error reports carry the deploy they came from.
   env: { NEXT_PUBLIC_RELEASE: process.env.RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev" },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

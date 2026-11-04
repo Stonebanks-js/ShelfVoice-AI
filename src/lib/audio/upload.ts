@@ -9,9 +9,9 @@ interface SignedUpload {
 
 export type UploadKind = "voice" | "bill" | "shelf";
 
-// Sends a file straight to Storage through a signed URL (doc 02: files skip
+// Sends a file straight to Storage through a signed URL (files skip
 // our server). The client picks the ID, so a retry overwrites the same
-// object instead of making a second one (doc 07).
+// object instead of making a second one.
 export async function uploadFile(
   kind: UploadKind,
   bytes: Uint8Array<ArrayBuffer>,

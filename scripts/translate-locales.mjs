@@ -1,5 +1,5 @@
 // Translates the app's screens into the regional languages with Muse Spark
-// (V-06, E-36: Meta models only), then writes src/i18n/locales/<lang>.ts and
+//, then writes src/i18n/locales/<lang>.ts and
 // a review sheet, i18n-review/<lang>.csv, for a native speaker to check.
 //
 // Usage: node --experimental-strip-types scripts/translate-locales.mjs [kn ta ...]

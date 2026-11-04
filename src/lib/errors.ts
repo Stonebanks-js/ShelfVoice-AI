@@ -3,7 +3,7 @@ import type { MessageKey } from "@/i18n/dictionary";
 import { ApiFailure } from "./api";
 
 // Server error codes to words the owner understands, in their language
-// (doc 06: never show raw errors). Screens add their own codes on top.
+// (never show raw errors). Screens add their own codes on top.
 export function errorKey(error: unknown): MessageKey {
   if (!(error instanceof ApiFailure)) return "error.generic";
   if (error.code === "OFFLINE") return "error.offline";

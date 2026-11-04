@@ -6,7 +6,7 @@ import { requireShop } from "@/server/owner";
 
 const Body = z.object({ status: z.enum(["AVAILABLE", "UNAVAILABLE"]) }).strict();
 
-// One item of a customer order: the shop has it, or not (V-04).
+// One item of a customer order: the shop has it, or not.
 export const PATCH = route(async (request, ctx: RouteContext<"/api/v1/orders/[id]/items/[itemId]">, { requestId }) => {
   const { id, itemId } = await ctx.params;
   const owner = await requireShop();

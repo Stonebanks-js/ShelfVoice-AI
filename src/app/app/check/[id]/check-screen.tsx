@@ -40,7 +40,7 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
   const { lang, t } = useLang();
   const router = useRouter();
   const toast = useToast();
-  // Doc 06: anything unclear starts unselected, so it's never saved by accident.
+  // Anything unclear starts unselected, so it's never saved by accident.
   const [items, setItems] = useState<Item[]>(() =>
     proposal.changes.map((change, key) => ({ key, change, selected: !needsCheck(change) })),
   );
@@ -59,7 +59,7 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
   // Prices as typed on new-product cards, so "14." survives until it's a number.
   const [priceText, setPriceText] = useState<Record<number, string>>({});
 
-  // A price or count set on the card itself counts as checked (doc 06), so
+  // A price or count set on the card itself counts as checked, so
   // the card is included.
   const setNew = (key: number, patch: { price_paise?: number | null; stock_qty?: number | null }) =>
     setItems((list) => list.map((i) => (i.key === key && i.change.op === "add_product" ? { ...i, change: { ...i.change, ...patch }, selected: true } : i)));
@@ -83,7 +83,7 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
     setError(null);
     try {
       await api(`/api/v1/proposals/${proposal.id}/confirm`, { json: { changes: selected.map((i) => i.change) } });
-      // Doc 06: "5 changes saved" with Undo for 10 seconds.
+      // "5 changes saved" with Undo for 10 seconds.
       toast.show({ message: t("toast.saved", { n: selected.length }), action: { label: t("action.undo"), onAction: () => void undo() } });
       router.replace("/app");
       router.refresh();
@@ -244,7 +244,7 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
         </section>
       )}
 
-      {/* Doc 06: the confirm action sits in the thumb zone. */}
+      {/* The confirm action sits in the thumb zone. */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-separator bg-chrome backdrop-blur-xl">
         <div className="mx-auto flex max-w-2xl flex-col gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {error && (
@@ -286,7 +286,7 @@ export function CheckScreen({ proposal, catalog }: { proposal: Proposal; catalog
 
 const rupees = paiseText;
 
-// A new product's price and stock, set right on its card (V-01): shelf and
+// A new product's price and stock, set right on its card: shelf and
 // bill photos list many products, too many to open one by one.
 function NewProductFields({
   change,

@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
-// F-03b review gate (doc 04 "Upload interrupted"; doc 06 offline state): a
+// A
 // voice note recorded without a connection waits on the phone with a clock,
 // and is sent by itself when the connection comes back. The AI step is
 // mocked, so no Meta credit is spent.

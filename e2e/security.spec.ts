@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { localSupabase, signInToSampleShop } from "./support";
 
-// F-13 review gate: security headers on every page, no Content Security
+// Security headers on every page, no Content Security
 // Policy violations across the main screens, and browser errors reaching
 // the server (and so Axiom) without user text.
 

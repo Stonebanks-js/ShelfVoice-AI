@@ -8,7 +8,7 @@ import { ApiError } from "./http";
 import { log } from "./log";
 import { adminClient } from "./supabase";
 
-// Client IP, hashed with a salt that rotates daily (doc 03 data inventory):
+// Client IP, hashed with a salt that rotates daily:
 // enough to rate-limit, never stored raw.
 export function ipHash(request: Request): string {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
@@ -16,14 +16,14 @@ export function ipHash(request: Request): string {
   return createHash("sha256").update(`${env.CRON_SECRET ?? "local-salt"}:${day}:${ip}`).digest("hex").slice(0, 32);
 }
 
-// Fixed-window limit (decision P4). Throws 429 once the window is full.
+// Fixed-window limit. Throws 429 once the window is full.
 export async function limit(key: string, max: number, windowSeconds: number) {
   const { data, error } = await adminClient().rpc("hit_rate_limit", { p_key: key, p_window_seconds: windowSeconds });
   if (error) throw new ApiError(500, "DATABASE", "Something went wrong");
   if (data > max) throw new ApiError(429, "RATE_LIMITED", "Too many requests, please try again later");
 }
 
-// Cloudflare Turnstile server-side check (doc 03 P2, doc 07).
+// Cloudflare Turnstile server-side check.
 export async function verifyTurnstile(token: string | null | undefined, request: Request): Promise<void> {
   if (!token) throw new ApiError(403, "TURNSTILE_REQUIRED", "Please complete the check and try again");
   const body = new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: token });
@@ -33,10 +33,10 @@ export async function verifyTurnstile(token: string | null | undefined, request:
   try {
     answer = await siteverify(body);
   } catch {
-    // Doc 05: Turnstile failure rejects with a friendly retry message.
+    // Turnstile failure rejects with a friendly retry message.
   }
   if (answer.success) return;
-  // Cloudflare's reason, never the token or the secret (V-12):
+  // Cloudflare's reason, never the token or the secret:
   // "invalid-input-secret" means our setup is wrong, "invalid-input-response"
   // a bad or foreign token, "timeout-or-duplicate" a reused one.
   log("warn", "turnstile.failed", { codes: answer["error-codes"] ?? [], hostname: answer.hostname ?? null });
@@ -54,7 +54,7 @@ async function siteverify(body: URLSearchParams): Promise<Siteverify> {
   return (await res.json()) as Siteverify;
 }
 
-// Whether Cloudflare accepts our secret at all (V-12), from a check with a
+// Whether Cloudflare accepts our secret at all, from a check with a
 // token that can't be valid: a good secret gets "invalid-input-response", a
 // wrong one "invalid-input-secret". Cached 5 minutes; reveals no key.
 let secretCheck: { status: "accepted" | "rejected" | "unreachable"; at: number } | undefined;

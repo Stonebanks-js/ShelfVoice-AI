@@ -32,7 +32,7 @@ export function SkeletonList({ rows = 3, label }: { rows?: number; label: string
   );
 }
 
-// Every screen designs its empty state up front (doc 06): what's missing and
+// Every screen designs its empty state up front: what's missing and
 // the one thing to do about it.
 export function EmptyState({
   icon,

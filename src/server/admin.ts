@@ -26,7 +26,7 @@ export interface AdminToday {
   breaker: { state: Database["public"]["Enums"]["breaker_state"]; manual: boolean; failures: number; openedAt: string | null };
 }
 
-// The team's accounts (W-20b). Anonymous demo users have no email.
+// The team's accounts. Anonymous demo users have no email.
 export function isAdminEmail(email: string | null | undefined): boolean {
   return Boolean(email && env.ADMIN_EMAILS?.includes(email.trim().toLowerCase()));
 }
@@ -78,7 +78,7 @@ export async function adminToday(): Promise<AdminToday> {
   };
 }
 
-// The manual switch (W-20b): open pauses every Meta call until switched
+// The manual switch: open pauses every Meta call until switched
 // back; closing also clears any automatic open.
 export async function setBreaker(open: boolean, userId: string) {
   const { error } = await adminClient()

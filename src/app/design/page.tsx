@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// Live style guide (errata E-32): every token and component, in both themes
+// Live style guide: every token and component, in both themes
 // and both languages, checked on a phone before screens are built on them.
 export default function DesignPage() {
   return (

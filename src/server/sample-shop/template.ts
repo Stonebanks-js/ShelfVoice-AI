@@ -1,8 +1,7 @@
-// The sample shop the tests run against (it was the public demo shop until
-// E-36): 15 common kirana products and 90 days of generated sales and
+// The sample shop the tests run against: 15 common kirana products and 90 days of generated sales and
 // deliveries, so the order list has real data. A fixed seed makes every copy, and
-// every test run, identical. Final stock levels follow the Key Screens order
-// list with errata E-19 applied.
+// every test run, identical. Final stock levels give a believable
+// order list.
 export interface TemplateProduct {
   name: string;
   aliases: string[];

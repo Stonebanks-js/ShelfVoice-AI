@@ -25,7 +25,7 @@ export async function requireOwner(): Promise<Owner> {
 }
 
 // Whoever is signed in, or null: for pages and routes anyone may use, which
-// do a little more for a signed-in customer (V-05). Per request: the Supabase
+// do a little more for a signed-in customer. Per request: the Supabase
 // client reads the clock as it starts, which Next would otherwise flag while
 // prerendering a page shell (as in ownerState).
 export async function currentUser(): Promise<Owner | null> {
@@ -35,7 +35,7 @@ export async function currentUser(): Promise<Owner | null> {
   return data.user ? { db, user: data.user } : null;
 }
 
-// One owner account owns one shop (doc 01 FR-01); RLS returns only theirs.
+// One owner account owns one shop; RLS returns only theirs.
 export async function requireShop(): Promise<Owner & { shop: Shop }> {
   const owner = await requireOwner();
   const { data: shop, error } = await owner.db.from("shops").select("*").maybeSingle();

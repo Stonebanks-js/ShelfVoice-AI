@@ -1,4 +1,4 @@
-// Customer orders (V-04) against the local database: placing, the secret
+// Customer orders against the local database: placing, the secret
 // link, the owner's steps, sales logged on completion, and who can see what.
 // Needs `supabase start`.
 import { randomUUID } from "node:crypto";

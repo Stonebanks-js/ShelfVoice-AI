@@ -6,7 +6,7 @@ import { languageSuggestion, ownerState, requestLang } from "@/server/session";
 import Loading from "../loading";
 import { SetupSteps } from "./setup-steps";
 
-// O-2 setup (doc 06, E-36): language, shop name, kind and place, for a new
+// Language, shop name, kind and place, for a new
 // owner with no shop yet. The language is preselected from the phone.
 export default function WelcomePage() {
   return (
@@ -20,7 +20,7 @@ async function Welcome() {
   const state = await ownerState();
   if (!state) redirect("/");
   if (state.shop) redirect("/app");
-  // The state's language is suggested above the list (V-06); the owner picks.
+  // The state's language is suggested above the list; the owner picks.
   const lang = await requestLang(state);
   return <SetupSteps initial={lang} suggestion={await languageSuggestion(lang)} />;
 }

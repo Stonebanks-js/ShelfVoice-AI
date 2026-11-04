@@ -1,6 +1,6 @@
-// The AI jobs (doc 02 "AI layer"): prompts, strict schemas, and conversion
+// The AI jobs: prompts, strict schemas, and conversion
 // of model output into validated changes. The model proposes; code owns
-// every stored number and checks every product ID (doc 02 guardrails).
+// every stored number and checks every product ID.
 import { z } from "zod";
 
 import { Change, priceChangeAllowed, rupeesToPaise, toE164 } from "@/server/changes";
@@ -222,7 +222,7 @@ function nameMatch(product: CatalogItem, spoken: string): number {
 }
 
 // Other products the transcript names at least as specifically as the one
-// the model chose ("Maggi" with two Maggi products). Doc 01: ask, don't
+// the model chose ("Maggi" with two Maggi products). Ask, don't
 // guess. When the transcript doesn't name the chosen product in catalog
 // words at all (say, Devanagari), there's nothing to compare, so the
 // model's choice stands.
@@ -299,7 +299,7 @@ export async function interpretCommand(
     } else if (call.name === "record_sale") {
       const a = args as z.infer<typeof ToolArgs.record_sale>;
       // A price that only repeats the catalog's wasn't something the owner
-      // said (doc 04: the model never adds numbers); the sale uses it anyway.
+      // said (the model never adds numbers); the sale uses it anyway.
       const paise = a.price_rupees === null ? null : rupeesToPaise(a.price_rupees);
       result.changes.push({ op: "record_sale", product_id: product.id, qty: a.qty, unit_price_paise: paise === product.price_paise ? null : paise });
     } else if (call.name === "record_delivery") {
@@ -393,7 +393,7 @@ export async function readBill(
 }
 
 // ------------------------------------------------------------ shelf photo
-// Names the packaged products visible on a shop shelf (V-01, E-36), so an
+// Names the packaged products visible on a shop shelf, so an
 // owner can list a whole shelf at once. Muse Spark reads the photo; no
 // cut-outs, so SAM 3.1 isn't needed. Counts are left to the owner: products
 // hide behind each other, so a count from a photo would be a guess.
@@ -496,7 +496,7 @@ const ReviewOutput = z.object({
 
 export type ReviewInsight = z.infer<typeof ReviewOutput>;
 
-// No tools: a customer's words can only fill this schema (doc 03 LLM01).
+// No tools: a customer's words can only fill this schema.
 export async function analyseReview(ai: MetaClient, ctx: AiContext, transcript: string, catalog: CatalogItem[]): Promise<ReviewInsight> {
   const out = await ai.structured({ ...ctx, job: "REVIEW", promptVersion: "review@v1" }, {
     instructions: [
@@ -541,7 +541,7 @@ export function templateExplanation(i: ExplainInput): string {
 }
 
 // The model only words the sentence; it must quote the computed numbers
-// exactly (doc 04: 100% numbers match), or the template is used.
+// exactly (100% numbers match), or the template is used.
 export async function explainRestock(ai: MetaClient, ctx: AiContext, input: ExplainInput): Promise<string> {
   try {
     const out = await ai.structured({ ...ctx, job: "EXPLANATION", promptVersion: "explain@v2" }, {

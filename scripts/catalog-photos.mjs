@@ -1,4 +1,4 @@
-// Finds a packshot for each ready-made product on Open Food Facts (V-11) and
+// Finds a packshot for each ready-made product on Open Food Facts and
 // keeps it only when it is the same product in the same pack: the rules in
 // src/lib/catalog/match.ts, then a person looking at every kept photo (the
 // review sheet this writes) before src/lib/catalog/photos.ts is committed.

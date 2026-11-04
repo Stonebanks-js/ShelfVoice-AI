@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { log } from "./log";
 
-// Doc 02 contract rules: one error shape everywhere, no stack traces to
+// One error shape everywhere, no stack traces to
 // clients, Zod at every boundary.
 export class ApiError extends Error {
   constructor(
@@ -48,7 +48,7 @@ export interface Handle {
 }
 
 // Wraps a route handler: request ID, same-origin check for state-changing
-// calls (doc 03 TH-09, CSRF), error mapping and one log line per request.
+// calls (CSRF), error mapping and one log line per request.
 export function route<C>(handler: (request: Request, context: C, handle: Handle) => Promise<Response>) {
   return async (request: Request, context: C): Promise<Response> => {
     const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();

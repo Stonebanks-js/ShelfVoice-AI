@@ -1,4 +1,4 @@
--- Doc 03 TH-02 and doc 04: a table in the public schema without RLS fails CI.
+-- A table in the public schema without RLS fails CI.
 begin;
 create extension if not exists pgtap with schema extensions;
 

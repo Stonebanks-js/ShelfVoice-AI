@@ -8,7 +8,7 @@ import { HelpView } from "./help-view";
 
 export const metadata: Metadata = { title: "Help · Shelf Voice" };
 
-// Help for shop owners (V-05): short answers to what they ask most.
+// Help for shop owners: short answers to what they ask most.
 export default function HelpPage() {
   return (
     <Suspense>

@@ -1,4 +1,4 @@
--- Shops near you on a map (V-09): nearby_shops also returns each shop's
+-- Shops near you on a map: nearby_shops also returns each shop's
 -- position, rounded to three decimals (about 100 m), enough for a pin on a
 -- map and no more. Only published, non-demo shops, as before. The return
 -- type changes, so the function is dropped and created again.

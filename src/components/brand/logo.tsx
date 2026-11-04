@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 
-// The Shelf Voice logo (errata E-35): a shopping bag with five voice bars
+// The Shelf Voice logo: a shopping bag with five voice bars
 // inside and a red orbit around it. Source files are in brand/logo. Drawn on
 // the original artwork's grid; the small mark drops the orbit and thickens the
 // bars so it holds at favicon sizes.

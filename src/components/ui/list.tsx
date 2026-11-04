@@ -35,7 +35,7 @@ const TONE: Record<IconTone, string> = {
   gray: "text-ink-2",
 };
 
-// A row's leading icon, plain as in SF Symbols lists: no tinted square (E-35).
+// A row's leading icon, plain as in SF Symbols lists: no tinted square.
 export function IconTile({ icon, tone = "accent" }: { icon: ReactNode; tone?: IconTone }) {
   return (
     <span aria-hidden className={cn("grid size-8 shrink-0 place-items-center [&>svg]:size-[22px] [&>svg]:stroke-[1.75]", TONE[tone])}>
@@ -49,7 +49,7 @@ interface ListRowProps {
   subtitle?: ReactNode;
   icon?: ReactNode;
   iconTone?: IconTone;
-  media?: ReactNode; // a product thumbnail or photo in place of the icon (E-37)
+  media?: ReactNode; // a product thumbnail or photo in place of the icon
   value?: ReactNode; // trailing text or badge
   accessory?: ReactNode; // trailing control, e.g. a Switch
   href?: string;
@@ -67,7 +67,7 @@ export function ListRow({ title, subtitle, icon, iconTone, media, value, accesso
       {media ? <span className="my-2 shrink-0">{media}</span> : icon && <IconTile icon={icon} tone={iconTone} />}
       <span className="flex min-h-12 min-w-0 flex-1 items-center gap-3 border-separator py-2.5 pr-4 [li+li_&]:border-t">
         <span className="flex min-w-0 flex-1 flex-col">
-          {/* Titles wrap rather than cut off: regional labels run longer (V-06). */}
+          {/* Titles wrap rather than cut off: regional labels run longer. */}
           <span id={titleId} className="line-clamp-2 text-body text-ink [overflow-wrap:anywhere]">
             {title}
           </span>

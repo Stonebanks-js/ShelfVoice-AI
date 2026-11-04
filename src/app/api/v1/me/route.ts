@@ -2,7 +2,7 @@ import { deleteCustomer, getAccount } from "@/server/customer";
 import { route } from "@/server/http";
 import { requireOwner } from "@/server/owner";
 
-// The signed-in customer's account (V-05): details, addresses, wishlist,
+// The signed-in customer's account: details, addresses, wishlist,
 // favourite shops, orders and refunds. 401 when signed out.
 export const GET = route(async () => {
   const user = await requireOwner();

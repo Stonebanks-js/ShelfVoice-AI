@@ -1,4 +1,4 @@
--- Propose-then-confirm (doc 02, ADR-001) and undo (errata E-02).
+-- Propose-then-confirm and undo.
 begin;
 create extension if not exists pgtap with schema extensions;
 

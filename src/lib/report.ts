@@ -8,7 +8,7 @@ export function pageFor(pathname: string): string {
 
 const NOISE = [/^Script error\.?$/i, /ResizeObserver loop/i, /Non-Error promise rejection captured/i];
 
-// Doc 05: drop browser-extension and cross-origin noise, so alerts reflect
+// Drop browser-extension and cross-origin noise, so alerts reflect
 // errors in Shelf Voice's own code.
 export function isNoise(message: string, source?: string, stack?: string): boolean {
   if (NOISE.some((pattern) => pattern.test(message))) return true;

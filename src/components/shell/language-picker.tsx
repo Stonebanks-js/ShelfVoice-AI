@@ -8,7 +8,7 @@ import { LANG_ENGLISH, LANG_NAMES, LANGS, type Lang } from "@/i18n/dictionary";
 import { useLang } from "@/i18n/lang";
 import { cn } from "@/lib/cn";
 
-// The language switch (V-06): eleven languages, each written in its own
+// The language switch: eleven languages, each written in its own
 // script with its English name under it, in a sheet. A pill for the top of
 // a screen, or a row inside a settings list.
 export function LanguagePicker({ variant = "pill", onChange }: { variant?: "pill" | "row"; onChange?: (lang: Lang) => void }) {
@@ -93,7 +93,7 @@ export interface LanguageSuggestion {
   question: string;
 }
 
-// "You seem to be in Karnataka. Which language do you want?" (V-06), from the
+// "You seem to be in Karnataka. Which language do you want?", from the
 // visitor's rough location (the internet address's region, no permission
 // asked), in the screen's language and in the suggested one.
 export function SuggestLanguage({ suggestion, onChosen }: { suggestion: LanguageSuggestion; onChosen?: (lang: Lang) => void }) {

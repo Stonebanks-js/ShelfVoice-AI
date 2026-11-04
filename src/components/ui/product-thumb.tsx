@@ -19,9 +19,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/cn";
 
-// A product's face (E-37): its photo when the shop has one, otherwise a tile
+// A product's face: its photo when the shop has one, otherwise a tile
 // in its category's colour with a drawn mark, so a list of products reads
-// like a shelf instead of a column of identical icons. A packshot (V-11)
+// like a shelf instead of a column of identical icons. A packshot
 // sits whole on a white tile in both themes, never cropped or stretched,
 // and a photo that fails to load falls back to the drawn tile.
 

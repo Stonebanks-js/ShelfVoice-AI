@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { blockingViolations, darkMode, localAdmin, localSupabase, signInToSampleShop } from "./support";
 
-// F-09 review gate: My shop (O-9) against the local database: preview,
+// My shop against the local database: preview,
 // publish, review QR, details, hours, language, sign out and delete.
 
 test.skip(!localSupabase, "needs the local Supabase stack");

@@ -12,7 +12,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    // No orientation lock: tablets and desktops get their own layouts (E-37).
+    // No orientation lock: tablets and desktops get their own layouts.
     // The splash matches the icon's white; the bar matches the app's light background.
     background_color: "#ffffff",
     theme_color: "#f4f5f7",

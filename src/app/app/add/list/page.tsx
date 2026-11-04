@@ -8,7 +8,7 @@ import { ownerClient } from "@/server/supabase";
 import Loading from "../../loading";
 import { ListPicker } from "./list-picker";
 
-// V-01 ready-made list for the shop's type, marking what it already has.
+// Ready-made list for the shop's type, marking what it already has.
 export default function ListPage() {
   return (
     <Suspense fallback={<Loading />}>

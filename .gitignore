@@ -30,7 +30,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files: only the placeholder template is committed (doc 03, doc 08)
+# env files: only the placeholder template is committed
 .env*
 !.env.example
 

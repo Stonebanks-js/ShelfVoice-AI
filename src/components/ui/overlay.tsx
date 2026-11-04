@@ -26,7 +26,7 @@ function useModal(open: boolean, onClose: () => void) {
   return ref;
 }
 
-// Bottom sheet (doc 06 Sheet): slides up on phones, centred card on wide screens.
+// Bottom sheet: slides up on phones, centred card on wide screens.
 export function Sheet({
   open,
   onClose,

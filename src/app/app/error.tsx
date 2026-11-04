@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/feedback";
 import { useLang } from "@/i18n/lang";
 
-// Doc 06 error state: "Couldn't load …" with Retry, never a raw error. The
+// "Couldn't load …" with Retry, never a raw error. The
 // language provider lives in the layout, which keeps rendering around this.
 export default function AppError({ error, retry }: { error: unknown; retry: () => void }) {
   const { t } = useLang();

@@ -35,7 +35,7 @@ describe("server env schema", () => {
   beforeEach(() => vi.resetModules());
   afterEach(() => vi.unstubAllEnvs());
 
-  it("applies the doc 08 and errata E-06 defaults", async () => {
+  it("applies the defaults", async () => {
     const { parseServerEnv } = await load(base);
     const env = parseServerEnv();
     expect(env.META_MODE).toBe("recorded");
@@ -80,7 +80,7 @@ describe("server env schema", () => {
     expect(parseServerEnv().ADMIN_EMAILS).toEqual(["a@example.com", "b@example.com"]);
   });
 
-  it("refuses anything but a Turnstile site key on Vercel (V-10)", async () => {
+  it("refuses anything but a Turnstile site key on Vercel", async () => {
     const { parseClientEnv } = await load({ ...base, NEXT_PUBLIC_TURNSTILE_SITE_KEY: "LLM_not-a-site-key-at-all-000000", VERCEL_ENV: "production" });
     expect(parseClientEnv).toThrow(/NEXT_PUBLIC_TURNSTILE_SITE_KEY/);
     expect(parseClientEnv).not.toThrow(/LLM_/);

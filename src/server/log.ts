@@ -1,9 +1,9 @@
 import { after } from "next/server";
 
-// Structured JSON logs (doc 05 "Logging"): one object per line, event names
+// Structured JSON logs: one object per line, event names
 // as area.action, and a redaction pass so no audio, transcript, prompt,
 // token, cookie, key, email or raw IP is ever written. Deployed, lines also
-// go to Axiom and error events to the team's Discord channel (doc 05 O1, O4).
+// go to Axiom and error events to the team's Discord channel.
 type Level = "debug" | "info" | "warn" | "error";
 export type Severity = "critical" | "high" | "medium";
 
@@ -18,7 +18,7 @@ export function redact(value: unknown, depth = 0): unknown {
   );
 }
 
-// Doc 05: each deploy is tagged with its git SHA so errors tie to a release.
+// Each deploy is tagged with its git SHA so errors tie to a release.
 // NEXT_PUBLIC_RELEASE is fixed at build time (next.config), which covers
 // deploys from release.yml, where Vercel sets no git variables at runtime.
 export const release = () =>

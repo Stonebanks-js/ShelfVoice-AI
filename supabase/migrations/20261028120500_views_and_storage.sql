@@ -1,9 +1,9 @@
--- Migration 6 (doc 07): public storefront view, AI spend view, storage
+-- Migration 6: public storefront view, AI spend view, storage
 -- buckets and storage policies.
 
 -- Published shops and their published, non-archived products, with an
--- in-stock flag and never a count (doc 06, errata E-05). security_invoker
--- means the anon role's own policies and column grants apply (doc 03).
+-- in-stock flag and never a count. security_invoker
+-- means the anon role's own policies and column grants apply.
 create view public.public_storefront
 with (security_invoker = true) as
 select
@@ -34,7 +34,7 @@ where s.is_published;
 revoke all on public.public_storefront from anon, authenticated;
 grant select on public.public_storefront to anon;
 
--- Daily AI spend by job, for the budget alerts and admin page (doc 05).
+-- Daily AI spend by job, for the budget alerts and admin page.
 create view public.ai_spend_daily
 with (security_invoker = true) as
 select
@@ -48,7 +48,7 @@ group by 1, 2;
 revoke all on public.ai_spend_daily from anon, authenticated;
 grant select on public.ai_spend_daily to service_role;
 
--- Buckets (doc 02, doc 03 upload limits). Paths start with the shop id.
+-- Buckets. Paths start with the shop id.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values
   ('voice', 'voice', false, 4194304, array['audio/wav', 'audio/x-wav', 'audio/wave']),

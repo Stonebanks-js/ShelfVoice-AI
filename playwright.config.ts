@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.E2E_PORT ?? 3200);
 
-// Doc 04: journeys run at a 360 px phone viewport and a 1280 px desktop
+// Journeys run at a 360 px phone viewport and a 1280 px desktop
 // viewport. Voice journeys use Chromium's fake microphone (a steady tone,
 // permission granted without a prompt), so every project uses Chromium.
 export default defineConfig({
@@ -39,7 +39,7 @@ export default defineConfig({
     command: `pnpm build && pnpm start --port ${port}`,
     // Journeys never spend Meta credit: an AI call they forget to mock fails
     // fast on a missing recording instead of reaching the live API. Nor do
-    // they load map tiles from the internet (V-09).
+    // they load map tiles from the internet.
     // One admin address per project, so the two never share a session.
     env: { META_MODE: "recorded", OPEN_FOOD_FACTS_URL: "off", REVERSE_GEOCODE_URL: "off", NEXT_PUBLIC_MAP_TILES: "off", E2E_TEST_ROUTES: "1", ADMIN_EMAILS: "admin-phone-360@example.test,admin-desktop-1280@example.test" },
     url: `http://localhost:${port}`,

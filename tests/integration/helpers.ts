@@ -1,4 +1,4 @@
-// Integration test helpers: real local Supabase (doc 04: Supabase is never
+// Integration test helpers: real local Supabase (Supabase is never
 // mocked), test owners signed in with their own RLS-bound clients.
 import { randomUUID } from "node:crypto";
 

@@ -1,5 +1,5 @@
--- Migration 8: confirm and undo for proposals (doc 02 propose-then-confirm,
--- errata E-02), and the fixed-window rate-limit counter (decision P4).
+-- Migration 8: confirm and undo for proposals (propose, then confirm),
+-- and the fixed-window rate-limit counter.
 
 -- ---------------------------------------------------------------- rate limit
 -- Counts one hit for a key in the current fixed window and returns the new
@@ -180,7 +180,7 @@ revoke all on function public.confirm_proposal(uuid, jsonb) from public, anon;
 grant execute on function public.confirm_proposal(uuid, jsonb) to authenticated, service_role;
 
 -- -------------------------------------------------------------- undo proposal
--- Reverses a confirmed proposal within the undo window (errata E-02) by
+-- Reverses a confirmed proposal within the undo window by
 -- writing offsetting changes; nothing is deleted. Server-only (service role),
 -- called after the server has checked the caller owns the proposal. A change
 -- that no longer matches what was confirmed (edited since, or stock already
@@ -284,7 +284,7 @@ revoke all on function public.undo_proposal(uuid, integer) from public, anon, au
 grant execute on function public.undo_proposal(uuid, integer) to service_role;
 
 -- -------------------------------------------------------------- AI spend
--- Spend so far for the budget caps (doc 05, errata E-06): all time, today in
+-- Spend so far for the budget caps: all time, today in
 -- India time, and today for one shop. Server-only.
 create function public.ai_spend(p_shop_id uuid default null)
 returns table (total_usd numeric, today_usd numeric, shop_today_usd numeric)

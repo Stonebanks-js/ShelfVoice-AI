@@ -7,7 +7,7 @@ import { LogoMark } from "@/components/brand/logo";
 const SEEN = "sv_splash_seen";
 const SHOW_MS = 2500;
 
-// The opening screen (V-10, testers on Nov 3): the logo on the brand's red,
+// The opening screen: the logo on the brand's red,
 // its voice bars moving, for about 2.5 s on the first open of a session. It
 // also covers the page settling in, which testers saw as a jump. Skipped when
 // the phone asks for reduced motion or the session has seen it already.

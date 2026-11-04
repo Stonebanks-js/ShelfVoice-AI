@@ -34,7 +34,7 @@ export function Switch({
       <span
         className={cn(
           "relative h-[31px] w-[51px] rounded-full transition-colors duration-200",
-          checked ? "bg-success" : "bg-fill-strong", // on is green, as on every phone (E-37)
+          checked ? "bg-success" : "bg-fill-strong", // on is green, as on every phone
         )}
       >
         <span
@@ -101,7 +101,7 @@ export function Segmented<T extends string>({
   );
 }
 
-// Filter chip (doc 06 U4: category chips). Round means "tap to filter".
+// Filter chip (category chips). Round means "tap to filter".
 export function Chip({
   selected,
   onClick,
@@ -136,12 +136,12 @@ const BADGE: Record<BadgeTone, string> = {
   success: "bg-success-soft text-success",
   danger: "bg-danger-soft text-danger",
   check: "bg-check-soft text-check",
-  low: "bg-warn-soft text-warn", // running low: amber (E-37)
+  low: "bg-warn-soft text-warn", // running low: amber
 };
 
-// Status badge: icon plus word, never colour alone (doc 06). `wrap` lets a
+// Status badge: icon plus word, never colour alone. `wrap` lets a
 // long label (a sentence, or a regional language) take a second line instead
-// of running past the screen edge (V-06).
+// of running past the screen edge.
 export function Badge({ tone = "neutral", icon, wrap = false, children }: { tone?: BadgeTone; icon?: ReactNode; wrap?: boolean; children: ReactNode }) {
   return (
     <span

@@ -3,7 +3,7 @@ import { ApiError, route } from "@/server/http";
 import { orderForCustomer } from "@/server/orders";
 import { currentUser } from "@/server/owner";
 
-// The customer's order, from the secret link (V-04). The status page polls it.
+// The customer's order, from the secret link. The status page polls it.
 export const GET = route(async (request, ctx: RouteContext<"/api/v1/public/orders/[id]">) => {
   await limit(`order-status:${ipHash(request)}`, 120, 60);
   const { id } = await ctx.params;

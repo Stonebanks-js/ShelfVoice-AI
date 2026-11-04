@@ -6,7 +6,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { ListRow } from "@/components/ui/list";
 import { useLang } from "@/i18n/lang";
 
-// Installing Shelf Voice as an app (E-37). Chrome's "Add to home screen"
+// Installing Shelf Voice as an app. Chrome's "Add to home screen"
 // can make a plain shortcut that opens in a browser tab; the install prompt
 // it offers once the page qualifies makes a real app window instead. This
 // keeps that prompt for an "Install app" button, and registers the service

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { isNoise, pageFor, scrub } from "./report";
 
-describe("browser error reports (doc 05)", () => {
+describe("browser error reports", () => {
   it("names pages without record IDs", () => {
     expect(pageFor("/app/check/5d7239b6-b0c5-401d-a83f-63390b8a4511")).toBe("/app/check/:id");
     expect(pageFor("/s/sharma-kirana-k3f9")).toBe("/s/sharma-kirana-k3f9");

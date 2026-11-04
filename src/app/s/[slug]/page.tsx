@@ -7,10 +7,10 @@ import { getStorefront } from "@/server/storefront";
 
 import { StorefrontView } from "./storefront-view";
 
-// P-1 Storefront (doc 06): the shop the way a painted signboard shows it,
+// The shop the way a painted signboard shows it,
 // server-rendered from the cache and refreshed whenever the owner edits.
 // Renders once the cached read is back, so customers never see a spinner
-// (doc 06: server-rendered, no spinner). The root shell has already gone
+// (server-rendered, no spinner). The root shell has already gone
 // out by then, so a missing shop shows the not-found page with status 200
 // and a noindex tag; a true 404 would need a database check in the proxy
 // on every visit.

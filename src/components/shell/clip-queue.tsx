@@ -30,7 +30,7 @@ function subscribeOnline(onChange: () => void) {
   };
 }
 
-// Doc 06 offline state: a slim bar says recordings will send later, the mic
+// A slim bar says recordings will send later, the mic
 // keeps working, and each waiting clip shows a clock until it's sent. Clips
 // live in IndexedDB, so closing the app doesn't lose them; whichever tab
 // holds the lock sends them, oldest first, when the phone is back online.
@@ -151,7 +151,7 @@ export function ClipQueueProvider({ ownerId, children }: { ownerId: string; chil
             {online ? "" : `${t("queue.offline")} `}
             {waiting === 1 ? t("queue.waiting1") : waiting > 1 ? t("queue.waitingN", { n: waiting }) : ""}
           </span>
-          {/* One clock per waiting clip (doc 06), up to five. */}
+          {/* One clock per waiting clip, up to five. */}
           {waiting > 0 && (
             <span aria-hidden className="flex items-center gap-0.5">
               {clips.slice(0, 5).map((clip) => (

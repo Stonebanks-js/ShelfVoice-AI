@@ -3,7 +3,7 @@ import { fromPostgres, readJson, route } from "@/server/http";
 import { requireShop } from "@/server/owner";
 import { withPhotos } from "@/server/stock-photos";
 
-// Owner catalog with stock and forecast (Stock tab, doc 06 O-6).
+// Owner catalog with stock and forecast (Stock tab).
 export const GET = route(async () => {
   const { db, shop } = await requireShop();
   const { data, error } = await db
@@ -17,7 +17,7 @@ export const GET = route(async () => {
   return Response.json({ products: withPhotos(data) });
 });
 
-// Add a product by tap (doc 02: direct catalog edits by tap). Its forecast
+// Add a product by tap (direct catalog edits by tap). Its forecast
 // row is made right away, so a low count warns today, not after the nightly job.
 export const POST = route(async (request, _ctx, { requestId }) => {
   const owner = await requireShop();

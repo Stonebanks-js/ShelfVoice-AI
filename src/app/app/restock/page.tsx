@@ -9,7 +9,7 @@ import { ownerState } from "@/server/session";
 import Loading from "../loading";
 import { RestockScreen } from "./restock-screen";
 
-// O-7 Restock (doc 06 order list; under My shop since V-04): what to order
+// Restock (under My shop): what to order
 // from the supplier, fewest days left first, with the quantity, a one-line
 // reason and the customer-review flag.
 export default function RestockPage() {

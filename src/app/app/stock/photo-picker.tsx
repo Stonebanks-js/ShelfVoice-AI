@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { errorKey } from "@/lib/errors";
 import type { PhotoCandidate } from "@/server/product-photos";
 
-// The product's photo in its sheet (V-11): what customers see now, and a
+// The product's photo in its sheet: what customers see now, and a
 // search of Open Food Facts the owner chooses from. Nothing is saved until a
 // photo is tapped; the product works the same without one.
 export function PhotoPicker({

@@ -8,7 +8,7 @@ async function slug(ctx: RouteContext<"/api/v1/me/favourites/[slug]">) {
   return value;
 }
 
-// Save a shop as a favourite, or take it off (V-05).
+// Save a shop as a favourite, or take it off.
 export const PUT = route(async (_request, ctx: RouteContext<"/api/v1/me/favourites/[slug]">) => {
   await setFavourite(await requireOwner(), await slug(ctx), true);
   return new Response(null, { status: 204 });

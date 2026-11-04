@@ -1,5 +1,5 @@
-// Clean product images for every ready-made product (V-12), with Meta's
-// muse-image-1.0 (Meta models only). Testers found the Open Food Facts
+// Clean product images for every ready-made product, with Meta's
+// muse-image-1.0. Testers found the Open Food Facts
 // photos too rough (hands, shelves, an opened bottle) and most products had
 // none. For a product with a checked OFF photo, the image endpoint redraws
 // that same pack as a clean packshot, keeping its real label (a derivative,

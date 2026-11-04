@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { blockingViolations, chooseLanguage, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
 
-// F-02 and V-03 review gate: the first screen (shop owner or customer), the
+// The first screen (shop owner or customer), the
 // owner's Google sign-in and the four setup steps. The first block needs no
 // backend. The second runs against the local Supabase stack when one is up
 // (`supabase start`), and is skipped otherwise, as in the CI e2e job.
@@ -16,7 +16,7 @@ test.describe("first screen and sign-in", () => {
     await page.goto("/");
     await chooseLanguage(page, "English");
     await expect(page.getByRole("heading", { level: 1, name: "Shelf Voice" })).toBeVisible();
-    // V-10: a welcome first, then the two choices behind "Get started".
+    // A welcome first, then the two choices behind "Get started".
     await expect(page.getByText("Speak, and your shop is online")).toBeVisible();
     expect(await blockingViolations(page)).toEqual([]);
     await page.getByRole("link", { name: "Get started" }).click();
@@ -24,7 +24,7 @@ test.describe("first screen and sign-in", () => {
     const choices = page.getByRole("navigation", { name: "Who are you?" });
     await expect(choices.getByRole("link", { name: /^Shop owner/ })).toHaveAttribute("href", "/owner");
     await expect(choices.getByRole("link", { name: /^Customer/ })).toHaveAttribute("href", "/shops");
-    // No demo shop any more (E-36).
+    // No demo shop any more.
     await expect(page.getByText(/demo/i)).toHaveCount(0);
     expect(await blockingViolations(page)).toEqual([]);
 

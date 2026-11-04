@@ -11,7 +11,7 @@ const DAY_MS = 86_400_000;
 const IST_OFFSET_MS = 330 * 60_000;
 
 // A seeded shop with 90 days of history for a test owner: the tests' fixture
-// since the public demo shop was removed (E-36). Written with the service
+// since the public demo shop was removed. Written with the service
 // role; reached only through the test-only route and the integration tests.
 export async function createSampleShop(userId: string, now = new Date(), language: "hi" | "en" = "hi"): Promise<string> {
   const db = adminClient();
@@ -72,7 +72,7 @@ export async function createSampleShop(userId: string, now = new Date(), languag
     if (error) throw error;
   }
 
-  // Two analysed reviews, one flagging atta as out of stock (doc 01 story 6).
+  // Two analysed reviews, one flagging atta as out of stock.
   const atta = idByIndex[DEMO_PRODUCTS.findIndex((p) => p.name === "Aashirvaad Atta")];
   const maggi = idByIndex[DEMO_PRODUCTS.findIndex((p) => p.name.startsWith("Maggi"))];
   const { error: reviewError } = await db.from("reviews").insert([

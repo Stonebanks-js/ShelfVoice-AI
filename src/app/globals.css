@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 /*
- * Shelf Voice design tokens (ERRATA E-32: Apple-style, dark mode follows the
- * phone; E-35: black, white and one red, taken from the logo). Every colour
+ * Shelf Voice design tokens (Apple-style, dark mode follows the
+ * phone; black, white and one red, taken from the logo). Every colour
  * pair used for text is checked at 4.5:1 or better. Components use these
  * through Tailwind classes such as bg-surface, text-ink-2 and
  * border-separator; no raw colour values in TSX.
  *
- * E-37 (Nov 3, owner): the logo's red now carries primary actions too, green
+ * The logo's red now carries primary actions too, green
  * means money in and in stock, amber means running low, and products without
  * a photo get a category colour. The red orbit still means voice, and things
  * that need the owner now always come with an icon and words.
@@ -30,7 +30,7 @@
   --ink-3: #8e9097; /* chevrons and placeholders only, never real text */
   --separator: rgb(60 60 67 / 0.14);
   --accent: #101010; /* links, tinted text, selected tab */
-  --accent-fill: #c8141f; /* E-37: primary actions in the logo red; white on it 5.9:1 */
+  --accent-fill: #c8141f; /* Primary actions in the logo red; white on it 5.9:1 */
   --accent-pressed: #a50f19;
   --accent-soft: #fdecee; /* brand tint for secondary surfaces; ink on it 17:1 */
   --on-accent: #ffffff;
@@ -38,7 +38,7 @@
   --on-voice: #ffffff;
   --danger: #b80a16; /* 6.1:1 on bg, 5.8:1 on danger-soft */
   --danger-soft: #fbe9ea;
-  --success: #0b7a3b; /* E-37: money in, in stock; 4.9:1 on bg, 4.8:1 on its soft */
+  --success: #0b7a3b; /* Money in, in stock; 4.9:1 on bg, 4.8:1 on its soft */
   --success-soft: #e8f5ee;
   --warn: #9a5b00; /* running low; 5:1 on its soft */
   --warn-soft: #fff4e2;
@@ -49,7 +49,7 @@
   --elev-card: 0 1px 2px rgb(16 16 24 / 0.05), 0 4px 14px rgb(16 16 24 / 0.05);
   --elev-float: 0 10px 30px rgb(16 16 24 / 0.14), 0 2px 6px rgb(16 16 24 / 0.08);
   --elev-mic: 0 8px 20px rgb(184 10 22 / 0.32), 0 2px 4px rgb(0 0 0 / 0.1);
-  /* Category tiles for products without a photo (E-37): a pale ground and a
+  /* Category tiles for products without a photo: a pale ground and a
      deep ink of the same hue, 4.5:1 or better. */
   --cat-1-bg: #e8f1ff; --cat-1-fg: #1f4f99; /* dairy, blue */
   --cat-2-bg: #fff3dc; --cat-2-fg: #8a5300; /* staples, grain */
@@ -180,12 +180,12 @@
      Devanagari, so Hindi characters fall through to Noto Sans Devanagari. */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, var(--font-devanagari), sans-serif;
-  /* E-37: Bricolage Grotesque for headings, figures and prices; scripts it
+  /* Bricolage Grotesque for headings, figures and prices; scripts it
      lacks fall back to the phone's own font. */
   --font-display: var(--font-bricolage), -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, var(--font-devanagari), sans-serif;
 
-  /* Doc 06 type scale (px): 14, 16, 20, 24, 32, 40; body is 16. */
+  /* Type scale (px): 14, 16, 20, 24, 32, 40; body is 16. */
   --text-footnote: 0.875rem;
   --text-footnote--line-height: 1.25rem;
   --text-body: 1rem;
@@ -237,7 +237,7 @@
   from { transform: scaleX(1); }
   to { transform: scaleX(0); }
 }
-/* The splash (V-10): the logo settles in, the voice bars speak. */
+/* The splash: the logo settles in, the voice bars speak. */
 @keyframes splash-in {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
@@ -246,7 +246,7 @@
   0%, 100% { transform: scaleY(0.35); }
   50% { transform: scaleY(1); }
 }
-/* A screen arriving: a short rise from an already-visible start (E-37). */
+/* A screen arriving: a short rise from an already-visible start. */
 @keyframes rise-in {
   from { transform: translateY(8px); opacity: 0.6; }
   to { transform: translateY(0); opacity: 1; }
@@ -272,7 +272,7 @@
     font-size: 1rem;
     line-height: 1.5rem;
   }
-  /* The parts the browser draws carry the palette too (E-37). */
+  /* The parts the browser draws carry the palette too. */
   ::selection {
     background: var(--accent-soft);
     color: var(--ink);
@@ -284,7 +284,7 @@
   html {
     scrollbar-color: var(--fill-strong) transparent;
   }
-  /* One focus ring everywhere, visible on every surface (doc 06). */
+  /* One focus ring everywhere, visible on every surface. */
   :focus-visible {
     outline: 3px solid var(--accent);
     outline-offset: 2px;
@@ -294,7 +294,7 @@
   }
 }
 
-/* Shops near you on a map (V-09): the customer as a blue dot, each shop as
+/* Shops near you on a map: the customer as a blue dot, each shop as
    a red pin with its initial. MapLibre places them; these draw them. */
 .sv-map-me {
   width: 18px;
@@ -348,7 +348,7 @@
   scale: 1.1;
 }
 
-/* Screen changes (V-10): the old screen leaves fast, the new one arrives
+/* Screen changes: the old screen leaves fast, the new one arrives
    gently, so the two never compete. */
 ::view-transition-old(.page) {
   animation: 140ms ease-out both vt-fade-out;

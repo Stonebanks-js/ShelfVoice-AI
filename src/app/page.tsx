@@ -7,7 +7,7 @@ import { languageSuggestion, ownerState, requestLang } from "@/server/session";
 
 import { Start } from "./start";
 
-// The first screen (doc 06 O-1, changed by E-36): shop owner or customer.
+// The first screen: shop owner or customer.
 // The language comes from the request, so the screen streams in behind a shell.
 export default function Home() {
   return (

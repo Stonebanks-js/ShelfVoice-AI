@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { fitWithin } from "./image";
 
-describe("photo size (doc 02: 1600 px longest side)", () => {
+describe("photo size (1600 px longest side)", () => {
   it.each([
     [4032, 3024, 1600, 1200], // a 12 MP phone photo, landscape
     [3024, 4032, 1200, 1600], // the same, portrait

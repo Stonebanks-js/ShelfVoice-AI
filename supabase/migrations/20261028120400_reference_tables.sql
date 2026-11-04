@@ -1,5 +1,5 @@
--- Migration 5 (doc 07): festival calendar, rate limits, shared AI breaker.
--- The festival rows are seeded with W-19 (FR-12), once each 2026-27 date has
+-- Migration 5: festival calendar, rate limits, shared AI breaker.
+-- The festival rows are seeded later, once each 2026-27 date has
 -- been checked against a source; this migration creates the table only.
 
 create table public.festival_calendar (
@@ -12,7 +12,7 @@ create table public.festival_calendar (
   check (ends_on >= starts_on)
 );
 
--- Fixed-window counters written only by server code (decision P4).
+-- Fixed-window counters written only by server code.
 create table public.rate_limits (
   key text not null check (char_length(key) between 1 and 200),
   window_start timestamptz not null,
@@ -20,7 +20,7 @@ create table public.rate_limits (
   primary key (key, window_start)
 );
 
--- Circuit-breaker state shared by every function instance (doc 05).
+-- Circuit-breaker state shared by every function instance.
 create table public.ai_breaker (
   provider text primary key,
   state public.breaker_state not null default 'CLOSED',

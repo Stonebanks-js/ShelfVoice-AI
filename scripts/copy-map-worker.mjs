@@ -1,4 +1,4 @@
-// Copies MapLibre's map worker into public/ before dev and build (V-09).
+// Copies MapLibre's map worker into public/ before dev and build.
 // MapLibre 6 looks for its worker beside its own module file, which no
 // longer exists once Next bundles the library; the shop finder points it at
 // /vendor/maplibre/ instead. Ignored by git; rebuilt from node_modules.

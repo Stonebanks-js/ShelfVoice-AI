@@ -1,4 +1,4 @@
--- Shops near a pincode by distance (V-10). A pincode search had no point to
+-- Shops near a pincode by distance. A pincode search had no point to
 -- measure from, so every shop read "in your area" in name order and shops
 -- just across a district line were missed. Now the middle of the shops that
 -- share the pincode is the point: results come nearest first with distances,

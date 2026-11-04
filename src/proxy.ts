@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isAdminEmail } from "@/server/admin";
 
 // Runs before every page and API route (Next 16 "proxy", formerly
-// middleware): stamps a request ID for log correlation (doc 05) and refreshes
+// middleware): stamps a request ID for log correlation and refreshes
 // the Supabase session cookie once per request.
 export async function proxy(request: NextRequest) {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
@@ -16,7 +16,7 @@ export async function proxy(request: NextRequest) {
   let headers = forwarded();
 
   // Customer pages and the privacy page never use a session: skip the auth
-  // round trip (doc 06: the storefront and review page load in 15 seconds or
+  // round trip (the storefront and review page load in 15 seconds or
   // less on a phone). Nor do the app manifest, the service worker, its
   // offline page and the Android app's link check.
   const path = request.nextUrl.pathname;
@@ -70,7 +70,7 @@ export async function proxy(request: NextRequest) {
     return redirect;
   }
 
-  // The admin page is a plain 404 to anyone not on ADMIN_EMAILS (W-20b);
+  // The admin page is a plain 404 to anyone not on ADMIN_EMAILS;
   // checked here so the status is a real 404, not a streamed one.
   if ((path === "/admin" || path.startsWith("/admin/")) && !isAdminEmail(user?.email)) {
     const hidden = NextResponse.rewrite(new URL("/_admin-hidden", request.url), { request: { headers } });

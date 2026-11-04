@@ -13,15 +13,15 @@ import { useLang } from "@/i18n/lang";
 
 import { Splash } from "./splash";
 
-// The first screen (E-36): two plain choices, so nobody has to guess which
+// The first screen: two plain choices, so nobody has to guess which
 // button is theirs. Shop owners go on to sign in; customers find shops
 // near them without an account.
 //
-// E-37: the brand leads. On a phone the logo's red fills the screen and the
+// The brand leads. On a phone the logo's red fills the screen and the
 // choices rise over it on a sheet at the bottom, in thumb reach; from 1024 px the screen splits, the red
 // side showing what the app does (a spoken line becoming shop products).
 //
-// V-10 (testers, Nov 3): first a short splash, then a welcome that says what
+// (testers, Nov 3): first a short splash, then a welcome that says what
 // the app is, and only after "Get started" the two choices. The choices live
 // at /?who=1, so the phone's back button returns to the welcome.
 export function Start({ suggestion }: { suggestion: LanguageSuggestion | null }) {
@@ -94,7 +94,7 @@ export function Start({ suggestion }: { suggestion: LanguageSuggestion | null })
   );
 }
 
-// What the app does, one line each, on the welcome (V-10).
+// What the app does, one line each, on the welcome.
 function Point({ icon, title, body, tone }: { icon: ReactNode; title: string; body: string; tone: number }) {
   return (
     <li className="flex items-start gap-3 rounded-xl bg-surface p-4 shadow-card">

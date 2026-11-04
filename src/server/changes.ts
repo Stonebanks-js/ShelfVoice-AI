@@ -36,12 +36,12 @@ export const Change = z.discriminatedUnion("op", [
 ]);
 export type Change = z.infer<typeof Change>;
 
-// Doc 03 "Tool permissions": at most 50 changes per proposal.
+// At most 50 changes per proposal.
 export const Changes = z.array(Change).max(50);
 
 export const rupeesToPaise = (rupees: number) => Math.round(rupees * 100);
 
-// Doc 03: a new price must be above 0 and under 10x the old one.
+// A new price must be above 0 and under 10x the old one.
 export function priceChangeAllowed(oldPaise: number | null, newPaise: number): boolean {
   return newPaise > 0 && (oldPaise === null || newPaise < oldPaise * 10);
 }

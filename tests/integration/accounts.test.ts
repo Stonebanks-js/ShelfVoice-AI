@@ -1,4 +1,4 @@
-// Customer accounts, delivery rules and refunds (V-05) against the local
+// Customer accounts, delivery rules and refunds against the local
 // database. Needs `supabase start`.
 import { describe, expect, it, vi } from "vitest";
 

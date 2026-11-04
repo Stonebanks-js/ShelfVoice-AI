@@ -1,11 +1,11 @@
--- V-11: a product's photo lives in its own shop's folder and nowhere else;
+-- A product's photo lives in its own shop's folder and nowhere else;
 -- customers see the MRP and the photo credit, never anything new besides.
 begin;
 create extension if not exists pgtap with schema extensions;
 
 select plan(7);
 
--- The sample shops (V-10) are published too; inside this transaction only.
+-- The sample shops are published too; inside this transaction only.
 delete from auth.users where email like '%@shelfvoice.invalid';
 
 insert into auth.users (id, email, aud, role) values

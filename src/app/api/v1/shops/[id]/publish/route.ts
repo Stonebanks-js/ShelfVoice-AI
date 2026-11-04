@@ -6,8 +6,8 @@ import { refreshStorefront } from "@/server/storefront";
 
 const Body = z.object({ published: z.boolean() }).strict();
 
-// Publish or unpublish the storefront (doc 02). Unpublishing is instant
-// (doc 03 TH-10).
+// Publish or unpublish the storefront. Unpublishing is instant
+//.
 export const POST = route(async (request, ctx: RouteContext<"/api/v1/shops/[id]/publish">) => {
   const { id } = await ctx.params;
   const { db, shop } = await requireShop();

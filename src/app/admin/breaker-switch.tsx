@@ -20,7 +20,7 @@ function describe(breaker: Breaker): { status: string; badge: React.ReactNode } 
   return { status: "Meta calls are going through.", badge: <Badge tone="success">Running</Badge> };
 }
 
-// The manual breaker switch (W-20b): pausing asks first, since owners and
+// The manual breaker switch: pausing asks first, since owners and
 // customers lose every AI feature until it's switched back.
 export function BreakerSwitch({ initial }: { initial: Breaker }) {
   const [breaker, setBreaker] = useState(initial);

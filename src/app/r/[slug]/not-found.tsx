@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { buttonClass } from "@/components/ui/button";
 
-// Doc 06 P-2: no review page for an unknown or unpublished shop; a plain 404 in both
+// No review page for an unknown or unpublished shop; a plain 404 in both
 // languages, since there is no shop to take a language from.
 export default function ReviewNotFound() {
   return (

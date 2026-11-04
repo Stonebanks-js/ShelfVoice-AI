@@ -4,10 +4,10 @@ import { ApiError, route } from "@/server/http";
 import { NEXT_COOKIE, safeNext } from "@/server/next-path";
 import { ownerClient } from "@/server/supabase";
 
-// Sign-in with Google through Supabase Auth, OAuth with PKCE (doc 03), for
-// shop owners and, since V-05, customers. `?next=` says where to land after
+// Sign-in with Google through Supabase Auth, OAuth with PKCE, for
+// shop owners and customers. `?next=` says where to land after
 // (kept in a short-lived cookie, so the return address Supabase allows stays
-// the same). Needs the Google provider configured in Supabase (C-10).
+// the same). Needs the Google provider configured in Supabase.
 export const GET = route(async (request) => {
   const url = new URL(request.url);
   const origin = url.origin;
