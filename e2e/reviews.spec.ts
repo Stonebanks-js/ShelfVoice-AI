@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { blockingViolations, darkMode, localAdmin, localSupabase, signInAsNewOwner, signInToSampleShop } from "./support";
+import { blockingViolations, darkMode, localAdmin, localSupabase, ownTestAddress, signInAsNewOwner, signInToSampleShop } from "./support";
 
 // F-08 review gate: the review feed (O-8) against the local database:
 // sentiment, words, item chips, Hide and Show, filters, the 30-day audio.
@@ -84,4 +84,37 @@ test("a shop with no reviews is pointed to its QR", async ({ page }) => {
   await page.goto("/app/reviews");
   await expect(page.getByRole("heading", { name: "No reviews yet" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Get your QR" })).toHaveAttribute("href", "/app/shop");
+});
+
+// V-12 (owner, Nov 5: "check it reaches the owner"): a customer's voice
+// review from the shop's review page shows up in the owner's Reviews feed.
+test("a customer's voice review reaches the owner's Reviews", async ({ page, browser }) => {
+  const shopId = await openReviews(page);
+  const cards = page.getByRole("main").getByRole("listitem").filter({ has: page.getByRole("button", { name: "Hide" }) });
+  await expect(cards).toHaveCount(2);
+  const { data: shop } = await localAdmin().from("shops").select("slug").eq("id", shopId).single();
+
+  const customerContext = await browser.newContext({ viewport: page.viewportSize() ?? undefined, permissions: ["microphone"] });
+  const customer = await customerContext.newPage();
+  try {
+    await ownTestAddress(customer);
+    await customer.route("https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit", (route) =>
+      route.fulfill({
+        contentType: "text/javascript",
+        body: `window.turnstile = { render(el, o) { window.__ts = o; return "w1"; }, execute() { setTimeout(() => window.__ts.callback("XXXX.DUMMY.TOKEN.XXXX"), 10); }, reset() {}, remove() {} };`,
+      }),
+    );
+    await customer.goto(`/r/${shop!.slug}`);
+    await customer.getByRole("button", { name: "I agree, record" }).click();
+    await customer.waitForTimeout(1500);
+    await customer.getByRole("button", { name: "Recording, tap to stop" }).click();
+    await expect(customer.getByRole("status").filter({ hasText: "Thank you! The shop will hear this." })).toBeVisible({ timeout: 20_000 });
+  } finally {
+    await customerContext.close();
+  }
+
+  // The owner sees it, newest first, with its recording.
+  await page.reload();
+  await expect(cards).toHaveCount(3);
+  await expect(cards.first().locator("audio")).toHaveCount(1);
 });
