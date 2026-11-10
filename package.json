@@ -39,7 +39,7 @@
     "@types/web-push": "3.6.4",
     "@vitest/coverage-v8": "5.0.5",
     "eslint": "^9",
-    "eslint-config-next": "16.4.3",
+    "eslint-config-next": "16.4.4",
     "supabase": "2.122.0",
     "tailwindcss": "^4",
     "typescript": "^6",
